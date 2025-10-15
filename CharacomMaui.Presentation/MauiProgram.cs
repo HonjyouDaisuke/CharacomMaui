@@ -25,8 +25,8 @@ public static class MauiProgram
     builder.Logging.AddDebug();
 #endif
     // BoxApiService を ICloudStorageService に紐付け
-    builder.Services.AddSingleton<ICloudStorageService>(sp =>
-        new BoxApiService("YOUR_ACCESS_TOKEN_HERE"));
+    builder.Services.AddSingleton<IBoxAuthService>(sp =>
+        new BoxApiAuthService("xt52jorsw8fzbit06h1rbciwl96cywe1", "BQiaeKEhaNY0yn33R4oiEAyyWtswcYCT"));
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
     builder.Services.AddTransient<ProcessImageFromBoxUseCase>();
     // builder.Services.AddTransient<MainPageViewModel>();
