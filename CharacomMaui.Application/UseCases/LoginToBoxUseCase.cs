@@ -5,9 +5,9 @@ namespace CharacomMaui.Application.UseCases;
 
 public class LoginToBoxUseCase
 {
-  private readonly IBoxAuthService _authService;
+  private readonly IBoxApiAuthService _authService;
 
-  public LoginToBoxUseCase(IBoxAuthService authService)
+  public LoginToBoxUseCase(IBoxApiAuthService authService)
   {
     _authService = authService;
   }
@@ -16,8 +16,10 @@ public class LoginToBoxUseCase
   /// 認可 URL を取得 → ユーザーにリダイレクト → コード取得 → トークン取得。
   /// 最終的にアクセストークンを返す。
   /// </summary>
-  public string GetAuthorizationUrl() => _authService.GetAuthorizationUrl();
-
+  public string GetAuthorizationUrl(string clientId, string clientSecret)
+  {
+    return _authService.GetAuthorizationUrl(clientId, clientSecret);
+  }
   public async Task<BoxAuthResult> LoginWithCodeAsync(string code, string redirectUri)
   {
     var result = await _authService.ExchangeCodeForTokenAsync(code, redirectUri);

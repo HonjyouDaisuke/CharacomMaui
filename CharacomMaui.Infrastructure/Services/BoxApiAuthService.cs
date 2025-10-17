@@ -10,27 +10,40 @@ using CharacomMaui.Application.Models;
 
 namespace CharacomMaui.Infrastructure.Services;
 
-public class BoxApiAuthService : IBoxAuthService
+public class BoxApiAuthService : IBoxApiAuthService
 {
-  private readonly string _clientId;
-  private readonly string _clientSecret;
+  private string _clientId;
+  private string _clientSecret;
 
   // 認可 URI、トークンエンドポイント
   private const string AuthorizationEndpoint = "https://account.box.com/api/oauth2/authorize";
   private const string TokenEndpoint = "https://api.box.com/oauth2/token";
+  private const string RedirectUri = "myapp://callback";
 
-  public BoxApiAuthService(string clientId, string clientSecret)
+  public BoxApiAuthService()
+  {
+  }
+
+  public void SetBoxKeyString(string clientId, string clientSecret)
   {
     _clientId = clientId;
     _clientSecret = clientSecret;
   }
 
-  public string GetAuthorizationUrl()
+
+  public string GetAuthorizationUrl(string clientId, string clientSecret)
   {
-    // 必要なら state パラメータを含める
-    string redirectUri = Uri.EscapeDataString("myapp://callback");  // アプリで登録した URI に置き換え
-    return $"{AuthorizationEndpoint}?response_type=code&client_id={_clientId}&redirect_uri={redirectUri}";
+    _clientId = clientId;
+    _clientSecret = clientSecret;
+    // BoxのOAuth2認可エンドポイントに必要なクエリを組み立てる
+    var baseUrl = "https://account.box.com/api/oauth2/authorize";
+    var url =
+        $"{baseUrl}?response_type=code" +
+        $"&client_id={Uri.EscapeDataString(clientId)}" +
+        $"&redirect_uri={Uri.EscapeDataString(RedirectUri)}";
+    return url;
   }
+
 
   public async Task<BoxAuthResult> ExchangeCodeForTokenAsync(string authorizationCode, string redirectUri)
   {

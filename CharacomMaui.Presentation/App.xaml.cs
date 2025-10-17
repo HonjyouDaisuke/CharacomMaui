@@ -29,10 +29,10 @@ public partial class App : Microsoft.Maui.Controls.Application
         try
         {
           // DIなどで取得する実装に置き換えてOK
-          var boxAuthService = ServiceHelper.GetService<IBoxAuthService>();
-          var result = await boxAuthService.ExchangeCodeForTokenAsync(code, "myapp://callback");
+          //var boxAuthService = ServiceHelper.GetService<IBoxApiAuthService>();
+          //var result = await boxAuthService.ExchangeCodeForTokenAsync(code, "myapp://callback");
 
-          await Shell.Current.DisplayAlert("Box Login", $"Access Token: {result.AccessToken}", "OK");
+          //await Shell.Current.DisplayAlert("Box Login", $"Access Token: {result.AccessToken}", "OK");
         }
         catch (Exception ex)
         {

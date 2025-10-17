@@ -21,16 +21,23 @@ public static class MauiProgram
           fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
         });
 
+    // ServiceのDI
+    builder.Services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();
 #if DEBUG
     builder.Logging.AddDebug();
 #endif
     // BoxApiService を ICloudStorageService に紐付け
-    builder.Services.AddSingleton<IBoxAuthService>(sp =>
-        new BoxApiAuthService("xt52jorsw8fzbit06h1rbciwl96cywe1", "BQiaeKEhaNY0yn33R4oiEAyyWtswcYCT"));
+    builder.Services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
+
+    // UseCaseのDI
     builder.Services.AddTransient<ProcessImageFromBoxUseCase>();
     // builder.Services.AddTransient<MainPageViewModel>();
+    builder.Services.AddTransient<GetBoxConfigUseCase>();
+    builder.Services.AddTransient<LoginToBoxUseCase>();
 
+    // PageのDI
+    builder.Services.AddTransient<MainPage>();
     return builder.Build();
   }
 }

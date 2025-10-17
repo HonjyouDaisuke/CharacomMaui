@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Infrastructure.Services;
 
@@ -10,20 +11,30 @@ public partial class MainPage : ContentPage
 {
   int count = 0;
   private readonly LoginToBoxUseCase _loginUseCase;
+  private readonly BoxApiAuthService _boxApiAuthService;
+  private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
   private const string RootFolderId = "303046914186";
   public ObservableCollection<BoxItemViewModel> Files { get; } = new();
 
-
-  public MainPage()
+  public MainPage(GetBoxConfigUseCase getBoxConfigUseCase,
+                  LoginToBoxUseCase loginUseCase
+                  )
   {
-    InitializeComponent();
-    // 👇 この2行を実際の値に置き換える
-    string clientId = "xt52jorsw8fzbit06h1rbciwl96cywe1";
-    string clientSecret = "BQiaeKEhaNY0yn33R4oiEAyyWtswcYCT";
+    try
+    {
+      InitializeComponent();
 
-    var authService = new BoxApiAuthService(clientId, clientSecret);
-    _loginUseCase = new LoginToBoxUseCase(authService);
-    FilesCollection.ItemsSource = Files;
+      _getBoxConfigUseCase = getBoxConfigUseCase;
+      _loginUseCase = loginUseCase;
+      //_boxApiAuthService = boxApiAuthService;
+
+      FilesCollection.ItemsSource = Files;
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[MainPage ctor] {ex}");
+      throw;
+    }
   }
 
   private void OnCounterClicked(object? sender, EventArgs e)
@@ -37,15 +48,30 @@ public partial class MainPage : ContentPage
 
     SemanticScreenReader.Announce(CounterBtn.Text);
   }
+  private async void OnConfigClicked(object sender, EventArgs e)
+  {
 
+    try
+    {
+      var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
+      await DisplayAlert("取得成功", $"ClientId: {clientId}\nSecret: {clientSecret}", "OK");
+    }
+    catch (Exception ex)
+    {
+      await DisplayAlert("エラー", ex.Message, "OK");
+    }
+  }
   private async void OnLoginClicked(object sender, EventArgs e)
   {
+    var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
+    //_boxApiAuthService.SetBoxKeyString(clientId, clinetSecret);
+
     StatusLabel.Text += "start";
     try
     {
       StatusLabel.Text = "認証画面を開いています...";
       // 認可URL取得
-      var authUrl = _loginUseCase.GetAuthorizationUrl();
+      var authUrl = _loginUseCase.GetAuthorizationUrl(clientId, clientSecret);
       StatusLabel.Text += "Login step 1";
 
       // MAUIのWebAuthenticatorを使ってOAuth認証画面を開く

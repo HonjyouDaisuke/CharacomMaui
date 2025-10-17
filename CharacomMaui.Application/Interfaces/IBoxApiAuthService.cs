@@ -3,12 +3,12 @@ using CharacomMaui.Application.Models;
 
 namespace CharacomMaui.Application.Interfaces;
 
-public interface IBoxAuthService
+public interface IBoxApiAuthService
 {
   /// <summary>
   /// 認可 URL を生成して返す。ユーザーをこのURLにリダイレクトさせる。
   /// </summary>
-  string GetAuthorizationUrl();
+  string GetAuthorizationUrl(string clientId, string clientSecret);
 
   /// <summary>
   /// 認可コードを使ってアクセストークンを取得する。
@@ -21,6 +21,8 @@ public interface IBoxAuthService
   /// リフレッシュトークンを使ってアクセストークンを再取得する。
   /// </summary>
   Task<BoxAuthResult> RefreshTokenAsync(string refreshToken);
+
+  void SetBoxKeyString(string clientId, string clientSecret);
 }
 
 
