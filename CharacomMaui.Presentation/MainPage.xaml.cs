@@ -63,6 +63,7 @@ public partial class MainPage : ContentPage
       await DisplayAlert("エラー", ex.Message, "OK");
     }
   }
+
   private async void OnLoginClicked(object sender, EventArgs e)
   {
 
@@ -70,49 +71,6 @@ public partial class MainPage : ContentPage
     await _loginViewModel.LoginAsync();
 
     StatusLabel.Text = "ログイン成功！";
-    return;
-    var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
-    //_boxApiAuthService.SetBoxKeyString(clientId, clinetSecret);
-
-    StatusLabel.Text += "start";
-    try
-    {
-      StatusLabel.Text = "認証画面を開いています...";
-      // 認可URL取得
-      var authUrl = _loginUseCase.GetAuthorizationUrl(clientId, clientSecret);
-      StatusLabel.Text += "Login step 1";
-
-      // MAUIのWebAuthenticatorを使ってOAuth認証画面を開く
-      var callbackUrl = new Uri("myapp://callback"); // Boxで登録したredirect_uriと一致させる
-      StatusLabel.Text += "Login step 2";
-      var result = await WebAuthenticator.AuthenticateAsync(
-          new Uri(authUrl),
-          callbackUrl);
-      await Shell.Current.DisplayAlert("Debug", $"Query: {result.Properties["code"]}", "OK");
-
-      if (result?.Properties?.ContainsKey("code") == true)
-      {
-        string code = result.Properties["code"];
-        StatusLabel.Text = "アクセストークン取得中...";
-
-        var tokens = await _loginUseCase.LoginWithCodeAsync(code, "myapp://callback");
-        StatusLabel.Text += $"AccessToken = {tokens.AccessToken} RefreshToken={tokens.RefreshToken}";
-        Preferences.Set("box_access_token", tokens.AccessToken);
-        Preferences.Set("box_refresh_token", tokens.RefreshToken);
-
-        StatusLabel.Text += "ログイン成功！";
-      }
-      else
-      {
-        StatusLabel.Text += "認可コードが取得できませんでした。";
-      }
-    }
-    catch (Exception ex)
-    {
-      StatusLabel.Text += $"ログイン失敗: {ex.Message}";
-      await Shell.Current.DisplayAlert("Debug", ex.Message, "OK");
-
-    }
   }
 
   private async void OnListFilesClicked(object sender, EventArgs e)
