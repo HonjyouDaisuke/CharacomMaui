@@ -55,7 +55,7 @@ public class BoxApiAuthService : IBoxApiAuthService
             new("code", authorizationCode),
             new("client_id", _clientId),
             new("client_secret", _clientSecret),
-            new("redirect_uri", redirectUri)
+            new("redirect_uri", "myapp://callback")
         };
 
     var content = new FormUrlEncodedContent(pairs);
@@ -70,7 +70,7 @@ public class BoxApiAuthService : IBoxApiAuthService
     {
       AccessToken = root.GetProperty("access_token").GetString(),
       RefreshToken = root.GetProperty("refresh_token").GetString(),
-      ExpiresIn = root.GetProperty("expires_in").GetInt32()
+      ExpiresAt = root.GetProperty("expires_in").GetInt32()
     };
 
     return result;
@@ -100,7 +100,7 @@ public class BoxApiAuthService : IBoxApiAuthService
     {
       AccessToken = root.GetProperty("access_token").GetString(),
       RefreshToken = root.GetProperty("refresh_token").GetString(),
-      ExpiresIn = root.GetProperty("expires_in").GetInt32()
+      ExpiresAt = root.GetProperty("expires_in").GetInt32()
     };
 
     return result;

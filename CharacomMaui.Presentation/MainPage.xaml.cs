@@ -4,6 +4,7 @@ using System.Text.Json;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Presentation.ViewModels;
 
 namespace CharacomMaui.Presentation;
 
@@ -13,12 +14,13 @@ public partial class MainPage : ContentPage
   private readonly LoginToBoxUseCase _loginUseCase;
   private readonly BoxApiAuthService _boxApiAuthService;
   private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
+  private readonly LoginViewModel _loginViewModel;
   private const string RootFolderId = "303046914186";
   public ObservableCollection<BoxItemViewModel> Files { get; } = new();
 
   public MainPage(GetBoxConfigUseCase getBoxConfigUseCase,
-                  LoginToBoxUseCase loginUseCase
-                  )
+                  LoginToBoxUseCase loginUseCase,
+                  LoginViewModel loginViewModel)
   {
     try
     {
@@ -27,7 +29,7 @@ public partial class MainPage : ContentPage
       _getBoxConfigUseCase = getBoxConfigUseCase;
       _loginUseCase = loginUseCase;
       //_boxApiAuthService = boxApiAuthService;
-
+      _loginViewModel = loginViewModel;
       FilesCollection.ItemsSource = Files;
     }
     catch (Exception ex)
@@ -63,6 +65,12 @@ public partial class MainPage : ContentPage
   }
   private async void OnLoginClicked(object sender, EventArgs e)
   {
+
+    StatusLabel.Text = "ログイン処理を開始...";
+    await _loginViewModel.LoginAsync();
+
+    StatusLabel.Text = "ログイン成功！";
+    return;
     var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
     //_boxApiAuthService.SetBoxKeyString(clientId, clinetSecret);
 

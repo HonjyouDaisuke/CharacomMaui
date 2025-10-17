@@ -1,6 +1,8 @@
 ﻿using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Presentation.Services;
+using CharacomMaui.Presentation.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
@@ -28,6 +30,7 @@ public static class MauiProgram
 #endif
     // BoxApiService を ICloudStorageService に紐付け
     builder.Services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();
+    builder.Services.AddSingleton<ITokenStorageService, TokenStorageService>();
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
 
     // UseCaseのDI
@@ -35,6 +38,7 @@ public static class MauiProgram
     // builder.Services.AddTransient<MainPageViewModel>();
     builder.Services.AddTransient<GetBoxConfigUseCase>();
     builder.Services.AddTransient<LoginToBoxUseCase>();
+    builder.Services.AddSingleton<LoginViewModel>();
 
     // PageのDI
     builder.Services.AddTransient<MainPage>();
