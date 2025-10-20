@@ -52,4 +52,41 @@ public class BoxApiRepository : IBoxApiRepository
 
     return items;
   }
+
+  public async Task<List<BoxImageItem>> GetJpgImagesAsync(string accessToken, string folderId)
+  {
+    var items = await GetFolderItemsAsync(accessToken, folderId);
+    var result = new List<BoxImageItem>();
+
+    foreach (var item in items)
+    {
+      if (item.Type == "file" &&
+          (item.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+           item.Name.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)))
+      {
+        var bytes = await DownloadFileAsync(accessToken, item.Id);
+        result.Add(new BoxImageItem
+        {
+          Id = item.Id,
+          Name = item.Name,
+          Type = item.Type,
+          Image = bytes
+        });
+      }
+    }
+
+    return result;
+  }
+
+  private async Task<byte[]> DownloadFileAsync(string accessToken, string fileId)
+  {
+    _httpClient.DefaultRequestHeaders.Authorization =
+        new AuthenticationHeaderValue("Bearer", accessToken);
+
+    var url = $"https://api.box.com/2.0/files/{fileId}/content";
+    using var response = await _httpClient.GetAsync(url);
+    response.EnsureSuccessStatusCode();
+
+    return await response.Content.ReadAsByteArrayAsync();
+  }
 }

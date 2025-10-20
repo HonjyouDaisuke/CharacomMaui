@@ -1,5 +1,6 @@
 // CharacomMaui.Presentation/ViewModels/BoxFolderViewModel.cs
 using CharacomMaui.Application.UseCases;
+using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace CharacomMaui.Presentation.ViewModels;
@@ -7,13 +8,16 @@ namespace CharacomMaui.Presentation.ViewModels;
 public class BoxFolderViewModel
 {
   private readonly GetBoxFolderItemsUseCase _useCase;
+  private readonly GetBoxImageItemsUseCase _imageUseCase;
   private readonly string RootFolderId = "303046914186";
 
   public ObservableCollection<BoxItemViewModel> Files { get; } = new();
+  public ObservableCollection<BoxImageItemViewModel> Files2 { get; } = new();
 
-  public BoxFolderViewModel(GetBoxFolderItemsUseCase useCase)
+  public BoxFolderViewModel(GetBoxFolderItemsUseCase useCase, GetBoxImageItemsUseCase imageUseCase)
   {
     _useCase = useCase;
+    _imageUseCase = imageUseCase;
   }
 
   public async Task LoadFolderItemsAsync(string accessToken)
@@ -24,6 +28,16 @@ public class BoxFolderViewModel
     foreach (var item in items)
     {
       Files.Add(new BoxItemViewModel(item));
+    }
+  }
+
+  public async Task LoadImageItemsAsync(string accessToken, string folderId)
+  {
+    var items = await _imageUseCase.ExecuteAsync(accessToken, folderId);
+    Files2.Clear();
+    foreach (var item in items)
+    {
+      Files2.Add(new BoxImageItemViewModel(item));
     }
   }
 }

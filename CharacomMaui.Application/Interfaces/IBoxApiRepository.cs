@@ -13,5 +13,6 @@ namespace CharacomMaui.Application.Interfaces
     /// <param name="folderId">取得するフォルダID</param>
     /// <returns>Boxアイテム一覧</returns>
     Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string folderId);
+    Task<List<BoxImageItem>> GetJpgImagesAsync(string accessToken, string folderId);
   }
 }
