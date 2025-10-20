@@ -39,8 +39,10 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
         builder.Services.AddTransient<GetBoxFolderItemsUseCase>();
+        builder.Services.AddTransient<GetBoxImageItemsUseCase>();
         builder.Services.AddSingleton<BoxFolderViewModel>();
         builder.Services.AddSingleton<BoxItemViewModel>();
+        builder.Services.AddSingleton<BoxImageItemViewModel>();
         // PageのDI
         builder.Services.AddTransient<MainPage>();
         return builder.Build();
