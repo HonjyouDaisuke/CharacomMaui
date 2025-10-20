@@ -33,7 +33,7 @@ public partial class HomePage : ContentPage
       _boxFolderViewModel = boxFolderViewModel;
       //_boxApiAuthService = boxApiAuthService;
       _boxLoginViewModel = boxLoginViewModel;
-      FilesCollection.ItemsSource = Files;
+      FilesCollection.ItemsSource = Files2;
     }
     catch (Exception ex)
     {
@@ -104,17 +104,18 @@ public partial class HomePage : ContentPage
 
   private void addFiles()
   {
-    Files.Clear();
-    foreach (var entry in _boxFolderViewModel.Files)
+    Files2.Clear();
+    foreach (var entry in _boxFolderViewModel.Files2)
     {
-      BoxItem item = new BoxItem
+      BoxImageItem item = new BoxImageItem
       {
         Id = entry.Id ?? "",
         Name = entry.Name ?? "",
-        Type = entry.Type ?? ""
+        Type = entry.Type ?? "",
+        Image = entry.Image
       };
 
-      Files.Add(new BoxItemViewModel(item));
+      Files2.Add(new BoxImageItemViewModel(item));
     }
   }
 }

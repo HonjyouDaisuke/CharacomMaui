@@ -1,5 +1,6 @@
 // CharacomMaui.Presentation/ViewModels/BoxFolderViewModel.cs
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Domain.Entities;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 
@@ -12,7 +13,7 @@ public class BoxFolderViewModel
   private readonly string RootFolderId = "303046914186";
 
   public ObservableCollection<BoxItemViewModel> Files { get; } = new();
-  public ObservableCollection<BoxImageItemViewModel> Files2 { get; } = new();
+  public ObservableCollection<BoxImageItem> Files2 { get; } = new();
 
   public BoxFolderViewModel(GetBoxFolderItemsUseCase useCase, GetBoxImageItemsUseCase imageUseCase)
   {
@@ -37,7 +38,7 @@ public class BoxFolderViewModel
     Files2.Clear();
     foreach (var item in items)
     {
-      Files2.Add(new BoxImageItemViewModel(item));
+      Files2.Add(item);
     }
   }
 }

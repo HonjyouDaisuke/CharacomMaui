@@ -59,16 +59,19 @@
                     StrokeShape="RoundRectangle 6"
                     Padding="8"
                     Margin="4">
-              <HorizontalStackLayout>
-                <Label Text="{Binding Name}"
-                       FontAttributes="Bold"/>
-                <Label Text="  "/>
-                <Label Text="{Binding Type}"
-                       Opacity="0.7"/>
-                <Label HorizontalOptions="End"
-                       Text="{Binding Id}"
-                       Opacity="0.5"
-                       FontSize="12"/>
+              <HorizontalStackLayout Spacing="8"
+                                     VerticalOptions="Center">
+                <Image Source="{Binding Image}"
+                       WidthRequest="50"
+                       HeightRequest="50"
+                       Aspect="AspectFill"/>
+                <VerticalStackLayout>
+                  <Label Text="{Binding Name}"
+                         FontAttributes="Bold"/>
+                  <Label Text="{Binding Type}"
+                         Opacity="0.7"
+                         FontSize="12"/>
+                </VerticalStackLayout>
               </HorizontalStackLayout>
             </Border>
           </DataTemplate>
