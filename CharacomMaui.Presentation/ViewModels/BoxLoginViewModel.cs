@@ -83,23 +83,10 @@ public class BoxLoginViewModel
 
             tokens = await _loginUseCase.LoginWithCodeAsync(code, callbackUrl.ToString());
 
-            //await _tokenStorage.SaveTokensAsync(tokens);
-
-
         }
         await _tokenStorage.SaveTokensAsync(tokens);
         return tokens;
-        //return await _loginUseCase.ExecuteAsync(getDeviceString(), clientId, clientSecret);
 
-        /***
-        var callbackUrl = "myapp://callback";
-
-        // プラットフォーム依存の処理はインターフェースに任せる
-        var code = await _authenticator.AuthenticateAsync(authUrl, callbackUrl);
-
-        var tokens = await _loginUseCase.LoginWithCodeAsync(code, callbackUrl);
-        await _tokenStorage.SaveTokensAsync(tokens);
-        ****/
     }
 
     public async Task<BoxAuthResult> ExchangeCodeForTokenAsync(
