@@ -32,6 +32,7 @@ public class BoxLoginViewModel
         var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
         var authUrl = _loginUseCase.GetAuthorizationUrl(clientId, clientSecret);
         var tokens = new BoxAuthResult();
+        System.Diagnostics.Debug.WriteLine("🟢 [OAuthDebug]Login start!!.");
         if (DeviceInfo.Platform == DevicePlatform.WinUI)
         {
             // WebViewで認可コード取得

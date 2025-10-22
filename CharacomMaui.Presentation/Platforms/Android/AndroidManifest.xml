@@ -7,9 +7,9 @@
     android:roundIcon="@mipmap/appicon_round" 
     android:supportsRtl="true"
     android:label="CharacomMaui">
-
+<!-- Microsoft.Maui.Authentication.WebAuthenticatorCallbackActivity -->
     <activity 
-      android:name="Microsoft.Maui.Authentication.WebAuthenticatorCallbackActivity"
+      android:name="crc6453803a93ff7e354e.WebAuthenticationCallbackActivity"
       android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
