@@ -33,7 +33,7 @@ public class BoxLoginViewModel
         var authUrl = _loginUseCase.GetAuthorizationUrl(clientId, clientSecret);
         var tokens = new BoxAuthResult();
         System.Diagnostics.Debug.WriteLine("🟢 [OAuthDebug]Login start!!.");
-        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+        if (DeviceInfo.Platform == DevicePlatform.WinUI || DeviceInfo.Platform == DevicePlatform.Android)
         {
             // WebViewで認可コード取得
             var tcs = new TaskCompletionSource<BoxAuthResult>();
