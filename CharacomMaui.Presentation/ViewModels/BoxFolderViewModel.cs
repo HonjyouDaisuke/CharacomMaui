@@ -21,6 +21,11 @@ public class BoxFolderViewModel
     _imageUseCase = imageUseCase;
   }
 
+  public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
+  {
+    var items = await _useCase.GetFolderItemCountAsync(accessToken, folderId);
+    return items;
+  }
   public async Task LoadFolderItemsAsync(string accessToken)
   {
     var items = await _useCase.ExecuteAsync(accessToken, RootFolderId);
@@ -32,9 +37,9 @@ public class BoxFolderViewModel
     }
   }
 
-  public async Task LoadImageItemsAsync(string accessToken, string folderId)
+  public async Task LoadImageItemsAsync(string accessToken, string folderId, IProgress<double>? progress = null, CancellationToken token = default)
   {
-    var items = await _imageUseCase.ExecuteAsync(accessToken, folderId);
+    var items = await _imageUseCase.ExecuteAsync(accessToken, folderId, progress, token);
     Files2.Clear();
     foreach (var item in items)
     {

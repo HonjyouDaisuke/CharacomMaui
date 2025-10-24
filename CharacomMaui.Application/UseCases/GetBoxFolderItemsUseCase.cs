@@ -17,4 +17,9 @@ public class GetBoxFolderItemsUseCase
   {
     return await _boxApiRepository.GetFolderItemsAsync(accessToken, folderId);
   }
+
+  public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
+  {
+    return await _boxApiRepository.GetFolderItemCountAsync(accessToken, folderId);
+  }
 }

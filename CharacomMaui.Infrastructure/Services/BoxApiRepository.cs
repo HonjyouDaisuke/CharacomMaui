@@ -3,6 +3,8 @@ using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipelines;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -17,6 +19,29 @@ public class BoxApiRepository : IBoxApiRepository
   public BoxApiRepository(HttpClient httpClient)
   {
     _httpClient = httpClient;
+  }
+
+  public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
+  {
+    _httpClient.DefaultRequestHeaders.Authorization =
+        new AuthenticationHeaderValue("Bearer", accessToken);
+
+    var url = $"https://api.box.com/2.0/folders/{folderId}/items?fields=id,name,size,type,modified_at";
+    var response = await _httpClient.GetAsync(url);
+    var json = await response.Content.ReadAsStringAsync();
+    if (!response.IsSuccessStatusCode)
+      throw new Exception($"Box API error: {(int)response.StatusCode} {response.ReasonPhrase}");
+
+    using var doc = JsonDocument.Parse(json);
+    var root = doc.RootElement;
+
+    if (!root.TryGetProperty("entries", out var entries))
+      throw new Exception($"entries が見つかりません。レスポンス: {json}");
+
+    // EnumerateArray() の Count() を使う
+    int itemCount = entries.EnumerateArray().Count();
+
+    return itemCount;
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string folderId)
@@ -78,7 +103,7 @@ public class BoxApiRepository : IBoxApiRepository
     return result;
   }
 
-  private async Task<byte[]> DownloadFileAsync(string accessToken, string fileId)
+  public async Task<byte[]> DownloadFileAsync(string accessToken, string fileId)
   {
     _httpClient.DefaultRequestHeaders.Authorization =
         new AuthenticationHeaderValue("Bearer", accessToken);
