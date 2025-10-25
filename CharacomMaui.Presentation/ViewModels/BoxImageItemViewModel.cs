@@ -1,49 +1,61 @@
 // CharacomMaui.Presentation/ViewModels/BoxItemViewModel.cs
 using CharacomMaui.Domain.Entities;
 using SkiaSharp;
+using Microsoft.Maui.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace CharacomMaui.Presentation.ViewModels
+namespace CharacomMaui.Presentation.ViewModels;
+
+public partial class BoxImageItemViewModel : ObservableObject
 {
-    public class BoxImageItemViewModel
+  public string Id { get; set; } = string.Empty;
+  public string Name { get; set; } = string.Empty;
+  public string Type { get; set; } = string.Empty;
+
+  private readonly byte[] _imageBytes; // 元の画像データを保持
+
+  // ⭐ Image プロパティは ObservableProperty を使用する
+  [ObservableProperty]
+  private ImageSource? image;
+
+  public BoxImageItemViewModel(BoxImageItem item)
+  {
+    Id = item.Id;
+    Name = item.Name;
+    Type = item.Type;
+    _imageBytes = item.Image; // データだけ保持
+
+    // ⭐ コンストラクタから LoadImageAsync の呼び出しを完全に削除する！
+  }
+
+  // ⭐ 外部から呼び出すロードメソッド
+  public async Task LoadImageAsync()
+  {
+    if (Image != null)
     {
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public ImageSource? Image { get; private set; }
-
-        public BoxImageItemViewModel(BoxImageItem item)
-        {
-            Id = item.Id;
-            Name = item.Name;
-            Type = item.Type;
-
-            // ImageSourceは非同期で安全に生成
-            LoadImageAsync(item.Image);
-        }
-
-        private async void LoadImageAsync(byte[] imageBytes)
-        {
-            try
-            {
-                // バックグラウンドで SKBitmap → ImageSource 変換
-                var img = await Task.Run(() =>
-                {
-                    using var ms = new MemoryStream(imageBytes);
-                    var bmp = SKBitmap.Decode(ms);
-                    return CharacomMaui.Presentation.Helpers.ImageSourceConverter.FromSKBitmap(bmp);
-                });
-
-                // UIスレッドで Image にセット
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    Image = img;
-                });
-            }
-            catch
-            {
-                // 変換失敗時は null のまま
-                Image = null;
-            }
-        }
+      return;
     }
+
+    try
+    {
+      // バックグラウンドで SKBitmap → ImageSource 変換
+      var img = await Task.Run(() =>
+      {
+        using var ms = new MemoryStream(_imageBytes);
+        var bmp = SKBitmap.Decode(ms);
+        // 変換ロジックをここに
+        return CharacomMaui.Presentation.Helpers.ImageSourceConverter.FromSKBitmap(bmp);
+      });
+
+      // ⭐ UIスレッドでの画像セットは、ObservableObject の SetProperty で行われる
+      await MainThread.InvokeOnMainThreadAsync(() =>
+      {
+        Image = img;
+      });
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[LoadImageAsync Error] {ex.Message}");
+    }
+  }
 }

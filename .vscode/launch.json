@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run MAUI MacCatalyst",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-maccatalyst",
+      "program": "${workspaceFolder}/CharacomMaui.Presentation/bin/Debug/net9.0-maccatalyst/maccatalyst-arm64/CharacomMaui.Presentation.app/Contents/MacOS/CharacomMaui.Presentation",
+      "args": [],
+      "cwd": "${workspaceFolder}/CharacomMaui.Presentation",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Debug CharacomMaui.Presentation (Android Emulator)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build CharacomMaui.Presentation (Android)",
+      "program": "${workspaceFolder}/CharacomMaui.Presentation/bin/Debug/net9.0-android/CharacomMaui.Presentation.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/CharacomMaui.Presentation",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true,
+      "launchBrowser": false,
+      "pipeTransport": {
+        "pipeProgram": "adb",
+        "pipeArgs": ["shell", "dotnet"],
+        "debuggerPath": "/data/data/com.termux/files/usr/bin/netcoredbg",
+        "quoteArgs": true
+      }
+    }
+  ]
+}
