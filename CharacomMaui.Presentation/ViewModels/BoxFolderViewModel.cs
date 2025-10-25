@@ -41,10 +41,10 @@ public partial class BoxFolderViewModel : ObservableObject
     public async Task LoadImageItemsAsync(string accessToken, string folderId, IProgress<double>? progress = null, CancellationToken token = default)
     {
         var items = await _imageUseCase.ExecuteAsync(accessToken, folderId, progress, token);
-        files2.Clear();
+        Files2.Clear();
         foreach (var item in items)
         {
-            files2.Add(new BoxImageItemViewModel(item));
+            Files2.Add(new BoxImageItemViewModel(item));
         }
 
 
