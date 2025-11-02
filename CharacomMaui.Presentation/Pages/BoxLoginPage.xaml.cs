@@ -18,7 +18,9 @@ public partial class BoxLoginPage : ContentPage
     try
     {
       var result = await _loginViewModel.LoginAsync();
+
       await DisplayAlert("ログイン成功", $"AccessToken: {result.AccessToken}", "OK");
+
     }
     catch (Exception ex)
     {

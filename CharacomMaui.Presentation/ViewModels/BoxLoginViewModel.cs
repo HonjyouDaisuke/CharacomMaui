@@ -90,6 +90,11 @@ public class BoxLoginViewModel
 
   }
 
+  public async Task GetUserInfoAsync(string access_token)
+  {
+    await _loginUseCase.GetUserInfoAsync(access_token);
+
+  }
   public async Task<BoxAuthResult> ExchangeCodeForTokenAsync(
   string clientId,
   string clientSecret,

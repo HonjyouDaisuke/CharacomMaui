@@ -81,7 +81,9 @@ public partial class HomePage : ContentPage
 
     StatusLabel.Text = "ログイン処理を開始...";
     await _boxLoginViewModel.LoginAsync();
-
+    var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+    System.Diagnostics.Debug.WriteLine("ユーザ情報取得開始");
+    await _boxLoginViewModel.GetUserInfoAsync(accessToken);
     StatusLabel.Text = "ログイン成功！";
   }
 
