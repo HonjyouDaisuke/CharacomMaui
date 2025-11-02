@@ -5,24 +5,26 @@ namespace CharacomMaui.Presentation.Pages;
 
 public partial class BoxLoginPage : ContentPage
 {
-    private readonly BoxLoginViewModel _loginViewModel;
+  private readonly BoxLoginViewModel _loginViewModel;
 
-    public BoxLoginPage(BoxLoginViewModel loginViewModel)
-    {
-        InitializeComponent();
-        _loginViewModel = loginViewModel;
-    }
+  public BoxLoginPage(BoxLoginViewModel loginViewModel)
+  {
+    InitializeComponent();
+    _loginViewModel = loginViewModel;
+  }
 
-    private async void OnLoginClicked(object sender, EventArgs e)
+  private async void OnLoginClicked(object sender, EventArgs e)
+  {
+    try
     {
-        try
-        {
-            var result = await _loginViewModel.LoginAsync();
-            await DisplayAlert("ログイン成功", $"AccessToken: {result.AccessToken}", "OK");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("エラー", ex.Message, "OK");
-        }
+      var result = await _loginViewModel.LoginAsync();
+
+      await DisplayAlert("繝ｭ繧ｰ繧､繝ｳ謌仙粥", $"AccessToken: {result.AccessToken}", "OK");
+
     }
+    catch (Exception ex)
+    {
+      await DisplayAlert("繧ｨ繝ｩ繝ｼ", ex.Message, "OK");
+    }
+  }
 }

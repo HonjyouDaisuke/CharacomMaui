@@ -1,118 +1,202 @@
 ﻿using CharacomMaui.Application.UseCases;
-using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.ViewModels;
+using CommunityToolkit.Maui.Extensions;
 using System.Collections.ObjectModel;
-
 namespace CharacomMaui.Presentation.Pages;
 
 public partial class HomePage : ContentPage
 {
-    int count = 0;
-    private readonly LoginToBoxUseCase _loginUseCase;
-    private readonly BoxApiAuthService _boxApiAuthService;
-    private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
-    private readonly BoxFolderViewModel _boxFolderViewModel;
-    private readonly BoxLoginViewModel _boxLoginViewModel;
-    private const string RootFolderId = "303046914186";
-    public ObservableCollection<BoxItemViewModel> Files { get; } = new();
+  int count = 0;
+  private const string BOX_ACCESS_TOKEN = "box_access_token";
 
-    public HomePage(GetBoxConfigUseCase getBoxConfigUseCase,
-                    LoginToBoxUseCase loginUseCase,
-                    BoxFolderViewModel boxFolderViewModel,
-                    BoxLoginViewModel boxLoginViewModel)
+
+  private readonly LoginToBoxUseCase _loginUseCase;
+  private readonly BoxApiAuthService _boxApiAuthService;
+  private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
+  private readonly BoxFolderViewModel _boxFolderViewModel;
+  private readonly BoxLoginViewModel _boxLoginViewModel;
+
+  private const string RootFolderId = "303046914186";
+  private const string TEST_FOLDER_ID = "303046914186";
+  public ObservableCollection<BoxItemViewModel> Files { get; } = new();
+  public ObservableCollection<BoxImageItemViewModel> Files2 { get; set; } = new();
+
+  public HomePage(GetBoxConfigUseCase getBoxConfigUseCase,
+                  LoginToBoxUseCase loginUseCase,
+                  BoxFolderViewModel boxFolderViewModel,
+                  BoxLoginViewModel boxLoginViewModel)
+  {
+    try
     {
-        try
-        {
-            InitializeComponent();
+      InitializeComponent();
 
-            _getBoxConfigUseCase = getBoxConfigUseCase;
-            _loginUseCase = loginUseCase;
-            _boxFolderViewModel = boxFolderViewModel;
-            //_boxApiAuthService = boxApiAuthService;
-            _boxLoginViewModel = boxLoginViewModel;
-            FilesCollection.ItemsSource = Files;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[MainPage ctor] {ex}");
-            throw;
-        }
+      _getBoxConfigUseCase = getBoxConfigUseCase;
+      _loginUseCase = loginUseCase;
+      _boxFolderViewModel = boxFolderViewModel;
+      //_boxApiAuthService = boxApiAuthService;
+      _boxLoginViewModel = boxLoginViewModel;
+      BindingContext = _boxFolderViewModel;
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[MainPage ctor] {ex}");
+      throw;
+    }
+  }
+
+  private void OnCounterClicked(object? sender, EventArgs e)
+  {
+    count++;
+
+    if (count == 1)
+      CounterBtn.Text = $"Clicked {count} time";
+    else
+      CounterBtn.Text = $"Clicked {count} times";
+
+    SemanticScreenReader.Announce(CounterBtn.Text);
+  }
+  private async void OnConfigClicked(object sender, EventArgs e)
+  {
+
+    try
+    {
+      var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
+      await DisplayAlert("取得成功", $"ClientId: {clientId}\nSecret: {clientSecret}", "OK");
+    }
+    catch (Exception ex)
+    {
+      await DisplayAlert("エラー", ex.Message, "OK");
+    }
+  }
+  private async void OnPlatformClicked(object sender, EventArgs e)
+  {
+    System.Diagnostics.Debug.WriteLine("OnStart Clicked");
+    Console.WriteLine("Console.Debug");
+    await DisplayAlert("Info", $"プラットフォーム：{GetPlatfrom()}", "OK");
+  }
+  private async void OnLoginClicked(object sender, EventArgs e)
+  {
+
+    StatusLabel.Text = "ログイン処理を開始...";
+    await _boxLoginViewModel.LoginAsync();
+    var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+    System.Diagnostics.Debug.WriteLine("ユーザ情報取得開始");
+    await _boxLoginViewModel.GetUserInfoAsync(accessToken);
+    StatusLabel.Text = "ログイン成功！";
+  }
+
+  private async void OnListFilesClicked(object sender, EventArgs e)
+  {
+    try
+    {
+      StatusLabel.Text = "取得中...";
+
+      var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+      StatusLabel.Text = $"AccessToken = {accessToken}";
+      if (string.IsNullOrEmpty(accessToken))
+      {
+        StatusLabel.Text = "アクセストークンがありません。先にログインしてください。";
+        return;
+      }
+
+      // await _boxFolderViewModel.LoadFolderItemsAsync(accessToken);
+      await _boxFolderViewModel.LoadImageItemsAsync(accessToken, TEST_FOLDER_ID);
+      //addFiles();
+      StatusLabel.Text = $"一覧取得完了できたぜ！: {_boxFolderViewModel.Files2.Count} 件";
+    }
+    catch (Exception ex)
+    {
+      StatusLabel.Text += $"取得失敗だぜ : {ex.Message}";
     }
 
-    private void OnCounterClicked(object? sender, EventArgs e)
+  }
+
+  private async void OnStartDownloadClicked(object sender, EventArgs e)
+  {
+    var cts = new CancellationTokenSource();
+    var popup = new DownloadingDialog();
+
+    // (中略: CancelRequested の設定)
+
+    _ = this.ShowPopupAsync(popup);
+    await Task.Delay(100); // ⭐ ポップアップの描画を待つ (Mac対策)
+
+    var progressHandler = new Progress<double>(p =>
+      {
+        popup.Dispatcher.Dispatch(() => popup.UpdateProgress(p));
+      });
+
+    try
     {
-        count++;
+      var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
 
-        if (count == 1)
-            CounterBtn.Text = $"Clicked {count} time";
-        else
-            CounterBtn.Text = $"Clicked {count} times";
+      // 1. ダウンロードとViewModelへのアイテム追加（画像セットは含まない）
+      await _boxFolderViewModel.LoadImageItemsAsync(accessToken, TEST_FOLDER_ID, progressHandler, cts.Token);
 
-        SemanticScreenReader.Announce(CounterBtn.Text);
+      // 2. ⭐ 画像ロード処理を順次、制御しながら実行する
+      foreach (var item in _boxFolderViewModel.Files2)
+      {
+        if (cts.Token.IsCancellationRequested) break;
+
+        // 画像ロード（Task.Run でデコード、MainThread.InvokeOnMainThreadAsync でUI更新）
+        await item.LoadImageAsync();
+
+        // ⭐ 極めて重要: UIスレッドの負荷を下げるため、各画像ロードの間に短い待ち時間を設ける
+        // Mac Catalystではこの短い遅延がフリーズ防止に非常に効果的です
+        await Task.Delay(50, cts.Token);
+      }
+
+      // 3. 全ての処理が完了した後、ポップアップを閉じる
+      await this.ClosePopupAsync();
     }
-    private async void OnConfigClicked(object sender, EventArgs e)
+    catch (OperationCanceledException)
     {
-
-        try
-        {
-            var (clientId, clientSecret) = await _getBoxConfigUseCase.ExecuteAsync();
-            await DisplayAlert("取得成功", $"ClientId: {clientId}\nSecret: {clientSecret}", "OK");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("エラー", ex.Message, "OK");
-        }
+      // ... (中略: キャンセル時の処理)
     }
-
-    private async void OnLoginClicked(object sender, EventArgs e)
+    catch (Exception ex)
     {
-
-        StatusLabel.Text = "ログイン処理を開始...";
-        await _boxLoginViewModel.LoginAsync();
-
-        StatusLabel.Text = "ログイン成功！";
+      // ... (中略: エラー時の処理)
     }
+  }
 
-    private async void OnListFilesClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            StatusLabel.Text = "取得中...";
+  /**
+  private async Task addFiles()
+  {
+      var tempList = _boxFolderViewModel.Files2.Take(10)
+              .Select(entry => new BoxImageItemViewModel(new BoxImageItem
+              {
+                  Id = entry.Id ?? "",
+                  Name = entry.Name ?? "",
+                  Type = entry.Type ?? "",
+                  Image = entry.Image
+              }))
+              .ToList();
 
-            var accessToken = Preferences.Get("box_access_token", string.Empty);
-            StatusLabel.Text = $"AccessToken = {accessToken}";
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                StatusLabel.Text = "アクセストークンがありません。先にログインしてください。";
-                return;
-            }
+      MainThread.BeginInvokeOnMainThread(() =>
+      {
+          var backup = Files2;
+          Files2 = null; // 一旦解除
+          OnPropertyChanged(nameof(Files2));
 
-            await _boxFolderViewModel.LoadFolderItemsAsync(accessToken);
-            addFiles();
-            StatusLabel.Text = $"一覧取得完了できたぜ！: {_boxFolderViewModel.Files.Count} 件";
-        }
-        catch (Exception ex)
-        {
-            StatusLabel.Text += $"取得失敗だぜ : {ex.Message}";
-        }
-
-    }
-
-    private void addFiles()
-    {
-        Files.Clear();
-        foreach (var entry in _boxFolderViewModel.Files)
-        {
-            BoxItem item = new BoxItem
-            {
-                Id = entry.Id ?? "",
-                Name = entry.Name ?? "",
-                Type = entry.Type ?? ""
-            };
-
-            Files.Add(new BoxItemViewModel(item));
-        }
-    }
+          Files2 = new ObservableCollection<BoxImageItemViewModel>(tempList);
+          OnPropertyChanged(nameof(Files2));
+      });
+      await DisplayAlert("Message", $"ファイル一覧を更新しました。{Files2.Count}", "OK");
+  }
+  **/
+  private string GetPlatfrom()
+  {
+    var platform = DeviceInfo.Platform;
+    if (platform == DevicePlatform.WinUI)
+      return "Windows";
+    else if (platform == DevicePlatform.Android)
+      return "Android";
+    else if (platform == DevicePlatform.MacCatalyst)
+      return "MacCatalyst";
+    else
+      return "OtherDevice";
+  }
 }
 

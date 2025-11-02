@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-maccatalyst",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "dotnet build ${workspaceFolder}/CharacomMaui.Presentation/CharacomMaui.Presentation.csproj -t:Build -f net9.0-maccatalyst && sleep 2"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build CharacomMaui.Presentation (Android)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/CharacomMaui.Presentation/CharacomMaui.Presentation.csproj",
+        "-f",
+        "net9.0-android",
+        "-c",
+        "Debug"
+      ],
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run CharacomMaui.Presentation (Android Emulator)",
+      "type": "shell",
+      "dependsOn": "Build CharacomMaui.Presentation (Android)",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/CharacomMaui.Presentation/CharacomMaui.Presentation.csproj",
+        "-f",
+        "net9.0-android",
+        "-c",
+        "Debug"
+      ],
+      "group": "none"
+    }
+  ]
+}

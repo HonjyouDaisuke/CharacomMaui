@@ -2,7 +2,7 @@
 using CharacomMaui.Presentation.Helpers;
 using System.Web;
 using CharacomMaui.Application.Interfaces;
-
+using MauiApp = Microsoft.Maui.Controls.Application;
 namespace CharacomMaui.Presentation;
 
 public partial class App : Microsoft.Maui.Controls.Application
@@ -10,8 +10,9 @@ public partial class App : Microsoft.Maui.Controls.Application
   public App()
   {
     InitializeComponent();
-
   }
+
+
   protected override async void OnAppLinkRequestReceived(Uri uri)
   {
     base.OnAppLinkRequestReceived(uri);
@@ -43,7 +44,7 @@ public partial class App : Microsoft.Maui.Controls.Application
   }
   protected override Window CreateWindow(IActivationState? activationState)
   {
-    return new Window(new AppShell());
+    return new Window(new MainPage());
   }
 
 }
