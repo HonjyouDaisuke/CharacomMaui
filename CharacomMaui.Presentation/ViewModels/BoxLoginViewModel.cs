@@ -24,8 +24,6 @@ public class BoxLoginViewModel
 
   }
 
-
-
   public async Task<BoxAuthResult?> LoginAsync()
   {
 
@@ -85,16 +83,18 @@ public class BoxLoginViewModel
       tokens = await _loginUseCase.LoginWithCodeAsync(code, callbackUrl.ToString());
 
     }
+    // TODO: BoxTokenの保存は削除する
     await _tokenStorage.SaveTokensAsync(tokens);
     return tokens;
 
   }
 
-  public async Task GetUserInfoAsync(string access_token)
+  public async Task<BoxUserResult> GetUserInfoAsync(string access_token)
   {
-    await _loginUseCase.GetUserInfoAsync(access_token);
-
+    var user = await _loginUseCase.GetUserInfoAsync(access_token);
+    return user;
   }
+
   public async Task<BoxAuthResult> ExchangeCodeForTokenAsync(
   string clientId,
   string clientSecret,
@@ -126,4 +126,6 @@ public class BoxLoginViewModel
       ExpiresAt = root.GetProperty("expires_in").GetInt32()
     };
   }
+
+
 }

@@ -32,9 +32,10 @@ public class LoginToBoxUseCase
     return result;
   }
 
-  public async Task GetUserInfoAsync(string accessToken)
+  public async Task<BoxUserResult> GetUserInfoAsync(string accessToken)
   {
-    await _authService.GetUserInfoAsync(accessToken);
+    var result = await _authService.GetUserInfoAsync(accessToken);
+    return result;
   }
 
 }

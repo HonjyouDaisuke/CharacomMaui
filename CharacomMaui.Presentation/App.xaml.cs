@@ -3,6 +3,8 @@ using CharacomMaui.Presentation.Helpers;
 using System.Web;
 using CharacomMaui.Application.Interfaces;
 using MauiApp = Microsoft.Maui.Controls.Application;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace CharacomMaui.Presentation;
 
 public partial class App : Microsoft.Maui.Controls.Application

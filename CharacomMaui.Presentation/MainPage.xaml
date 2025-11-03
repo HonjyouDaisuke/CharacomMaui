@@ -43,6 +43,16 @@
         </VerticalStackLayout>
       </Border>
 
+      <ScrollView x:Name="LogScrollView"
+                  HeightRequest="300"
+                  BackgroundColor="black">
+        <Editor x:Name="LogEditor"
+                HeightRequest="300"
+                BackgroundColor="Black"
+                TextColor="White"
+                IsReadOnly="True"
+                AutoSize="TextChanges"/>
+      </ScrollView>
     </VerticalStackLayout>
   </ScrollView>
 

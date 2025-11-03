@@ -30,6 +30,8 @@ public static class MauiProgram
     // BoxApiService を ICloudStorageService に紐付け
     builder.Services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();
     builder.Services.AddSingleton<ITokenStorageService, TokenStorageService>();
+    builder.Services.AddSingleton<IAppTokenStorageService, AppTokenStorageService>();
+    builder.Services.AddTransient<IUserRepository, ApiUserRepository>();
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
 
     // UseCaseのDI
@@ -37,7 +39,10 @@ public static class MauiProgram
     // builder.Services.AddTransient<MainPageViewModel>();
     builder.Services.AddTransient<GetBoxConfigUseCase>();
     builder.Services.AddTransient<LoginToBoxUseCase>();
+    builder.Services.AddTransient<CreateUserUseCase>();
     builder.Services.AddSingleton<BoxLoginViewModel>();
+    builder.Services.AddSingleton<CreateAppUserViewModel>();
+
 
     builder.Services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
     builder.Services.AddTransient<GetBoxFolderItemsUseCase>();
@@ -46,7 +51,7 @@ public static class MauiProgram
     builder.Services.AddSingleton<BoxItemViewModel>();
     builder.Services.AddSingleton<BoxImageItemViewModel>();
     // PageのDI
-    builder.Services.AddTransient<MainPage>();
+    builder.Services.AddSingleton<MainPage>();
     return builder.Build();
   }
 }
