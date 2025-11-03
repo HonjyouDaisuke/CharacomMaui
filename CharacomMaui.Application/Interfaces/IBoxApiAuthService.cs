@@ -23,7 +23,7 @@ public interface IBoxApiAuthService
   Task<BoxAuthResult> RefreshTokenAsync(string refreshToken);
 
   void SetBoxKeyString(string clientId, string clientSecret);
-  Task GetUserInfoAsync(string accessToken);
+  Task<BoxUserResult> GetUserInfoAsync(string accessToken);
 }
 
 
