@@ -1,9 +1,11 @@
 ﻿using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Infrastructure;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace CharacomMaui.Presentation;
@@ -31,6 +33,7 @@ public static class MauiProgram
     builder.Services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();
     builder.Services.AddSingleton<ITokenStorageService, TokenStorageService>();
     builder.Services.AddSingleton<IAppTokenStorageService, AppTokenStorageService>();
+    builder.Services.AddTransient<IBoxTopFolderRepository, ApiBoxTopFolderRepository>();
     builder.Services.AddTransient<IUserRepository, ApiUserRepository>();
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
 

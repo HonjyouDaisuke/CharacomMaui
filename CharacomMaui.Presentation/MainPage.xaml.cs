@@ -72,6 +72,12 @@ public partial class MainPage : ContentPage
     }
 
     LogEditor.Text += "終了しました...\n";
+
+    var window = MauiApp.Current?.Windows.FirstOrDefault();
+    if (window != null)
+    {
+      window.Page = new AppShell();
+    }
     /**
     StatusLabel.Text = "ログイン処理を開始...";
     await _boxLoginViewModel.LoginAsync();
@@ -87,6 +93,14 @@ public partial class MainPage : ContentPage
     **/
   }
 
+  private async void OnNewPageButtonClick(object sender, EventArgs e)
+  {
+    var window = MauiApp.Current?.Windows.FirstOrDefault();
+    if (window != null)
+    {
+      window.Page = new AppShell();
+    }
+  }
 
 }
 

@@ -14,4 +14,8 @@
     Title="Chart"
     ContentTemplate="{DataTemplate local:Pages.ChartPage}"
     Route="ChartPage"/>
+  <ShellContent
+    Title="ProjectList"
+    ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
+    Route="ProjectListPage"/>
 </Shell>

@@ -41,6 +41,16 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+  <!-- ✅ iOS 専用 RuntimeIdentifiers -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+    <RuntimeIdentifiers>iossimulator-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <!-- ✅ MacCatalyst 専用 RuntimeIdentifiers -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-maccatalyst'">
+    <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -62,6 +72,7 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.120" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
 		<PackageReference Include="SkiaSharp" Version="3.119.1" />
@@ -84,5 +95,4 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
-
 </Project>

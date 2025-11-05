@@ -42,7 +42,12 @@
                  HorizontalOptions="Center"/>
         </VerticalStackLayout>
       </Border>
-
+      <Button
+        x:Name="NewPageBtn"
+        Clicked="OnNewPageButtonClick"
+        HorizontalOptions="Fill"
+        SemanticProperties.Hint="Counts the number of times you click"
+        Text="Click me"/>
       <ScrollView x:Name="LogScrollView"
                   HeightRequest="300"
                   BackgroundColor="black">

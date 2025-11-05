@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CharacomMaui.Presentation.Pages.ProjectListPage"
+             Title="ProjectList">
+  <VerticalStackLayout>
+    <Label
+      Text="Welcome to Project Page"
+      VerticalOptions="Center"
+      HorizontalOptions="Center"/>
+
+    <Button
+      x:Name="CreateProjectBtn"
+      Clicked="OnCreateProjectBtn"
+      ImageSource="add_icon.png"
+      ContentLayout="Left,8"
+      BackgroundColor="#2196F3"
+      TextColor="White"
+      CornerRadius="8"
+      HeightRequest="40"
+      HorizontalOptions="Fill"
+      SemanticProperties.Hint="Counts the number of times you click"
+      Text="プロジェクトの新規作成"/>
+
+    <ScrollView x:Name="LogScrollView"
+                HeightRequest="300"
+                BackgroundColor="black">
+      <Editor x:Name="LogEditor"
+              HeightRequest="300"
+              BackgroundColor="Black"
+              TextColor="White"
+              IsReadOnly="True"
+              AutoSize="TextChanges"/>
+    </ScrollView>
+  </VerticalStackLayout>
+</ContentPage>
