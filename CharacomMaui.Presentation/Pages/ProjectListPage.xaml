@@ -14,8 +14,6 @@
       Clicked="OnCreateProjectBtn"
       ImageSource="add_icon.png"
       ContentLayout="Left,8"
-      BackgroundColor="#2196F3"
-      TextColor="White"
       CornerRadius="8"
       HeightRequest="40"
       HorizontalOptions="Fill"

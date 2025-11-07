@@ -2,26 +2,47 @@
 <views:Popup
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+  xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:views="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
-  x:Class="CharacomMaui.Presentation.Dialogs.CreateProjectDialog">
+  x:Class="CharacomMaui.Presentation.Dialogs.CreateProjectDialog"
+  BackgroundColor="#80000000">
+  <!-- ← 半透明の黒推奨（影部分） -->
 
-  <VerticalStackLayout Padding="20"
-      Spacing="15">
+  <views:Popup.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <material:ColorResource/>
+        <material:StyleResource/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </views:Popup.Resources>
+
+
+  <VerticalStackLayout Spacing="15">
+
     <Label Text="フォルダを選択"
            FontAttributes="Bold"
+           TextColor="white"
            HorizontalOptions="Center"/>
 
-    <Picker x:Name="FolderPicker"
-            ItemsSource="{Binding Folders}"
-            ItemDisplayBinding="{Binding Name}"
-            SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"/>
+    <uranium:Dropdown
+      ItemsSource="{Binding Folders}"
+      ItemDisplayBinding="{Binding Name}"
+      SelectedItem="{Binding SelectedFolder}"
+      TextColor="white"
+      Placeholder="フォルダを選択..."
+      Margin="0,10"/>
 
     <HorizontalStackLayout Spacing="10"
-        HorizontalOptions="Center">
+                           HorizontalOptions="Center">
       <Button Text="OK"
-          Clicked="OnOkClicked"/>
+              Clicked="OnOkClicked"/>
       <Button Text="キャンセル"
-          Clicked="OnCancelClicked"/>
+              Clicked="OnCancelClicked"/>
     </HorizontalStackLayout>
+
   </VerticalStackLayout>
+
+
 </views:Popup>

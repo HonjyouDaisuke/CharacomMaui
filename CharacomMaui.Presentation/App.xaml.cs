@@ -4,6 +4,7 @@ using System.Web;
 using CharacomMaui.Application.Interfaces;
 using MauiApp = Microsoft.Maui.Controls.Application;
 using Microsoft.Extensions.DependencyInjection;
+using UraniumUI;
 
 namespace CharacomMaui.Presentation;
 

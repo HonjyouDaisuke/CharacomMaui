@@ -1,12 +1,14 @@
 ﻿using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
-using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Infrastructure;
+using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using UraniumUI;
+using UraniumUI.Dialogs;
 
 namespace CharacomMaui.Presentation;
 
@@ -18,6 +20,9 @@ public static class MauiProgram
     builder
         .UseMauiApp<App>()
         .UseMauiCommunityToolkit()
+        .UseUraniumUI()
+        .UseUraniumUIMaterial()
+
         .ConfigureFonts(fonts =>
         {
           fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -26,6 +31,7 @@ public static class MauiProgram
 
     // ServiceのDI
     builder.Services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();
+    builder.Services.AddCommunityToolkitDialogs();
 #if DEBUG
     builder.Logging.AddDebug();
 #endif
@@ -46,7 +52,6 @@ public static class MauiProgram
     builder.Services.AddSingleton<BoxLoginViewModel>();
     builder.Services.AddSingleton<CreateAppUserViewModel>();
 
-
     builder.Services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
     builder.Services.AddTransient<GetBoxFolderItemsUseCase>();
     builder.Services.AddTransient<GetBoxImageItemsUseCase>();
@@ -58,4 +63,3 @@ public static class MauiProgram
     return builder.Build();
   }
 }
-
