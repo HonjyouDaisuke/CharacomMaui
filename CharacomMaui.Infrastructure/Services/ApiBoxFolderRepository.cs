@@ -9,25 +9,26 @@ using CharacomMaui.Domain.Entities;
 
 namespace CharacomMaui.Infrastructure.Services;
 
-public class ApiBoxTopFolderRepository : IBoxTopFolderRepository
+public class ApiBoxFolderRepository : IBoxFolderRepository
 {
   private readonly HttpClient _http;
 
-  public ApiBoxTopFolderRepository(HttpClient http)
+  public ApiBoxFolderRepository(HttpClient http)
   {
     _http = http;
     _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
-  public async Task<List<BoxItem>> GetTopFolders(string accessToken)
+  public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string folderId = null)
   {
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
+      folder_id = folderId,
     });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("get_top_folders.php", content);
+    var res = await _http.PostAsync("get_folder_items.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("----------server res--------------");

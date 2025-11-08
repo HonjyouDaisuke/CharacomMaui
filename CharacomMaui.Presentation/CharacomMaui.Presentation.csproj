@@ -38,7 +38,7 @@
   </PropertyGroup>
   <!-- ✅ MacCatalyst 専用 RuntimeIdentifiers -->
   <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-maccatalyst'">
-    <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <!-- App Icon -->

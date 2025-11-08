@@ -20,6 +20,11 @@
       SemanticProperties.Hint="Counts the number of times you click"
       Text="プロジェクトの新規作成"/>
 
+    <Button
+      x:Name="DialogBtn"
+      Clicked="OnDialogButtonClicked"
+      Text="ダイアログ表示"/>
+
     <ScrollView x:Name="LogScrollView"
                 HeightRequest="300"
                 BackgroundColor="black">

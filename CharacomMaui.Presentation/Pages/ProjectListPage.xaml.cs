@@ -7,59 +7,46 @@ using CharacomMaui.Presentation.Dialogs;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
+using UraniumUI.Dialogs.Mopups;
 
 namespace CharacomMaui.Presentation.Pages;
 
 public partial class ProjectListPage : ContentPage
 {
-  private readonly IBoxTopFolderRepository _repository;
-  public ProjectListPage(IBoxTopFolderRepository repository)
+  private readonly IBoxFolderRepository _repository;
+  private readonly IDialogService _dialogService;
+  private readonly CreateProjectViewModel _viewModel;
+  public ProjectListPage(IBoxFolderRepository repository, IDialogService dialogService, CreateProjectViewModel viewModel)
   {
     InitializeComponent();
     _repository = repository;
+    _dialogService = dialogService;
+    _viewModel = viewModel;
   }
-
+  private async void OnDialogButtonClicked(object sender, EventArgs e)
+  {
+    var result = await this.DisplayRadioButtonPromptAsync(
+            "Pick some of them below",
+            new[] { "Option 1", "Option 2", "Option 3" });
+  }
   private async void OnCreateProjectBtn(object? sender, EventArgs e)
   {
     LogEditor.Text += "プロジェクトの新規作成\n";
-    var accessToken = Preferences.Get("app_access_token", string.Empty);
-    var folderItems = await _repository.GetTopFolders(accessToken);
-    LogEditor.Text += $"accessToken = {accessToken}\n";
-    foreach (var item in folderItems)
+    // var accessToken = Preferences.Get("app_access_token", string.Empty);
+    var topFolderItems = await _viewModel.GetFolderItemsAsync();
+
+    var dialog = new CreateProjectDialog(topFolderItems, _dialogService, _viewModel);
+    await this.ShowPopupAsync(dialog);
+    if (dialog.SelectedTopFolder == null)
     {
-      LogEditor.Text += $"{item.Id}: {item.Name} ({item.Type})\n";
+      LogEditor.Text += "選択されていない";
+      return;
     }
 
-    /**
-    var dialog = new MaterialDialogBuilder()
-        .SetTitle("新規プロジェクト作成")
-        .SetMessage("必要な情報を入力してください。")
-        .AddDropdown<List<BoxItem>>("プロジェクトフォルダ", out var projectFolderPicker)
-        .AddDropdown<List<BoxItem>>("データフォルダ", out var dataFolderPicker)
-        .AddTextField("プロジェクト名", out var projectNameInput)
-        .AddTextField("説明（任意）", out var descriptionInput, isMultiLine: true)
-        .AddAction("作成")
-        .AddCancelAction("キャンセル");
+    var projectName = dialog.ProjectName;
+    var projectDescription = dialog.ProjectDescription;
+    var selectedFolder = dialog.SelectedTopFolder;
 
-    var result = await dialog.ShowAsync();
-    **/
-    try
-    {
-
-      var popup = new CreateProjectDialog(folderItems);
-      this.ShowPopup(popup, new PopupOptions
-      {
-        CanBeDismissedByTappingOutsideOfPopup = false
-      });
-    }
-    catch (Exception ex)
-    {
-      System.Diagnostics.Debug.WriteLine("Popup show failed: " + ex);
-    }
-
-
-
-
-
+    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name}\n";
   }
 }

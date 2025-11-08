@@ -1,10 +1,12 @@
 using System.ComponentModel;
+using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Services;
 
 public class CreateProjectViewModel : INotifyPropertyChanged
 {
   public List<BoxItem> Folders { get; }
-
+  private readonly IBoxFolderRepository _folderRepository;
   private BoxItem _selectedFolder = new();
   public BoxItem SelectedFolder
   {
@@ -22,11 +24,15 @@ public class CreateProjectViewModel : INotifyPropertyChanged
 
   public event PropertyChangedEventHandler PropertyChanged;
 
-  public CreateProjectViewModel(List<BoxItem> folders)
+  public CreateProjectViewModel(IBoxFolderRepository folderRepository)
   {
-    Folders = folders;
-    SelectedFolder = Folders.FirstOrDefault();
+    _folderRepository = folderRepository;
   }
 
+  public async Task<List<BoxItem>> GetFolderItemsAsync(string? folderId = null)
+  {
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
+    return await _folderRepository.GetFolderItemsAsync(accessToken, folderId);
+  }
 }
 
