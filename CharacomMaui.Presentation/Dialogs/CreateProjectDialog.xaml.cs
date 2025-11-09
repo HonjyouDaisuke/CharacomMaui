@@ -5,6 +5,7 @@ using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -22,8 +23,9 @@ public partial class CreateProjectDialog : Popup
     InitializeComponent();
     _dialogService = dialogService;
     _viewModel = viewModel;
-
+    Debug.WriteLine($"CreateProjectDialog start...");
     TopFolderDropdown.ItemsSource = topFolders;
+    Debug.WriteLine($"TopFolders Count = {topFolders.Count}");
     TopFolderDropdown.ItemDisplayBinding = new Binding("Name");
     // PropertyChanged で SelectedItem の変更を監視
     TopFolderDropdown.PropertyChanged += TopFolderDropdownPropertyChanged;
@@ -53,6 +55,8 @@ public partial class CreateProjectDialog : Popup
 
         CharaFolderDropdown.ItemsSource.Clear();
         CharaFolderDropdown.ItemsSource = charaFolders;
+
+        ProjectNameEntry.Text = selected.Name;
       }
     }
   }
@@ -62,7 +66,17 @@ public partial class CreateProjectDialog : Popup
     using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
     {
       // Indicate a long running operation
-      await Task.Delay(5000);
+      // エントリーの作成
+      var project = new Project
+      {
+        Name = ProjectName,
+        Description = ProjectDescription,
+        FolderId = SelectedTopFolder.Id,
+        CharaFolderId = SelectedCharaFolder.Id,
+      };
+
+      var res = await _viewModel.CreateProjectAsync(project);
+      System.Diagnostics.Debug.WriteLine(res.ToString());
     }
     await CloseAsync(); // Close に渡す値は任意。複数渡したい場合は Tuple かクラスにまとめる
   }

@@ -46,7 +46,8 @@ public partial class ProjectListPage : ContentPage
     var projectName = dialog.ProjectName;
     var projectDescription = dialog.ProjectDescription;
     var selectedFolder = dialog.SelectedTopFolder;
+    var selectedCharaFolder = dialog.SelectedCharaFolder;
 
-    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name}\n";
+    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
   }
 }

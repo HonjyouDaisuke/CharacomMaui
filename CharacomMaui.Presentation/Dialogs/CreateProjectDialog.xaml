@@ -4,6 +4,7 @@
   xmlns:views="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
   xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+  xmlns:validation="clr-namespace:InputKit.Shared.Validations;assembly=InputKit.Maui"
   x:Class="CharacomMaui.Presentation.Dialogs.CreateProjectDialog"
   BackgroundColor="Transparent">
 
@@ -24,18 +25,18 @@
         <Border.StrokeShape>
           <RoundRectangle CornerRadius="10"/>
         </Border.StrokeShape>
-        <VerticalStackLayout Spacing="50">
-          <Label Text="プロジェクト名"
-                 TextColor="White"/>
-          <Entry x:Name="ProjectNameEntry"
-                 TextColor="White"
-                 Placeholder="名前を入力"/>
-          <Label Text="説明（任意）"
-                 TextColor="White"/>
-          <Editor x:Name="ProjectDescriptionEditor"
-                  TextColor="White"
-                  Placeholder="説明を入力"
-                  HeightRequest="100"/>
+        <VerticalStackLayout Spacing="10">
+
+          <material:TextField x:Name="ProjectNameEntry"
+                              Title="プロジェクト名"
+                              AllowClear="True">
+            <validation:RequiredValidation/>
+          </material:TextField>
+          <material:TextField x:Name="ProjectDescriptionEditor"
+                              Title="プロジェクトの説明"
+                              AllowClear="True">
+            <validation:RequiredValidation/>
+          </material:TextField>
         </VerticalStackLayout>
       </Border>
 

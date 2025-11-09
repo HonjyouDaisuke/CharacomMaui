@@ -19,7 +19,7 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
     _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
-  public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string folderId = null)
+  public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string? folderId = null)
   {
     var json = JsonSerializer.Serialize(new
     {

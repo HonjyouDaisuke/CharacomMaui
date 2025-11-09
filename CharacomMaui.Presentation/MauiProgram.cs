@@ -5,6 +5,7 @@ using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui;
+using InputKit.Handlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mopups.Hosting;
@@ -25,11 +26,15 @@ public static class MauiProgram
         .UseUraniumUI()
         .UseUraniumUIMaterial()
         .ConfigureMopups()
-
+        .ConfigureMauiHandlers(handlers =>
+        {
+          handlers.AddInputKitHandlers();
+        })
         .ConfigureFonts(fonts =>
         {
           fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
           fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+          fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
         });
 
     // ServiceのDI
@@ -45,6 +50,7 @@ public static class MauiProgram
     builder.Services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();
     builder.Services.AddTransient<IUserRepository, ApiUserRepository>();
     builder.Services.AddSingleton<IDialogService, MopupsDialogService>();
+    builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
 
     // builder.Services.AddTransient<ICloudStorageService, BoxCloudStorageService>();
 
@@ -52,6 +58,7 @@ public static class MauiProgram
     builder.Services.AddTransient<ProcessImageFromBoxUseCase>();
     // builder.Services.AddTransient<MainPageViewModel>();
     builder.Services.AddTransient<GetBoxConfigUseCase>();
+    builder.Services.AddTransient<CreateProjectUseCase>();
     builder.Services.AddTransient<LoginToBoxUseCase>();
     builder.Services.AddTransient<CreateUserUseCase>();
     builder.Services.AddSingleton<BoxLoginViewModel>();
