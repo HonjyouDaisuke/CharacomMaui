@@ -48,6 +48,7 @@ public static class MauiProgram
     builder.Services.AddSingleton<ITokenStorageService, TokenStorageService>();
     builder.Services.AddSingleton<IAppTokenStorageService, AppTokenStorageService>();
     builder.Services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();
+    builder.Services.AddHttpClient<ITokenValidationService, ApiTokenValidationService>();
     builder.Services.AddTransient<IUserRepository, ApiUserRepository>();
     builder.Services.AddSingleton<IDialogService, MopupsDialogService>();
     builder.Services.AddTransient<IProjectRepository, ProjectRepository>();

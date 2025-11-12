@@ -1,10 +1,5 @@
-﻿using CharacomMaui.Application.UseCases;
-using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Services;
+﻿using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.ViewModels;
-using System.Collections.ObjectModel;
-using System.Net.Http.Headers;
-using System.Text.Json;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation;
@@ -18,7 +13,7 @@ public partial class MainPage : ContentPage
     try
     {
       InitializeComponent();
-      _boxLoginViewModel = MauiApp.Current.Handler.MauiContext.Services
+      _boxLoginViewModel = MauiApp.Current!.Handler.MauiContext!.Services
                                .GetRequiredService<BoxLoginViewModel>();
       _createAppUserViewModel = MauiApp.Current.Handler.MauiContext.Services
                              .GetRequiredService<CreateAppUserViewModel>();
@@ -73,24 +68,8 @@ public partial class MainPage : ContentPage
 
     LogEditor.Text += "終了しました...\n";
 
-    var window = MauiApp.Current?.Windows.FirstOrDefault();
-    if (window != null)
-    {
-      window.Page = new AppShell();
-    }
-    /**
-    StatusLabel.Text = "ログイン処理を開始...";
-    await _boxLoginViewModel.LoginAsync();
-    var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
-    System.Diagnostics.Debug.WriteLine("ユーザ情報取得開始");
-    await _boxLoginViewModel.GetUserInfoAsync(accessToken);
-    StatusLabel.Text = "ログイン成功！";
-    var window = MauiApp.Current?.Windows.FirstOrDefault();
-    if (window != null)
-    {
-      window.Page = new AppShell();
-    }
-    **/
+    MauiApp.Current!.Windows[0].Page = new AppShell();
+
   }
 
   private async void OnNewPageButtonClick(object sender, EventArgs e)

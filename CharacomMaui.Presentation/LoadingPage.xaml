@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CharacomMaui.Presentation.LoadingPage"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+  <Grid>
+    <!-- 背景色はテーマに応じて自動切替 -->
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <StackLayout Grid.Row="1"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Spacing="20">
+
+      <!-- ロゴ画像 -->
+      <Image Source="characom_logo.png"
+             WidthRequest="120"
+             HeightRequest="120"
+             Aspect="AspectFit"/>
+
+      <!-- ローディングメッセージ -->
+      <Label Text="Loading..."
+             FontSize="20"
+             HorizontalOptions="Center"
+             TextColor="{DynamicResource PrimaryTextColor}"/>
+
+      <!-- 回転インジケーター -->
+      <ActivityIndicator IsRunning="True"
+                         Color="{DynamicResource PrimaryAccentColor}"
+                         WidthRequest="40"
+                         HeightRequest="40"/>
+
+    </StackLayout>
+  </Grid>
+</ContentPage>

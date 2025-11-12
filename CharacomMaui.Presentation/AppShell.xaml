@@ -8,7 +8,7 @@
   Title="CharacomMaui.Presentation">
 
   <ShellContent
-    Title="Home"
+    Title="Homeホーム"
     ContentTemplate="{DataTemplate local:Pages.HomePage}"
     Route="HomePage"/>
   <ShellContent

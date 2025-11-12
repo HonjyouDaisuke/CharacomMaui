@@ -5,6 +5,7 @@ using CharacomMaui.Application.Interfaces;
 using MauiApp = Microsoft.Maui.Controls.Application;
 using Microsoft.Extensions.DependencyInjection;
 using UraniumUI;
+using System.Threading.Tasks;
 
 namespace CharacomMaui.Presentation;
 
@@ -45,9 +46,9 @@ public partial class App : Microsoft.Maui.Controls.Application
       }
     }
   }
+
   protected override Window CreateWindow(IActivationState? activationState)
   {
-    return new Window(new MainPage());
+    return new Window(new LoadingPage());
   }
-
 }
