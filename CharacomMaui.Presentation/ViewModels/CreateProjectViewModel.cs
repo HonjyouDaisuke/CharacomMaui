@@ -11,6 +11,7 @@ public class CreateProjectViewModel : INotifyPropertyChanged
   public List<BoxItem> Folders { get; }
   private readonly GetBoxFolderItemsUseCase _getFolderItemsUsecase;
   private readonly CreateProjectUseCase _createProjectUsecase;
+  private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
   private BoxItem _selectedFolder = new();
   public BoxItem SelectedFolder
   {
@@ -28,10 +29,13 @@ public class CreateProjectViewModel : INotifyPropertyChanged
 
   public event PropertyChangedEventHandler PropertyChanged;
 
-  public CreateProjectViewModel(GetBoxFolderItemsUseCase getBoxFolderItemsUseCase, CreateProjectUseCase createProjectUseCase)
+  public CreateProjectViewModel(GetBoxFolderItemsUseCase getBoxFolderItemsUseCase,
+                                CreateProjectUseCase createProjectUseCase,
+                                GetUserProjectsUseCase getUserProjectsUseCase)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
     _createProjectUsecase = createProjectUseCase;
+    _getUserProjectsUseCase = getUserProjectsUseCase;
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string? folderId = null)
@@ -45,6 +49,12 @@ public class CreateProjectViewModel : INotifyPropertyChanged
   {
     var access_token = Preferences.Get("app_access_token", string.Empty);
     return await _createProjectUsecase.ExecuteAsync(access_token, project);
+  }
+
+  public async Task<List<Project>?> GetProjectsAsync()
+  {
+    var access_token = Preferences.Get("app_access_token", string.Empty);
+    return await _getUserProjectsUseCase.GetProjectsInfoAsync(access_token);
   }
 }
 

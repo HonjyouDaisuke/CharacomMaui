@@ -4,9 +4,10 @@
              xmlns:u="clr-namespace:UraniumUI.Controls;assembly=UraniumUI"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+             xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
              x:Class="CharacomMaui.Presentation.Pages.ProjectListPage"
              Title="ProjectList">
-  <VerticalStackLayout>
+  <VerticalStackLayout Spacing="10">
     <Label
       Text="Welcome to Project Page"
       VerticalOptions="Center"
@@ -19,11 +20,21 @@
       Text="&#xE147; 新規作成"
       FontFamily="{x:Static models:Icons.FontFamily}"/>
 
-    <Button
-      x:Name="DialogBtn"
-      Clicked="OnDialogButtonClicked"
-      Text="ダイアログ表示"/>
-
+    <CollectionView
+      x:Name="ProjectsCollection"
+      HeightRequest="400"
+      ItemsLayout="VerticalGrid, 6"
+      ItemsSource="{Binding Files2}"
+      SelectionMode="None">
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <components:ProjectInfoCard
+            ProjectName="{Binding Name}"
+            CharaCount="{Binding CharaCount}"
+            UserCount="{Binding UserCount}"/>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
     <ScrollView x:Name="LogScrollView"
                 HeightRequest="300"
                 BackgroundColor="black">

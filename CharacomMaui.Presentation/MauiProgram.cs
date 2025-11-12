@@ -59,6 +59,7 @@ public static class MauiProgram
     // builder.Services.AddTransient<MainPageViewModel>();
     builder.Services.AddTransient<GetBoxConfigUseCase>();
     builder.Services.AddTransient<CreateProjectUseCase>();
+    builder.Services.AddTransient<GetUserProjectsUseCase>();
     builder.Services.AddTransient<LoginToBoxUseCase>();
     builder.Services.AddTransient<CreateUserUseCase>();
     builder.Services.AddSingleton<BoxLoginViewModel>();

@@ -3,6 +3,7 @@ using Box.Sdk.Gen.Schemas;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
@@ -22,6 +23,32 @@ public partial class ProjectListPage : ContentPage
     _repository = repository;
     _dialogService = dialogService;
     _viewModel = viewModel;
+  }
+
+  protected override async void OnAppearing()
+  {
+    base.OnAppearing();
+    var projects = await _viewModel.GetProjectsAsync();
+    if (projects == null) return;
+
+    ProjectsCollection.ItemsSource = projects;
+    foreach (var project in projects)
+    {
+      var card = new ProjectInfoCard
+      {
+        ProjectName = project.Name,
+        CharaCount = project.CharaCount,
+        UserCount = project.UserCount
+      };
+
+      //ProjectsContainer.Children.Add(card);
+
+      LogEditor.Text += $"projectName = {project.Name}\n";
+      LogEditor.Text += $"projectDescription = {project.Description}\n";
+      LogEditor.Text += $"UserCount = {project.UserCount}\n";
+      LogEditor.Text += $"CharaCount = {project.CharaCount}\n";
+      LogEditor.Text += "---------------------------------\n";
+    }
   }
   private async void OnDialogButtonClicked(object sender, EventArgs e)
   {

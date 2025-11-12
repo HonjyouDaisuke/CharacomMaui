@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -68,5 +69,65 @@ public class ProjectRepository : IProjectRepository
         Message = $"想定外のエラーが発生しました。。。{ex.Message}",
       };
     }
+  }
+
+  public async Task<List<string>> GetProjectsAsync(string accessToken)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync("get_user_projects.php", content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+    var response = JsonDocument.Parse(responseBody);
+
+    var list = response.RootElement
+        .GetProperty("projects")
+        .EnumerateArray()
+        .Select(x => x.GetProperty("project_id").GetString())
+        .ToList();
+    return list;
+  }
+
+  public async Task<List<Project>> GetProjectsInfoAsync(string accessToken)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync("get_user_projects.php", content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+    var response = JsonDocument.Parse(responseBody);
+
+    var options = new JsonSerializerOptions
+    {
+      PropertyNameCaseInsensitive = true
+    };
+
+    var result = JsonSerializer.Deserialize<ProjectInfoResponse>(responseBody, options);
+
+    if (result == null || !result.Success)
+      return new List<Project>();
+
+    List<Project> projects = [.. result.Projects.Select(x => new Project
+    {
+        Id = x.Project_Id,
+        Name = x.Name,
+        Description = x.Description,
+        CharaCount = x.Chara_Count,
+        UserCount = x.User_Count
+    })];
+
+    return projects;
   }
 }
