@@ -23,22 +23,26 @@ public partial class BoxFolderViewModel : ObservableObject
     _imageUseCase = imageUseCase;
   }
 
-  public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
-  {
-    var items = await _useCase.GetFolderItemCountAsync(accessToken, folderId);
-    return items;
-  }
-  public async Task LoadFolderItemsAsync(string accessToken)
-  {
-    var items = await _useCase.ExecuteAsync(accessToken, RootFolderId);
-
-    Files.Clear();
-    foreach (var item in items)
+  /**
+    public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
     {
-      Files.Add(new BoxItemViewModel(item));
+      var items = await _useCase.GetFolderItemCountAsync(accessToken, folderId);
+      return items;
     }
-  }
+  **/
 
+  /**
+    public async Task LoadFolderItemsAsync(string accessToken)
+    {
+      var items = await _useCase.ExecuteAsync(accessToken, RootFolderId);
+
+      Files.Clear();
+      foreach (var item in items)
+      {
+        Files.Add(new BoxItemViewModel(item));
+      }
+    }
+  **/
   public async Task LoadImageItemsAsync(string accessToken, string folderId, IProgress<double>? progress = null, CancellationToken token = default)
   {
     Console.WriteLine("Start LoadImage...");

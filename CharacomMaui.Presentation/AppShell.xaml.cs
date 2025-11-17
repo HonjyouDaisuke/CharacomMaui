@@ -1,10 +1,11 @@
-﻿namespace CharacomMaui.Presentation
+﻿namespace CharacomMaui.Presentation;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
-    {
-        public AppShell()
-        {
-            InitializeComponent();
-        }
-    }
+  public AppShell()
+  {
+    InitializeComponent();
+    Routing.RegisterRoute("ProjectDetailPage", typeof(Pages.ProjectDetailPage));
+  }
 }
+

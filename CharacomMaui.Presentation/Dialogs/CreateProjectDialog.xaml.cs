@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using CharacomMaui.Presentation.ViewModels;
 
 namespace CharacomMaui.Presentation.Dialogs;
 

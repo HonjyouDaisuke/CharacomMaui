@@ -34,7 +34,7 @@ public class BoxApiAuthService : IBoxApiAuthService
     using var http = new HttpClient();
     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-    var response = await http.GetAsync("https://api.box.com/2.0/users/me");
+    var response = await http.GetAsync($"https://api.box.com/2.0/users/me");
     var json = await response.Content.ReadAsStringAsync();
     response.EnsureSuccessStatusCode();
     using var doc = JsonDocument.Parse(json);
@@ -48,7 +48,7 @@ public class BoxApiAuthService : IBoxApiAuthService
       status = root.GetProperty("status").GetString(),
       avatar_url = root.GetProperty("avatar_url").GetString(),
     };
-    System.Diagnostics.Debug.WriteLine(json);
+
     return user;
     //return JsonSerializer.Deserialize<BoxUserInfo>(json) ?? new BoxUserInfo();
   }

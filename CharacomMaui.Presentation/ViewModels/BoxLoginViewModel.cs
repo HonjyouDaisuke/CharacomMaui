@@ -1,6 +1,7 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.Models;
 using CharacomMaui.Application.UseCases;
+using CommunityToolkit.Maui.Extensions;
 using System.Text.Json;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
@@ -61,7 +62,8 @@ public class BoxLoginViewModel
             }
 
             // WebViewを閉じる
-            await MauiApp.Current.MainPage.Navigation.PopModalAsync();
+            await MauiApp.Current!.Windows[0].Page!.ClosePopupAsync();
+            //await MauiApp.Current.MainPage.Navigation.PopModalAsync();
           }
           else
           {
@@ -70,7 +72,10 @@ public class BoxLoginViewModel
         }
       };
 
-      await MauiApp.Current.MainPage.Navigation.PushModalAsync(page);
+      var window = MauiApp.Current!.Windows.FirstOrDefault();
+      var pageToPush = window?.Page;
+      await page!.Navigation.PushModalAsync(pageToPush);
+      //await MauiApp.Current!.MainPage.Navigation.PushModalAsync(page); ↑３行
       tokens = await tcs.Task; // ここがTask<BoxAuthResult>になる
     }
     else

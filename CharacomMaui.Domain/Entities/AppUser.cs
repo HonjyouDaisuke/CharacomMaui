@@ -10,4 +10,5 @@ public class AppUser
   public string BoxRefreshToken { get; set; } = string.Empty;
   public string TokenExpiresAt { get; set; } = string.Empty;
   public string RoleId { get; set; } = string.Empty;
+  public string AvatarImgString { get; set; } = string.Empty;
 }

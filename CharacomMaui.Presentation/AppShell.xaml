@@ -5,7 +5,7 @@
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
-  Title="CharacomMaui.Presentation">
+  Title="CharacomMaui">
 
   <ShellContent
     Title="Homeホーム"
@@ -19,4 +19,8 @@
     Title="ProjectList"
     ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
     Route="ProjectListPage"/>
+  <ShellContent
+    Title="ProjectDetail"
+    ContentTemplate="{DataTemplate local:Pages.ProjectDetailPage}"
+    Route="ProjectDetailPage"/>
 </Shell>

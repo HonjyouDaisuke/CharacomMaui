@@ -34,6 +34,7 @@ public class ApiTokenValidationService : ITokenValidationService
 
     System.Diagnostics.Debug.WriteLine("----------server res check accessToken--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
+
     return JsonSerializer.Deserialize<TokenValidationResult>(responseBody)
            ?? new TokenValidationResult { Success = false };
   }

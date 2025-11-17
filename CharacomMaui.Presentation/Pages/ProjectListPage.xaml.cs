@@ -1,10 +1,13 @@
 using System.Threading.Tasks;
 using Box.Sdk.Gen.Schemas;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Presentation.Models;
+using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
@@ -14,15 +17,24 @@ namespace CharacomMaui.Presentation.Pages;
 
 public partial class ProjectListPage : ContentPage
 {
+  private ProjectInfoCard? _selectedCard;
+
   private readonly IBoxFolderRepository _repository;
   private readonly IDialogService _dialogService;
   private readonly CreateProjectViewModel _viewModel;
-  public ProjectListPage(IBoxFolderRepository repository, IDialogService dialogService, CreateProjectViewModel viewModel)
+  private readonly AppStatusUseCase _appStatusUseCase;
+  private readonly AppStatusNotifier _notifier;
+  public ProjectListPage(IBoxFolderRepository repository, IDialogService dialogService, CreateProjectViewModel viewModel, AppStatusUseCase appStatusUseCase, AppStatusNotifier notifier)
   {
     InitializeComponent();
     _repository = repository;
     _dialogService = dialogService;
+    _appStatusUseCase = appStatusUseCase;
     _viewModel = viewModel;
+    _notifier = notifier;
+    _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
+    System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
+    BindingContext = _viewModel;
   }
 
   protected override async void OnAppearing()
@@ -30,7 +42,8 @@ public partial class ProjectListPage : ContentPage
     base.OnAppearing();
     var projects = await _viewModel.GetProjectsAsync();
     if (projects == null) return;
-
+    // TODO:いる？
+    _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
     ProjectsCollection.ItemsSource = projects;
     foreach (var project in projects)
     {
@@ -76,5 +89,56 @@ public partial class ProjectListPage : ContentPage
     var selectedCharaFolder = dialog.SelectedCharaFolder;
 
     LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
+  }
+
+  private async void OnTestBtnClicked(object sender, EventArgs e)
+  {
+    Project project = new()
+    {
+      Name = "自動入力プロジェクト",
+      Id = "aaaaa",
+      Description = "sssss",
+    };
+    System.Diagnostics.Debug.WriteLine("set !" + project.Name);
+    //_appStatusUseCase.SetProjectInfo(project);
+    _notifier.ProjectName = project.Name;
+    var status = _appStatusUseCase.GetAppStatus();
+    System.Diagnostics.Debug.WriteLine($"app.Statu = {status}");
+  }
+  private void OnCardClicked(object sender, ProjectInfoEventArgs e)
+  {
+    if (sender is ProjectInfoCard clickedCard)
+    {
+      // 前のカードの選択を解除
+      if (_selectedCard != null && _selectedCard != clickedCard)
+        _selectedCard.IsSelected = false;
+
+      // 今回のカードを選択
+      clickedCard.IsSelected = true;
+      _selectedCard = clickedCard;
+      _notifier.ProjectName = _selectedCard.ProjectName;
+      LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
+    }
+
+  }
+
+  private async void OnCardDoubleClicked(object sender, ProjectInfoEventArgs e)
+  {
+    if (sender is ProjectInfoCard clickedCard)
+    {
+      // 前のカードの選択を解除
+      if (_selectedCard != null && _selectedCard != clickedCard)
+        _selectedCard.IsSelected = false;
+
+      // 今回のカードを選択
+      clickedCard.IsSelected = true;
+      _selectedCard = clickedCard;
+      _notifier.ProjectName = _selectedCard.ProjectName;
+      LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
+    }
+
+    await Shell.Current.GoToAsync(
+        $"ProjectDetailPage"
+    );
   }
 }

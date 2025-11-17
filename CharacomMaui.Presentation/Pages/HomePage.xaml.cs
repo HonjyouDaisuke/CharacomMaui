@@ -12,8 +12,6 @@ public partial class HomePage : ContentPage
   private const string BOX_ACCESS_TOKEN = "box_access_token";
 
 
-  private readonly LoginToBoxUseCase _loginUseCase;
-  private readonly BoxApiAuthService _boxApiAuthService;
   private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
   private readonly BoxFolderViewModel _boxFolderViewModel;
   private readonly BoxLoginViewModel _boxLoginViewModel;
@@ -24,7 +22,6 @@ public partial class HomePage : ContentPage
   public ObservableCollection<BoxImageItemViewModel> Files2 { get; set; } = new();
 
   public HomePage(GetBoxConfigUseCase getBoxConfigUseCase,
-                  LoginToBoxUseCase loginUseCase,
                   BoxFolderViewModel boxFolderViewModel,
                   BoxLoginViewModel boxLoginViewModel)
   {
@@ -33,9 +30,7 @@ public partial class HomePage : ContentPage
       InitializeComponent();
 
       _getBoxConfigUseCase = getBoxConfigUseCase;
-      _loginUseCase = loginUseCase;
       _boxFolderViewModel = boxFolderViewModel;
-      //_boxApiAuthService = boxApiAuthService;
       _boxLoginViewModel = boxLoginViewModel;
       BindingContext = _boxFolderViewModel;
     }
@@ -157,6 +152,7 @@ public partial class HomePage : ContentPage
     }
     catch (Exception ex)
     {
+      System.Diagnostics.Debug.WriteLine(ex.ToString());
       // ... (中略: エラー時の処理)
     }
   }
