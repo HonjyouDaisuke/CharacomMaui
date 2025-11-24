@@ -133,12 +133,15 @@ public partial class ProjectListPage : ContentPage
       // 今回のカードを選択
       clickedCard.IsSelected = true;
       _selectedCard = clickedCard;
+
       _notifier.ProjectName = _selectedCard.ProjectName;
+      _notifier.ProjectId = _selectedCard.ProjectId;
+      LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
 
     await Shell.Current.GoToAsync(
-        $"ProjectDetailPage"
+        $"ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
     );
   }
 }

@@ -56,7 +56,10 @@ public partial class CreateProjectDialog : Popup
 
         CharaFolderDropdown.ItemsSource.Clear();
         CharaFolderDropdown.ItemsSource = charaFolders;
-
+        if (CharaFolderDropdown.ItemsSource != null)
+        {
+          CharaFolderDropdown.SelectedItem = CharaFolderDropdown.ItemsSource[0];
+        }
         ProjectNameEntry.Text = selected.Name;
       }
     }

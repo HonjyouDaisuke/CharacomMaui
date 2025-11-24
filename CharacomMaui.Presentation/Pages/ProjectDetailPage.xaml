@@ -12,5 +12,41 @@
       Text="Welcome to .NET MAUI!"
       VerticalOptions="Center"
       HorizontalOptions="Center"/>
+
+    <components:ProjectDetailCard/>
+    <components:CharaDataProgressRowTitle/>
+    <ScrollView x:Name="CharaDataListView"
+                HeightRequest="300"
+                BackgroundColor="black">
+
+      <CollectionView
+        x:Name="CharaDataCollection"
+        HeightRequest="400"
+        ItemsLayout="VerticalGrid"
+        ItemsSource="{Binding CharaDataSummaries}"
+        SelectionMode="None">
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <components:CharaDataProgressRow
+              CharaName="{Binding CharaName}"
+              MaterialName="{Binding MaterialName}"
+              CharaCount="{Binding CharaCount}"
+              SelectedCount="{Binding SelectedCount}"
+              RowClicked="OnRowClicked"
+              RowDoubleClicked="OnRowDoubleClicked"/>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+    </ScrollView>
+    <ScrollView x:Name="LogScrollView"
+                HeightRequest="300"
+                BackgroundColor="black">
+      <Editor x:Name="LogEditor"
+              HeightRequest="300"
+              BackgroundColor="Black"
+              TextColor="White"
+              IsReadOnly="True"
+              AutoSize="TextChanges"/>
+    </ScrollView>
   </VerticalStackLayout>
 </ContentPage>

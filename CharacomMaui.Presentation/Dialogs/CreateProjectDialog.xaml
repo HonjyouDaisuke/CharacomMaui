@@ -71,8 +71,10 @@
       <HorizontalStackLayout Spacing="10"
                              HorizontalOptions="Center">
         <Button Text="OK"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                 Clicked="OnOkClicked"/>
         <Button Text="キャンセル"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Secondary}}"
                 Clicked="OnCancelClicked"/>
       </HorizontalStackLayout>
 
