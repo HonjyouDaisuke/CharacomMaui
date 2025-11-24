@@ -1,7 +1,6 @@
 // CharacomMaui.Presentation/ViewModels/BoxItemViewModel.cs
 using CharacomMaui.Domain.Entities;
 using SkiaSharp;
-using Microsoft.Maui.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CharacomMaui.Presentation.ViewModels;

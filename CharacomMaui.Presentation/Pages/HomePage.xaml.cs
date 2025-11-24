@@ -1,5 +1,4 @@
 ﻿using CharacomMaui.Application.UseCases;
-using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui.Extensions;

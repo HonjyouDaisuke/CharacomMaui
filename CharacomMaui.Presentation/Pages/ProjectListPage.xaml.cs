@@ -1,14 +1,10 @@
-using System.Threading.Tasks;
-using Box.Sdk.Gen.Schemas;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;

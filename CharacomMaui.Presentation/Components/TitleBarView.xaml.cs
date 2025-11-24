@@ -1,7 +1,6 @@
 namespace CharacomMaui.Presentation.Components;
 
 using CharacomMaui.Presentation.ViewModels;
-using CharacomMaui.Application.UseCases;
 
 public partial class TitleBarView : ContentView
 {

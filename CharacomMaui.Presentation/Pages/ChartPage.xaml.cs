@@ -1,4 +1,3 @@
-using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 
 namespace CharacomMaui.Presentation.Pages;

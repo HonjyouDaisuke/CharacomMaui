@@ -1,5 +1,4 @@
 using CharacomMaui.Application.Interfaces;
-using CharacomMaui.Application.Models;
 using CharacomMaui.Domain.Entities;
 
 

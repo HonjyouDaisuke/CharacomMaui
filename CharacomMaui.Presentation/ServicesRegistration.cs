@@ -2,7 +2,6 @@ using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
-using CharacomMaui.Presentation;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Pages;
 using CharacomMaui.Presentation.Services;

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Models;
 
 namespace CharacomMaui.Presentation.ViewModels;

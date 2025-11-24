@@ -1,12 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Services;
-using CharacomMaui.Presentation;
 
 namespace CharacomMaui.Presentation.ViewModels;
 

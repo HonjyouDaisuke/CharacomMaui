@@ -1,6 +1,5 @@
 // CharacomMaui.Presentation/ViewModels/BoxFolderViewModel.cs
 using CharacomMaui.Application.UseCases;
-using CharacomMaui.Domain.Entities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 

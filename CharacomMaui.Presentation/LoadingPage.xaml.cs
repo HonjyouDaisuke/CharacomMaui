@@ -1,7 +1,6 @@
 
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
-using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Helpers;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
@@ -58,7 +57,7 @@ public partial class LoadingPage : ContentPage
     {
       isValid = false;
     }
-
+    System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
     if (isValid)
     {
       var avaterImg = await _userUseCase.GetAvatarImgStringAsync(accessToken);

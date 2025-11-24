@@ -1,10 +1,7 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
-using Microsoft.Maui.Controls;
 using UraniumUI.Dialogs;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using CharacomMaui.Presentation.ViewModels;
 

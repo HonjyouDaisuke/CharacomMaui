@@ -1,12 +1,7 @@
-using System.Collections.Specialized;
-using System.Threading.Tasks;
-using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.ViewModels;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using UIKit;
 
 namespace CharacomMaui.Presentation.Pages;
 
