@@ -276,7 +276,7 @@ public partial class CharaSelectViewModel : ObservableObject
   {
     CharaImageBitmap = await CreateWhiteBitmap(320, 320);
     int count = CurrentCharaItems.Count(x => x.IsSelected == true);
-    int num = 0;
+    int num = 1;
     foreach (var item in CurrentCharaItems)
     {
       if (item == null) continue;
