@@ -7,12 +7,6 @@ public partial class CharaDataProgressRow : ContentView
   private const int DoubleClickTime = 300; // ダブルクリック判定の最大間隔(ms)
   private DateTime _lastTapTime;
   private CancellationTokenSource? _cts;
-  public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
-  public string MaterialName { get => (string)GetValue(MaterialNameProperty); set => SetValue(MaterialNameProperty, value); }
-  public int CharaCount { get => (int)GetValue(CharaCountProperty); set => SetValue(CharaCountProperty, value); }
-  public int SelectedCount { get => (int)GetValue(SelectedCountProperty); set => SetValue(SelectedCountProperty, value); }
-  public GridLength SelectedRatio { get => (GridLength)GetValue(SelectedRatioProperty); set => SetValue(SelectedRatioProperty, value); }
-  public GridLength UnselectedRatio { get => (GridLength)GetValue(UnselectedRatioProperty); set => SetValue(UnselectedRatioProperty, value); }
 
   public CharaDataProgressRow()
   {
@@ -22,6 +16,15 @@ public partial class CharaDataProgressRow : ContentView
       UpdateBackground(IsSelected);
     };
   }
+
+  public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
+  public string MaterialName { get => (string)GetValue(MaterialNameProperty); set => SetValue(MaterialNameProperty, value); }
+  public int CharaCount { get => (int)GetValue(CharaCountProperty); set => SetValue(CharaCountProperty, value); }
+  public int SelectedCount { get => (int)GetValue(SelectedCountProperty); set => SetValue(SelectedCountProperty, value); }
+  public GridLength SelectedRatio { get => (GridLength)GetValue(SelectedRatioProperty); set => SetValue(SelectedRatioProperty, value); }
+  public GridLength UnselectedRatio { get => (GridLength)GetValue(UnselectedRatioProperty); set => SetValue(UnselectedRatioProperty, value); }
+
+
 
   public static readonly BindableProperty CharaNameProperty =
     BindableProperty.Create(nameof(CharaName), typeof(string), typeof(CharaDataProgressRow), string.Empty);
@@ -58,8 +61,10 @@ public partial class CharaDataProgressRow : ContentView
   private void OnCardTapped(object? sender, EventArgs e)
   {
     // すでに遅延処理がある場合 → ダブルクリック
+    System.Diagnostics.Debug.WriteLine($"TAP instance: {this.GetHashCode()}");
     if (_cts != null)
     {
+      System.Diagnostics.Debug.WriteLine("DoubleTap: Cancel called");
       _cts.Cancel();
       _cts.Dispose();
       _cts = null;
@@ -79,7 +84,12 @@ public partial class CharaDataProgressRow : ContentView
     Task.Delay(DoubleClickTime, token).ContinueWith(t =>
     {
       if (t.IsCanceled)
+      {
+        System.Diagnostics.Debug.WriteLine("SingleTap: CANCELED");
         return;
+      }
+
+      System.Diagnostics.Debug.WriteLine("SingleTap: EXECUTED");
 
       MainThread.BeginInvokeOnMainThread(() =>
       {
@@ -107,6 +117,7 @@ public partial class CharaDataProgressRow : ContentView
 
   private void UpdateBackground(bool isSelected)
   {
+    //TODO: リソースから色を取ってくるようにする
     var primary = (Color)MauiApp.Current!.Resources["Primary"];
     var oddColor = (Color)MauiApp.Current!.Resources["Gray600"]; // 奇数行用
     var evenLight = Colors.White;

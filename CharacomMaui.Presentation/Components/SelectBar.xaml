@@ -1,0 +1,25 @@
+<ContentView
+  x:Class="CharacomMaui.Presentation.Components.SelectBar"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Name="Root">
+
+  <Grid>
+    <!-- 背景用 BoxView（AppThemeBinding に対応） -->
+    <BoxView
+      x:Name="BackgroundBox"
+      InputTransparent="True"/>
+
+    <!-- メイン内容 -->
+    <ScrollView Orientation="Vertical">
+      <FlexLayout x:Name="ButtonContainer"
+                  Direction="Row"
+                  Wrap="Wrap"
+                  AlignItems="Start"
+                  AlignContent="Start"
+                  JustifyContent="Start"
+                  Margin="0"
+                  Padding="0"/>
+    </ScrollView>
+  </Grid>
+</ContentView>

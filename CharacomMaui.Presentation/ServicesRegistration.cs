@@ -27,6 +27,12 @@ public static class ServicesRegistration
     services.AddTransient<CreateUserUseCase>();
     services.AddTransient<GetBoxFolderItemsUseCase>();
     services.AddTransient<GetBoxImageItemsUseCase>();
+    services.AddTransient<UpdateStrokeMasterUseCase>();
+    services.AddTransient<UpdateStandardMasterUseCase>();
+    services.AddTransient<FetchBoxItemUseCase>();
+    services.AddTransient<GetStandardFileIdUseCase>();
+    services.AddTransient<GetStrokeFileIdUseCase>();
+    services.AddTransient<UpdateCharaSelectedUseCase>();
 
     // Repository
     services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();
@@ -39,6 +45,9 @@ public static class ServicesRegistration
     services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();
     services.AddHttpClient<ITokenValidationService, ApiTokenValidationService>();
     services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
+    services.AddHttpClient<IStrokeMasterRepository, StrokeMasterRepository>();
+    services.AddHttpClient<IStandardMasterRepository, StandardMasterRepository>();
+    services.AddHttpClient<IFetchBoxItemContentService, FetchBoxItemContentService>();
 
     // ViewModel
     services.AddSingleton<BoxLoginViewModel>();
@@ -48,11 +57,12 @@ public static class ServicesRegistration
     services.AddTransient<ProjectDetailViewModel>();
     services.AddSingleton<BoxItemViewModel>();
     services.AddSingleton<BoxImageItemViewModel>();
-    services.AddSingleton<TitleBarViewModel>();   // ViewModel
+    services.AddSingleton<TitleBarViewModel>();
+    services.AddSingleton<CharaSelectViewModel>();
 
     // Domain Service
-    services.AddSingleton<AppStatus>();           // Domain 層の状態
-    services.AddSingleton<AppStatusNotifier>();   // Presentation 層の通知ラッパー
+    services.AddSingleton<AppStatus>();
+    services.AddSingleton<AppStatusNotifier>();
 
     // Infrastructure Service
     services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();

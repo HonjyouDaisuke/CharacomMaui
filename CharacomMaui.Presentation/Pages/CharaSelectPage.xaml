@@ -2,23 +2,120 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CharacomMaui.Presentation.Pages.CharaSelectPage"
-             Title="ChartPage">
+             xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+             xmlns:viewmodels="clr-namespace:CharacomMaui.Presentation.ViewModels"
+             xmlns:pages="clr-namespace:CharacomMaui.Presentation.Pages"
+             xmlns:uranium="clr-namespace:UraniumUI.Controls;assembly=UraniumUI"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             Title="CharaSelectPage">
   <Shell.TitleView>
-    <Grid Padding="0,0,10,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
-
-      <Label Text="{Binding UserName}"
-             VerticalOptions="Center"
-             FontSize="24"/>
-    </Grid>
+    <components:TitleBarView/>
   </Shell.TitleView>
-  <VerticalStackLayout>
-    <Label
-      Text="Welcome to .NET MAUI!"
+
+  <Grid RowDefinitions="Auto,Auto,*,*"
+        ColumnDefinitions="2*,2*,4*,2*">
+    <!-- 文字種選択 -->
+    <components:SelectBar
+      Grid.Row="0"
+      Grid.Column="0"
+      Grid.RowSpan="4"
+      x:Name="CharaSelectBar"
+      ThemeKey="Surface"
+      Items="{Binding CharaNames}"
+      ItemSelected="OnCharaSelectBarItemSelected"
+      InitialSelectedLabel="{Binding InitialCharaName}"/>
+
+    <!-- 標準書体画像 -->
+    <components:CharaImageCard
+      x:Name="StandardCanvasView"
+      CanvasHeight="200"
+      CanvasWidth="200"
+      Title="標準字体"
+      Bitmap="{Binding StandardBitmap}"
+      Grid.Row="0"
+      Grid.Column="1"
       VerticalOptions="Center"
       HorizontalOptions="Center"/>
-  </VerticalStackLayout>
+
+    <!-- 文字画像 -->
+    <VerticalStackLayout
+      Grid.Row="0"
+      Grid.Column="2">
+      <components:CharaImageCard
+        x:Name="CharaCanvasView"
+        CanvasHeight="320"
+        CanvasWidth="320"
+        Title="文字画像"
+        Bitmap="{Binding CharaImageBitmap}"
+        Grid.Row="0"
+        Grid.Column="2"
+        VerticalOptions="Center"
+        HorizontalOptions="Center"/>
+
+      <Button
+        Text="画像作成"
+        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+        TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
+        Clicked="OnDrawCanvas"/>
+    </VerticalStackLayout>
+    <!-- 筆順画像 -->
+    <components:CharaImageCard
+      x:Name="StrokeCanvasView"
+      CanvasHeight="200"
+      CanvasWidth="200"
+      Title="筆順画像"
+      Bitmap="{Binding StrokeBitmap}"
+      Grid.Row="0"
+      Grid.Column="3"
+      VerticalOptions="Center"
+      HorizontalOptions="Center"/>
+
+    <!-- 資料名選択 -->
+    <components:SelectBar
+      Grid.Row="1"
+      Grid.Column="1"
+      Grid.ColumnSpan="3"
+      HeightRequest="80"
+      ThemeKey="Background"
+      x:Name="MaterialSelectBar"
+      Items="{Binding MaterialNames}"
+      ItemSelected="OnMaterialSelectBarItemSelected"
+      InitialSelectedLabel="{Binding InitialMaterialName}"/>
+
+    <ScrollView
+      Grid.Row="2"
+      Grid.Column="1"
+      Grid.ColumnSpan="3">
+      <FlexLayout
+        Direction="Row"
+        Wrap="Wrap"
+        AlignItems="Start"
+        JustifyContent="Start"
+        BindableLayout.ItemsSource="{Binding CurrentCharaItems}"
+        Margin="10">
+
+        <BindableLayout.ItemTemplate>
+          <DataTemplate>
+            <components:CharaThumbnailCard
+              Title="{Binding FileId}"
+              CharaId="{Binding CharaId}"
+              CanvasWidth="64"
+              CanvasHeight="64"
+              IsSelected="{Binding IsSelected}"
+              RawImageData="{Binding RawImageData}"
+              CardClicked="OnCardClicked"
+              CardDoubleClicked="OnCardDoubleClicked"
+              Margin="5"/>
+          </DataTemplate>
+        </BindableLayout.ItemTemplate>
+      </FlexLayout>
+    </ScrollView>
+
+
+    <Editor x:Name="LogEditor"
+            Grid.Row="3"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            HeightRequest="300"/>
+  </Grid>
 </ContentPage>

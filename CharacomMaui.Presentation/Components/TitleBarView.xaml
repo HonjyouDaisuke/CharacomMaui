@@ -23,7 +23,7 @@
             HeightRequest="36"
             VerticalOptions="Center"
             HorizontalOptions="End">
-      <Image Source="{Binding AvatarImage}"
+      <Image Source="{Binding AvatarImageSource}"
              Aspect="AspectFill">
         <Image.Clip>
           <EllipseGeometry Center="18,18"

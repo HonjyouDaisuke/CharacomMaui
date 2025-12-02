@@ -62,7 +62,7 @@ public partial class LoadingPage : ContentPage
     {
       var avaterImg = await _userUseCase.GetAvatarImgStringAsync(accessToken);
       System.Diagnostics.Debug.WriteLine($"avaterImg = {avaterImg}");
-      user.AvatarImgString = avaterImg;
+      user!.AvatarImgString = avaterImg;
       _statusUseCase.SetUserInfo(user);
 
       MauiApp.Current!.Windows[0].Page = new AppShell();

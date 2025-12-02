@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using CharacomMaui.Domain.Entities;
+using CommunityToolkit.Maui.Core.Platform;
 
 namespace CharacomMaui.Presentation.Models;
 
@@ -43,5 +44,37 @@ public class AppStatusNotifier : INotifyPropertyChanged
   public event PropertyChangedEventHandler? PropertyChanged;
 
   private void OnPropertyChanged([CallerMemberName] string? name = null)
-      => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+  {
+    MainThread.BeginInvokeOnMainThread(() =>
+    {
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    });
+  }
+
+
+  public string? CharaName
+  {
+    get => _status.CharaName;
+    set
+    {
+      if (_status.CharaName != value)
+      {
+        _status.CharaName = value;
+        OnPropertyChanged();
+      }
+    }
+  }
+
+  public string? MaterialName
+  {
+    get => _status.MaterialName;
+    set
+    {
+      if (_status.MaterialName != value)
+      {
+        _status.MaterialName = value;
+        OnPropertyChanged();
+      }
+    }
+  }
 }
