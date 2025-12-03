@@ -119,7 +119,7 @@ public partial class SelectBar : ContentView
     control.ApplyInitialSelection();
   }
 
-  private Color getColor(string key)
+  private static Color GetColor(string key)
   {
     string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
     key = $"{key}{LorD}";
@@ -145,8 +145,8 @@ public partial class SelectBar : ContentView
       {
         Text = label,
         BackgroundColor = Colors.Transparent, // 非選択色
-        TextColor = getColor("Outline"),
-        BorderColor = getColor("Outline"),
+        TextColor = GetColor("Outline"),
+        BorderColor = GetColor("Outline"),
         BorderWidth = 1,
         WidthRequest = 60,
         CornerRadius = 8,
@@ -187,16 +187,14 @@ public partial class SelectBar : ContentView
     if (_selectedButton != null)
     {
       _selectedButton.BackgroundColor = Colors.Transparent;
-      _selectedButton.TextColor = getColor("Outline");
-      _selectedButton.BorderColor = getColor("Outline");
+      _selectedButton.TextColor = GetColor("Outline");
+      _selectedButton.BorderColor = GetColor("Outline");
       _selectedButton.BorderWidth = 1;
     }
 
-    Color primary = (Color)MauiApp.Current!.Resources["Primary"];
-    Color onPrimary = (Color)MauiApp.Current!.Resources["OnPrimary"];
     // 選択色
-    clickedButton.BackgroundColor = getColor("Primary");
-    clickedButton.TextColor = getColor("OnPrimary");
+    clickedButton.BackgroundColor = GetColor("Primary");
+    clickedButton.TextColor = GetColor("OnPrimary");
     clickedButton.BorderWidth = 0;
 
     _selectedButton = clickedButton;
