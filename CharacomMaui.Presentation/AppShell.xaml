@@ -2,16 +2,21 @@
 <Shell
   x:Class="CharacomMaui.Presentation.AppShell"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
   Title="CharacomMaui.Presentation">
 
   <ShellContent
-    Title="Home"
+    Title="Homeホーム"
     ContentTemplate="{DataTemplate local:Pages.HomePage}"
     Route="HomePage"/>
   <ShellContent
     Title="Chart"
     ContentTemplate="{DataTemplate local:Pages.ChartPage}"
     Route="ChartPage"/>
+  <ShellContent
+    Title="ProjectList"
+    ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
+    Route="ProjectListPage"/>
 </Shell>

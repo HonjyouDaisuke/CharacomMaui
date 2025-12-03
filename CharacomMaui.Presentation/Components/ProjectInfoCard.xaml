@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+  x:Class="CharacomMaui.Presentation.Components.ProjectInfoCard"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  x:Name="This">
+
+  <Border
+    Margin="4"
+    Padding="8"
+    BackgroundColor="{AppThemeBinding Light=#FFFFFF,
+                                          Dark=#1E1E1E}"
+    Shadow="3"
+    Stroke="{DynamicResource Gray200}"
+    StrokeShape="RoundRectangle 6"
+    StrokeThickness="1">
+
+    <VerticalStackLayout HorizontalOptions="Center"
+                         Spacing="6">
+      <Label FontAttributes="Bold"
+             Text="{Binding ProjectName, Source={x:Reference This}}"/>
+      <BoxView HeightRequest="1"
+               BackgroundColor="#444"
+               HorizontalOptions="Fill"/>
+      <HorizontalStackLayout HorizontalOptions="Start"
+                             Spacing="6">
+        <HorizontalStackLayout Spacing="4">
+          <Label Text="&#xe413;"
+                 FontSize="24"
+                 FontFamily="{x:Static models:Icons.FontFamily}"/>
+          <Label Text="{Binding CharaCount, Source={x:Reference This}}"/>
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout Spacing="4"
+                               HorizontalOptions="End">
+          <Label Text="&#xf233;"
+                 FontSize="24"
+                 FontFamily="{x:Static models:Icons.FontFamily}"/>
+          <Label Text="{Binding UserCount, Source={x:Reference This}}"/>
+        </HorizontalStackLayout>
+
+      </HorizontalStackLayout>
+    </VerticalStackLayout>
+  </Border>
+</ContentView>

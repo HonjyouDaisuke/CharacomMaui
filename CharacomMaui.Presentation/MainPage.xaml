@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:uranium="clr-namespace:UraniumUI.Controls;assembly=UraniumUI"
              x:Class="CharacomMaui.Presentation.MainPage">
 
   <ScrollView>
@@ -42,7 +43,12 @@
                  HorizontalOptions="Center"/>
         </VerticalStackLayout>
       </Border>
-
+      <Button
+        x:Name="NewPageBtn"
+        Clicked="OnNewPageButtonClick"
+        HorizontalOptions="Fill"
+        SemanticProperties.Hint="Counts the number of times you click"
+        Text="Click me"/>
       <ScrollView x:Name="LogScrollView"
                   HeightRequest="300"
                   BackgroundColor="black">
