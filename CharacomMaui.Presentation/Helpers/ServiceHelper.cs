@@ -1,6 +1,3 @@
-using Microsoft.Maui.Controls;
-using System;
-
 namespace CharacomMaui.Presentation.Helpers;
 
 public static class ServiceHelper

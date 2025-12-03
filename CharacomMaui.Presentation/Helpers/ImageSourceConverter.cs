@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using Microsoft.Maui.Controls;
 using SkiaSharp;
 
 namespace CharacomMaui.Presentation.Helpers;

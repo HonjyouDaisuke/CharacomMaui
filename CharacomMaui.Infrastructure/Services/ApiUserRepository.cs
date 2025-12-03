@@ -95,6 +95,7 @@ public class ApiUserRepository : IUserRepository
     var success = response.GetProperty("success").GetBoolean();
     if (!success)
     {
+      System.Diagnostics.Debug.WriteLine("success = Falseだよ");
       return null;
     }
 

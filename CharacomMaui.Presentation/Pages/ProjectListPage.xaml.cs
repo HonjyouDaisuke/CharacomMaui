@@ -1,14 +1,10 @@
-using System.Threading.Tasks;
-using Box.Sdk.Gen.Schemas;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
@@ -133,12 +129,15 @@ public partial class ProjectListPage : ContentPage
       // 今回のカードを選択
       clickedCard.IsSelected = true;
       _selectedCard = clickedCard;
+
       _notifier.ProjectName = _selectedCard.ProjectName;
+      _notifier.ProjectId = _selectedCard.ProjectId;
+      LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
 
     await Shell.Current.GoToAsync(
-        $"ProjectDetailPage"
+        $"ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
     );
   }
 }

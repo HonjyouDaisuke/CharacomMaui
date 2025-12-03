@@ -27,6 +27,19 @@ public class AppStatusNotifier : INotifyPropertyChanged
     }
   }
 
+  public string ProjectId
+  {
+    get => _status.ProjectId;
+    set
+    {
+      if (_status.ProjectId != value)
+      {
+        _status.ProjectId = value;
+        OnPropertyChanged();
+      }
+    }
+  }
+
   public event PropertyChangedEventHandler? PropertyChanged;
 
   private void OnPropertyChanged([CallerMemberName] string? name = null)

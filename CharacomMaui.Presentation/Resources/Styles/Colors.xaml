@@ -10,7 +10,7 @@
   <Color x:Key="OnPrimaryContainer">#176031</Color>
   <Color x:Key="PrimaryDarkText">#242424</Color>
 
-  <Color x:Key="Secondary">#B5FF7D</Color>
+  <Color x:Key="Secondary">#7B987F</Color>
   <Color x:Key="OnSecondary">#2C3639</Color>
   <Color x:Key="SecondaryContainer">#e1ffcb</Color>
   <Color x:Key="OnSecondaryContainer">#3F4E4F</Color>
