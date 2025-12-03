@@ -7,6 +7,7 @@
   x:Name="This">
 
   <Border
+    x:Name="BackgroundBorder"
     Margin="4"
     Padding="8"
     BackgroundColor="{AppThemeBinding Light=#FFFFFF,
@@ -15,7 +16,9 @@
     Stroke="{DynamicResource Gray200}"
     StrokeShape="RoundRectangle 6"
     StrokeThickness="1">
-
+    <Border.GestureRecognizers>
+      <TapGestureRecognizer Tapped="OnCardTapped"/>
+    </Border.GestureRecognizers>
     <VerticalStackLayout HorizontalOptions="Center"
                          Spacing="6">
       <Label FontAttributes="Bold"

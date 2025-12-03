@@ -1,18 +1,23 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation;
 
-public class CreateProjectViewModel : INotifyPropertyChanged
+namespace CharacomMaui.Presentation.ViewModels;
+
+public partial class CreateProjectViewModel : ObservableObject
 {
-  public List<BoxItem> Folders { get; }
   private readonly GetBoxFolderItemsUseCase _getFolderItemsUsecase;
   private readonly CreateProjectUseCase _createProjectUsecase;
   private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
   private BoxItem _selectedFolder = new();
+
+  public AppStatus _appStatus = new();
   public BoxItem SelectedFolder
   {
     get => _selectedFolder;
@@ -55,6 +60,24 @@ public class CreateProjectViewModel : INotifyPropertyChanged
   {
     var access_token = Preferences.Get("app_access_token", string.Empty);
     return await _getUserProjectsUseCase.GetProjectsInfoAsync(access_token);
+  }
+
+  public AppStatus AppStatus
+  {
+    get => _appStatus;
+    set
+    {
+      if (_appStatus != value)
+      {
+        _appStatus = value;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AppStatus)));
+      }
+    }
+  }
+
+  public void SetUserStatus(AppStatus appStatus)
+  {
+    AppStatus = appStatus;
   }
 }
 

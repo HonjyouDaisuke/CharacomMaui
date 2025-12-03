@@ -21,9 +21,11 @@ public class GetBoxFolderItemsUseCase
     return await _repository.GetFolderItemsAsync(accessToken, folderId);
   }
 
-  public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
-  {
-    // TODO:作り変えが必要
-    return 0;  //await _repository.GetFolderItemCountAsync(accessToken, folderId);
-  }
+  /**
+    public async Task<int> GetFolderItemCountAsync(string accessToken, string folderId)
+    {
+      // TODO:作り変えが必要
+      return 0;  //await _repository.GetFolderItemCountAsync(accessToken, folderId);
+    }
+  ***/
 }

@@ -1,4 +1,5 @@
-﻿using CharacomMaui.Domain.Entities;
+﻿using CharacomMaui.Application.UseCases;
+using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.ViewModels;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
@@ -8,7 +9,10 @@ public partial class MainPage : ContentPage
 {
   private readonly BoxLoginViewModel _boxLoginViewModel;
   private readonly CreateAppUserViewModel _createAppUserViewModel;
-  public MainPage()
+  private readonly GetUserInfoUseCase _userUseCase;
+  private readonly AppStatusUseCase _statusUseCase;
+
+  public MainPage(GetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase)
   {
     try
     {
@@ -18,6 +22,8 @@ public partial class MainPage : ContentPage
       _createAppUserViewModel = MauiApp.Current.Handler.MauiContext.Services
                              .GetRequiredService<CreateAppUserViewModel>();
       BindingContext = _boxLoginViewModel;
+      _userUseCase = userUseCase;
+      _statusUseCase = statusUseCase;
     }
     catch (Exception ex)
     {
@@ -60,6 +66,8 @@ public partial class MainPage : ContentPage
       LogEditor.Text += "ユーザー情報を保存しました...\n";
       var accessToken = Preferences.Get("app_access_token", string.Empty);
       LogEditor.Text += $"app AccessToken = {accessToken}\n";
+      var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
+      _statusUseCase.SetUserInfo(userInfo);
     }
     else
     {

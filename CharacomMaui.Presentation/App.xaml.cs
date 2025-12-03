@@ -6,14 +6,20 @@ using MauiApp = Microsoft.Maui.Controls.Application;
 using Microsoft.Extensions.DependencyInjection;
 using UraniumUI;
 using System.Threading.Tasks;
+using CharacomMaui.Application.UseCases;
+using CharacomMaui.Domain.Entities;
 
 namespace CharacomMaui.Presentation;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {
-  public App()
+  private readonly GetUserInfoUseCase _userUseCase;
+  private readonly AppStatusUseCase _statusUseCase;
+  public App(GetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase)
   {
     InitializeComponent();
+    _userUseCase = userUserCase;
+    _statusUseCase = statusUseCase;
   }
 
 
@@ -49,6 +55,10 @@ public partial class App : Microsoft.Maui.Controls.Application
 
   protected override Window CreateWindow(IActivationState? activationState)
   {
-    return new Window(new LoadingPage());
+    var window = new Window(new LoadingPage(_userUseCase, _statusUseCase));
+
+    window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
+
+    return window;
   }
 }

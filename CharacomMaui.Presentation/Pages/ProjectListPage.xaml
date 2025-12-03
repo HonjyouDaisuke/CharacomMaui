@@ -7,6 +7,10 @@
              xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
              x:Class="CharacomMaui.Presentation.Pages.ProjectListPage"
              Title="ProjectList">
+  <Shell.TitleView>
+    <components:TitleBarView/>
+  </Shell.TitleView>
+
   <VerticalStackLayout Spacing="10">
     <Label
       Text="Welcome to Project Page"
@@ -19,7 +23,10 @@
       SemanticProperties.Hint="Counts the number of times you click"
       Text="&#xE147; 新規作成"
       FontFamily="{x:Static models:Icons.FontFamily}"/>
-
+    <Button
+      x:Name="TestBtn"
+      Text="Test"
+      Clicked="OnTestBtnClicked"/>
     <CollectionView
       x:Name="ProjectsCollection"
       HeightRequest="400"
@@ -29,9 +36,12 @@
       <CollectionView.ItemTemplate>
         <DataTemplate>
           <components:ProjectInfoCard
+            ProjectId="{Binding Id}"
             ProjectName="{Binding Name}"
             CharaCount="{Binding CharaCount}"
-            UserCount="{Binding UserCount}"/>
+            UserCount="{Binding UserCount}"
+            CardClicked="OnCardClicked"
+            CardDoubleClicked="OnCardDoubleClicked"/>
         </DataTemplate>
       </CollectionView.ItemTemplate>
     </CollectionView>
