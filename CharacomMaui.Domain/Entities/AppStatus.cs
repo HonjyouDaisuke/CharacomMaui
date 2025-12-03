@@ -9,6 +9,8 @@ public class AppStatus
   public string ProjectName { get; set; } = string.Empty;
   public string ProjectFolderId { get; set; } = string.Empty;
   public string CharaFolderId { get; set; } = string.Empty;
+  public string MaterialName { get; set; } = string.Empty;
+  public string? CharaName { get; set; } = string.Empty;
   public string ProjectRole { get; set; } = string.Empty;
   public string AvatarUrl { get; set; } = string.Empty;
   public string AvatarImgString { get; set; } = string.Empty;

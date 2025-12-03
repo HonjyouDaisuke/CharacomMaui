@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Formats.Tar;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -46,7 +47,34 @@ public class CharaDataRepository : ICharaDataRepository
       System.Diagnostics.Debug.WriteLine(ex.Message);
       throw; // ← ここで投げれば MAUI の output にも出る
     }
+  }
 
+  public async Task<SimpleApiResult> UpdateSelectdCharaAsync(string accessToken, string charaId, bool isSelected)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      chara_id = charaId,
+      is_selected = isSelected,
+    });
 
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync("update_chara_selected.php", content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+
+    System.Diagnostics.Debug.WriteLine("---------- Update CharaSelected server res--------------");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken} CharaId = {charaId} is_selected = {isSelected}");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+    try
+    {
+      var result = JsonSerializer.Deserialize<SimpleApiResult>(responseBody);
+      return result;
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine("!!!! JSON Deserialize ERROR !!!!");
+      System.Diagnostics.Debug.WriteLine(ex.Message);
+      throw; // ← ここで投げれば MAUI の output にも出る
+    }
   }
 }

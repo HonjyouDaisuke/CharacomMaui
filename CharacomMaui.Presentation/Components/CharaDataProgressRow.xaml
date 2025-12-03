@@ -10,6 +10,10 @@
   <ContentView.Resources>
     <conv:OddConverter x:Key="OddConverter"/>
   </ContentView.Resources>
+  <ContentView.GestureRecognizers>
+    <TapGestureRecognizer Tapped="OnCardTapped"/>
+  </ContentView.GestureRecognizers>
+
   <Grid RowDefinitions="*, Auto">
 
     <Grid Margin="20,5,20,5"
@@ -18,9 +22,6 @@
           ColumnSpacing="10"
           x:Name="BackgroundBorder"
           BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
-      <Grid.GestureRecognizers>
-        <TapGestureRecognizer Tapped="OnCardTapped"/>
-      </Grid.GestureRecognizers>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="1*"/>
         <ColumnDefinition Width="1*"/>

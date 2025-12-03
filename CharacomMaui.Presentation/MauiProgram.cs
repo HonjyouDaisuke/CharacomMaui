@@ -2,6 +2,7 @@
 using InputKit.Handlers;
 using Microsoft.Extensions.Logging;
 using Mopups.Hosting;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 using UraniumUI;
 
 namespace CharacomMaui.Presentation;
@@ -16,6 +17,7 @@ public static class MauiProgram
         .UseMauiCommunityToolkit()
         .UseUraniumUI()
         .UseUraniumUIMaterial()
+        .UseSkiaSharp()
         .ConfigureMopups()
         .ConfigureMauiHandlers(handlers =>
         {

@@ -24,9 +24,13 @@
       Text="&#xE147; 新規作成"
       FontFamily="{x:Static models:Icons.FontFamily}"/>
     <Button
-      x:Name="TestBtn"
-      Text="Test"
-      Clicked="OnTestBtnClicked"/>
+      x:Name="StandardBtn"
+      Text="標準画像生成"
+      Clicked="OnStandardBtnClicked"/>
+    <Button
+      x:Name="StrokeBtn"
+      Text="筆順画像生成"
+      Clicked="OnStrokeBtnClicked"/>
     <CollectionView
       x:Name="ProjectsCollection"
       HeightRequest="400"
@@ -46,8 +50,7 @@
       </CollectionView.ItemTemplate>
     </CollectionView>
     <ScrollView x:Name="LogScrollView"
-                HeightRequest="300"
-                BackgroundColor="black">
+                HeightRequest="300">
       <Editor x:Name="LogEditor"
               HeightRequest="300"
               BackgroundColor="Black"

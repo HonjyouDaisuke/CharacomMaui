@@ -11,6 +11,8 @@ public partial class CreateProjectViewModel : ObservableObject
   private readonly GetBoxFolderItemsUseCase _getFolderItemsUsecase;
   private readonly CreateProjectUseCase _createProjectUsecase;
   private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
+  private readonly UpdateStrokeMasterUseCase _updateStrokeMasterUseCase;
+  private readonly UpdateStandardMasterUseCase _updateStandardMasterUseCase;
   private BoxItem _selectedFolder = new();
 
   public AppStatus _appStatus = new();
@@ -32,11 +34,15 @@ public partial class CreateProjectViewModel : ObservableObject
 
   public CreateProjectViewModel(GetBoxFolderItemsUseCase getBoxFolderItemsUseCase,
                                 CreateProjectUseCase createProjectUseCase,
-                                GetUserProjectsUseCase getUserProjectsUseCase)
+                                GetUserProjectsUseCase getUserProjectsUseCase,
+                                UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
+                                UpdateStandardMasterUseCase updateStandardMasterUseCase)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
     _createProjectUsecase = createProjectUseCase;
     _getUserProjectsUseCase = getUserProjectsUseCase;
+    _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
+    _updateStandardMasterUseCase = updateStandardMasterUseCase;
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string? folderId = null)
@@ -74,6 +80,18 @@ public partial class CreateProjectViewModel : ObservableObject
   public void SetUserStatus(AppStatus appStatus)
   {
     AppStatus = appStatus;
+  }
+
+  public async Task<SimpleApiResult> UpdateStrokeAsync()
+  {
+    var access_token = Preferences.Get("app_access_token", string.Empty);
+    return await _updateStrokeMasterUseCase.ExecuteAsync(access_token);
+  }
+
+  public async Task<SimpleApiResult> UpdateStandardAsync()
+  {
+    var access_token = Preferences.Get("app_access_token", string.Empty);
+    return await _updateStandardMasterUseCase.ExecuteAsync(access_token);
   }
 }
 

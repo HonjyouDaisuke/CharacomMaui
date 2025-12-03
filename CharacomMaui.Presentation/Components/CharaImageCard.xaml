@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+  x:Class="CharacomMaui.Presentation.Components.CharaImageCard"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+  x:Name="Root">
+  <Border
+    StrokeShape="RoundRectangle 8"
+    StrokeThickness="0"
+    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface},
+                                        Dark={DynamicResource SurfaceDark}}">
+    <Grid
+      Padding="10"
+      RowDefinitions="Auto, Auto"
+      RowSpacing="5">
+      <Label
+        x:Name="TitleLabel"
+        FontSize="20"
+        FontAttributes="Bold"
+        VerticalOptions="Center"
+        HorizontalOptions="Center"
+        Text="{Binding Source={x:Reference Root}, Path=Title}"
+        Grid.Row="0"/>
+
+      <skia:SKCanvasView
+        x:Name="CharaImage"
+        WidthRequest="{Binding Source={x:Reference Root}, Path=CanvasWidth}"
+        HeightRequest="{Binding Source={x:Reference Root}, Path=CanvasHeight}"
+        PaintSurface="OnPaintCharaImageSurface"
+        Grid.Row="1"/>
+
+    </Grid>
+  </Border>
+</ContentView>

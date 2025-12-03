@@ -87,19 +87,27 @@ public partial class ProjectListPage : ContentPage
     LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
   }
 
-  private async void OnTestBtnClicked(object sender, EventArgs e)
+  private async void OnStrokeBtnClicked(object sender, EventArgs e)
   {
-    Project project = new()
+    using (await _dialogService.DisplayProgressAsync("筆順書体マスター", "筆順書体マスターを作成しています。少々お待ちください。"))
     {
-      Name = "自動入力プロジェクト",
-      Id = "aaaaa",
-      Description = "sssss",
-    };
-    System.Diagnostics.Debug.WriteLine("set !" + project.Name);
-    //_appStatusUseCase.SetProjectInfo(project);
-    _notifier.ProjectName = project.Name;
-    var status = _appStatusUseCase.GetAppStatus();
-    System.Diagnostics.Debug.WriteLine($"app.Statu = {status}");
+      // Indicate a long running operation
+      // エントリーの作成
+      var res = await _viewModel.UpdateStrokeAsync();
+      System.Diagnostics.Debug.WriteLine(res.ToString());
+    }
+  }
+
+  // 標準画像の更新
+  private async void OnStandardBtnClicked(object sender, EventArgs e)
+  {
+    using (await _dialogService.DisplayProgressAsync("標準書体マスター", "標準書体マスターを作成しています。少々お待ちください。"))
+    {
+      // Indicate a long running operation
+      // エントリーの作成
+      var res = await _viewModel.UpdateStandardAsync();
+      System.Diagnostics.Debug.WriteLine(res.ToString());
+    }
   }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
   {
@@ -137,7 +145,7 @@ public partial class ProjectListPage : ContentPage
     }
 
     await Shell.Current.GoToAsync(
-        $"ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
+        $"///ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
     );
   }
 }

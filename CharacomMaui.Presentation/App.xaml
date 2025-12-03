@@ -6,6 +6,7 @@
              x:Class="CharacomMaui.Presentation.App">
   <Application.Resources>
     <ResourceDictionary>
+      <!--  💡 Uranium + Styles 読み込み -->
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary x:Name="appColors"
                             Source="Resources/Styles/Colors.xaml"/>
