@@ -5,11 +5,9 @@
   x:Name="Root">
 
   <Grid>
-    <!-- 背景用 BoxView（AppThemeBinding に対応） -->
     <BoxView
       x:Name="BackgroundBox"
       InputTransparent="True"/>
-
     <!-- メイン内容 -->
     <ScrollView Orientation="Vertical">
       <FlexLayout x:Name="ButtonContainer"

@@ -32,7 +32,6 @@ public partial class SelectBar : ContentView
     get => (IEnumerable<string>)GetValue(ItemsProperty);
     set => SetValue(ItemsProperty, value);
   }
-
   // ========= テーマ =========
   public static readonly BindableProperty ThemeKeyProperty =
     BindableProperty.Create(
@@ -84,17 +83,6 @@ public partial class SelectBar : ContentView
 
     control.BuildButtons();
   }
-
-  private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-  {
-    BuildButtons();
-  }
-
-  private static void OnInitialSelectedLabelChanged(BindableObject bindable, object oldValue, object newValue)
-  {
-    var control = (SelectBar)bindable;
-    control.ApplyInitialSelection();
-  }
   private static void OnThemeKeyChanged(BindableObject bindable, object oldVal, object newVal)
   {
     var control = (SelectBar)bindable;
@@ -119,6 +107,29 @@ public partial class SelectBar : ContentView
           (Color)dark);
     }
   }
+
+  private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    BuildButtons();
+  }
+
+  private static void OnInitialSelectedLabelChanged(BindableObject bindable, object oldValue, object newValue)
+  {
+    var control = (SelectBar)bindable;
+    control.ApplyInitialSelection();
+  }
+
+  private static Color GetColor(string key)
+  {
+    string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
+    key = $"{key}{LorD}";
+    if (MauiApp.Current!.Resources.TryGetValue(key, out var value) && value is Color color)
+      return color;
+
+    return Colors.Transparent;
+  }
+
+
   private void BuildButtons()
   {
     ButtonContainer.Children.Clear();
@@ -126,13 +137,17 @@ public partial class SelectBar : ContentView
     if (Items == null || !Items.Any())
       return;
 
+    string LorD = string.Empty;
+
     foreach (var label in Items)
     {
       var btn = new Button
       {
         Text = label,
-        BackgroundColor = Colors.LightGray, // 非選択色
-        TextColor = Colors.Black,
+        BackgroundColor = Colors.Transparent, // 非選択色
+        TextColor = GetColor("Outline"),
+        BorderColor = GetColor("Outline"),
+        BorderWidth = 1,
         WidthRequest = 60,
         CornerRadius = 8,
         Padding = new Thickness(16, 10),
@@ -171,15 +186,16 @@ public partial class SelectBar : ContentView
     // 非選択色に戻す
     if (_selectedButton != null)
     {
-      _selectedButton.BackgroundColor = Colors.LightGray;
-      _selectedButton.TextColor = Colors.Black;
+      _selectedButton.BackgroundColor = Colors.Transparent;
+      _selectedButton.TextColor = GetColor("Outline");
+      _selectedButton.BorderColor = GetColor("Outline");
+      _selectedButton.BorderWidth = 1;
     }
 
-    Color primary = (Color)MauiApp.Current!.Resources["Primary"];
-    Color onPrimary = (Color)MauiApp.Current!.Resources["OnPrimary"];
     // 選択色
-    clickedButton.BackgroundColor = primary;
-    clickedButton.TextColor = onPrimary;
+    clickedButton.BackgroundColor = GetColor("Primary");
+    clickedButton.TextColor = GetColor("OnPrimary");
+    clickedButton.BorderWidth = 0;
 
     _selectedButton = clickedButton;
 
