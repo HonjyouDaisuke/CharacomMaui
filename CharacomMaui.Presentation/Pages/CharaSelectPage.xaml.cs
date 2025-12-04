@@ -39,15 +39,19 @@ public partial class CharaSelectPage : ContentPage
     //CharaSelectBar.ItemSelected += OnCharaSelectBarItemSelected;
 
   }
-  protected override void OnAppearing()
+  protected override async void OnAppearing()
   {
     base.OnAppearing();
     LogEditor.Text += $"ProjectName = {_appStatus.ProjectName} id:{_appStatus.ProjectId}\n";
     LogEditor.Text += $"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}\n";
     LogEditor.Text += $"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}\n";
+    System.Diagnostics.Debug.WriteLine("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+    System.Diagnostics.Debug.WriteLine($"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}");
+    System.Diagnostics.Debug.WriteLine($"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}");
+
     if (_pageCharaName != _appStatus.CharaName || _pageMaterialName != _appStatus.MaterialName)
     {
-      _ = _viewModel.GetCharaItemAsync();
+      await _viewModel.GetCharaItemAsync();
       _pageCharaName = _appStatus.CharaName!;
       _pageMaterialName = _appStatus.MaterialName;
     }
@@ -70,6 +74,7 @@ public partial class CharaSelectPage : ContentPage
 
   private async void OnMaterialSelectBarItemSelected(object? sender, string selectedLabel)
   {
+    if (_viewModel.IsLoading) return;
     System.Diagnostics.Debug.WriteLine($"OnMaterialSelectBarItemSelected isChanging = {_isChanging}");
     LogEditor.Text += $"選択された資料名: {selectedLabel} pageMaterialName={_pageMaterialName}\n";
     if (string.IsNullOrEmpty(selectedLabel)) return;
@@ -93,6 +98,7 @@ public partial class CharaSelectPage : ContentPage
 
   private async void OnCharaSelectBarItemSelected(object? sender, string selectedLabel)
   {
+    if (_viewModel.IsLoading) return;
     System.Diagnostics.Debug.WriteLine($"OnCharaSelectBarItemSelected isChanging = {_isChanging}");
     LogEditor.Text += $"選択された文字種: {selectedLabel} pageCharaName={_pageCharaName}\n";
     if (string.IsNullOrEmpty(selectedLabel)) return;

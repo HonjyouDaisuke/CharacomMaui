@@ -8,10 +8,12 @@ namespace CharacomMaui.Presentation.ViewModels;
 public class ProjectDetailViewModel : INotifyPropertyChanged
 {
   public ObservableCollection<CharaDataSummary> CharaDataSummaries { get; } = [];
+  private readonly AppStatus _appStatus;
   GetProjectCharaItemsUseCase _useCase;
-  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase)
+  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus)
   {
     _useCase = useCase;
+    _appStatus = appStatus;
   }
   public event PropertyChangedEventHandler PropertyChanged;
   public async Task FetchCharaDataAsync(string ProjectId)
@@ -33,10 +35,18 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     int _count = 0;
     foreach (var item in grouped)
     {
-      System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個");
+      bool isSelected = false;
+      if (_appStatus.CharaName == item.CharaName && _appStatus.MaterialName == item.MaterialName)
+      {
+        isSelected = true;
+      }
+      System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個 IsSelected = {isSelected}");
       item.Number = _count;
+      item.IsSelected = isSelected;
       CharaDataSummaries.Add(item);
       _count++;
     }
+    System.Diagnostics.Debug.WriteLine($"appStatus = {_appStatus}");
+    System.Diagnostics.Debug.WriteLine($"行数は；；；{_count} CharaDataSummariesCount = {CharaDataSummaries.Count}");
   }
 }

@@ -1,5 +1,6 @@
 namespace CharacomMaui.Presentation.Components;
 
+using CharacomMaui.Domain.Entities;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 public partial class CharaDataProgressRow : ContentView
@@ -111,23 +112,56 @@ public partial class CharaDataProgressRow : ContentView
   {
     if (bindable is CharaDataProgressRow row && newValue is bool isSelected)
     {
+      System.Diagnostics.Debug.WriteLine($"OnIsSelectedChange -> charaName={row.CharaName} MaterialName={row.MaterialName} isSelect={row.IsSelected}");
       row.UpdateBackground(isSelected);
     }
   }
 
-  private void UpdateBackground(bool isSelected)
+  private static Color GetColor(string key)
   {
-    //TODO: リソースから色を取ってくるようにする
-    var primary = (Color)MauiApp.Current!.Resources["Primary"];
-    var oddColor = (Color)MauiApp.Current!.Resources["Gray600"]; // 奇数行用
-    var evenLight = Colors.White;
-    var evenDark = Color.FromArgb("#1E1E1E");
+    string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
+    key = $"{key}{LorD}";
+    if (MauiApp.Current!.Resources.TryGetValue(key, out var value) && value is Color color)
+      return color;
 
+    return Colors.Transparent;
+  }
+  protected override void OnBindingContextChanged()
+  {
+    base.OnBindingContextChanged();
+
+    if (BindingContext is CharaDataSummary data)
+    {
+      UpdateSelectionState(data.IsSelected);
+    }
+    else
+    {
+      // バインド解除された瞬間にも一応リセット
+      UpdateSelectionState(false);
+    }
+  }
+
+  private void UpdateSelectionState(bool isSelected)
+  {
     if (isSelected)
     {
-      BackgroundBorder.BackgroundColor = primary;
-      return;
+      BackgroundBorder.BackgroundColor = GetColor("Secondary");
+      CharaNameLabel.TextColor = GetColor("OnSecondary");
+      MaterialNameLabel.TextColor = GetColor("OnSecondary");
+      CharaCountLabel.TextColor = GetColor("OnSecondary");
+      SelectedCountLabel.TextColor = GetColor("OnSecondary");
     }
+    else
+    {
+      CharaNameLabel.TextColor = GetColor("OnSurface");
+      MaterialNameLabel.TextColor = GetColor("OnSurface");
+      CharaCountLabel.TextColor = GetColor("OnSurface");
+      SelectedCountLabel.TextColor = GetColor("OnSurface");
+    }
+  }
+  private void UpdateBackground(bool isSelected)
+  {
+
 
     // BindingContext から Number を取り出す
     int number = 0;
@@ -142,17 +176,8 @@ public partial class CharaDataProgressRow : ContentView
 
     bool isOdd = number % 2 == 1;
 
-    if (isOdd)
-    {
-      BackgroundBorder.BackgroundColor = oddColor;
-    }
-    else
-    {
-      BackgroundBorder.BackgroundColor =
-          App.Current.RequestedTheme == AppTheme.Light
-              ? evenLight
-              : evenDark;
-    }
+    BackgroundBorder.BackgroundColor = isOdd ? GetColor("Desiabled") : GetColor("Surface");
+
   }
 
 

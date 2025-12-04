@@ -21,7 +21,7 @@
           Grid.Row="0"
           ColumnSpacing="10"
           x:Name="BackgroundBorder"
-          BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
+          BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="1*"/>
         <ColumnDefinition Width="1*"/>
@@ -32,35 +32,41 @@
 
       <Label Grid.Column="0"
              HorizontalTextAlignment="Center"
+             x:Name="CharaNameLabel"
              Text="{Binding CharaName, Source={x:Reference This}}"/>
 
       <Label Grid.Column="1"
              HorizontalTextAlignment="Center"
+             x:Name="MaterialNameLabel"
              Text="{Binding MaterialName, Source={x:Reference This}}"/>
 
       <Label Grid.Column="2"
              HorizontalTextAlignment="End"
+             x:Name="CharaCountLabel"
              Text="{Binding CharaCount, Source={x:Reference This}}"/>
 
       <Label Grid.Column="3"
              HorizontalTextAlignment="End"
+             x:Name="SelectedCountLabel"
              Text="{Binding SelectedCount, Source={x:Reference This}}"/>
 
-      <Grid Grid.Column="4"
+      <Grid x:Name="ProgressGrid"
+            Grid.Column="4"
             VerticalOptions="Center"
-            HeightRequest="30"
-            BackgroundColor="{AppThemeBinding Light=#E5E5E5, Dark=#333}">
+            HorizontalOptions="Fill"
+            HeightRequest="30">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{Binding SelectedRatio, Source={x:Reference This}}"/>
           <ColumnDefinition Width="{Binding UnselectedRatio, Source={x:Reference This}}"/>
         </Grid.ColumnDefinitions>
-
         <BoxView Grid.Column="0"
-                 BackgroundColor="{DynamicResource Primary}"
+                 x:Name="SelectedBar"
+                 BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                  CornerRadius="4,0,4,0"/>
 
         <BoxView Grid.Column="1"
-                 BackgroundColor="{DynamicResource Gray200}"
+                 x:Name="UnSelectedBar"
+                 BackgroundColor="{AppThemeBinding Light={DynamicResource DisabledBackground}, Dark={DynamicResource DisabledBackground}}"
                  CornerRadius="0,4,0,4"/>
       </Grid>
     </Grid>
@@ -69,7 +75,7 @@
     <BoxView Grid.Row="1"
              Margin="20,0,20,0"
              HeightRequest="1"
-             BackgroundColor="{DynamicResource Gray200}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
              HorizontalOptions="Fill"/>
   </Grid>
 

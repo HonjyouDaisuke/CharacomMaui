@@ -11,4 +11,5 @@ public class CharaDataSummary
   public string MaterialName { get; set; } = string.Empty;
   public int CharaCount { get; set; } = 0;
   public int SelectedCount { get; set; } = 0;
+  public bool IsSelected { get; set; } = false;
 }

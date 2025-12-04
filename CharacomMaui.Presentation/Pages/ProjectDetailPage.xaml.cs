@@ -27,6 +27,7 @@ public partial class ProjectDetailPage : ContentPage
   protected override void OnAppearing()
   {
     base.OnAppearing();
+    LogEditor.Text += "OnAppearing()... \n";
     _ = GetCharaItemAsync();
   }
 
