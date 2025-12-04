@@ -1,4 +1,3 @@
-
 using System.Collections.ObjectModel;
 using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.UseCases;
@@ -45,6 +44,10 @@ public partial class CharaSelectViewModel : ObservableObject
   public ObservableCollection<CharaSelectCardData> CurrentCharaItems { get; } = [];
   private readonly IDialogService _dialogService;
   public bool IsLoading { get; private set; } = false;
+  /// <summary>
+  /// Initializes a new instance of <see cref="CharaSelectViewModel"/> with the required application state and use-case services.
+  /// </summary>
+  /// <param name="appStatus">Application state containing the currently selected character and material.</param>
   public CharaSelectViewModel(AppStatus appStatus,
                               GetProjectCharaItemsUseCase useCase,
                               FetchBoxItemUseCase fetchBoxItemUseCase,
@@ -63,6 +66,13 @@ public partial class CharaSelectViewModel : ObservableObject
     // CharaButtonCommand = new AsyncRelayCommand<string>(OnCharaTapped);
   }
 
+  /// <summary>
+  /// Loads character items into the view model and refreshes related UI state, preventing concurrent executions.
+  /// </summary>
+  /// <remarks>
+  /// Sets <see cref="IsLoading"/> to true for the duration of the operation and resets it when finished.
+  /// </remarks>
+  /// <returns>A task that completes when the load operation (including updating related images and item lists) has finished.</returns>
   public async Task GetCharaItemAsync()
   {
     if (IsLoading) return;
@@ -77,6 +87,14 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
+  /// <summary>
+  /// Loads character and material items for the current project and prepares related UI state and images.
+  /// </summary>
+  /// <remarks>
+  /// Fetches project character items, updates the cached item list, populates the CharaNames and MaterialNames collections,
+  /// sets InitialCharaName and InitialMaterialName from the current AppStatus (or defaults), and refreshes the standard, stroke,
+  /// and selectable character images used by the view model. Displays a progress dialog while the operation runs.
+  /// </remarks>
   public async Task LoadCharaItemsCoreAysnc()
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
@@ -133,6 +151,10 @@ public partial class CharaSelectViewModel : ObservableObject
       await UpdateCurrentCharaItemsAsync(accessToken);
     }
   }
+  /// <summary>
+  /// Refreshes the CurrentCharaItems collection to contain only items that match the current character and material, loading each item's image data.
+  /// </summary>
+  /// <param name="accessToken">Access token used to fetch image data for each item.</param>
   private async Task UpdateCurrentCharaItemsAsync(string accessToken)
   {
     CurrentCharaItems.Clear();

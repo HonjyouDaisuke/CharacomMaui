@@ -15,6 +15,10 @@ public class AppStatus
   public string AvatarUrl { get; set; } = string.Empty;
   public string AvatarImgString { get; set; } = string.Empty;
 
+  /// <summary>
+  /// Produces a single-line string representation of the app status containing key user, project, and character fields.
+  /// </summary>
+  /// <returns>A single-line string that includes UserId, UserName, UserRole, AvatarUrl, ProjectName, CharaName, and MaterialName (MaterialName appears labeled as "MatrialName" in the output).</returns>
   public override string ToString()
   {
     return $"userId = {UserId} userName = {UserName} userRole = {UserRole} avatarUrl = {AvatarUrl} projectName = {ProjectName} CharaName = {CharaName} MatrialName={MaterialName}";

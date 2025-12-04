@@ -24,6 +24,12 @@ public partial class CharaSelectPage : ContentPage
   private string _pageCharaName = string.Empty;
 
   public SKBitmap? LoadedBitmap { get; set; }
+  /// <summary>
+  /// Initializes a new CharaSelectPage, sets up its view model binding, and subscribes to app status notifications.
+  /// </summary>
+  /// <param name="appStatus">Current application status used for comparing and tracking selected character and material.</param>
+  /// <param name="viewModel">View model providing UI logic and data for character/material selection.</param>
+  /// <param name="notifier">Notifier whose PropertyChanged events are observed to react to changes in app status.</param>
   public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier)
   {
     _appStatus = appStatus;
@@ -39,6 +45,12 @@ public partial class CharaSelectPage : ContentPage
     //CharaSelectBar.ItemSelected += OnCharaSelectBarItemSelected;
 
   }
+  /// <summary>
+  /// Logs current project, character, and material status to the UI and debug output, and loads character data if the displayed character or material differs from the app state.
+  /// </summary>
+  /// <remarks>
+  /// If the tracked page character or material names differ from <see cref="_appStatus"/>'s values, requests the view model to load the character item and updates the page trackers.
+  /// </remarks>
   protected override async void OnAppearing()
   {
     base.OnAppearing();
@@ -72,6 +84,10 @@ public partial class CharaSelectPage : ContentPage
     }
   }
 
+  /// <summary>
+  /// Handles a material selection from the selection bar and initiates a material change when the selection is valid and different from the current material.
+  /// </summary>
+  /// <param name="selectedLabel">The label of the material selected by the user; ignored if null or empty.</param>
   private async void OnMaterialSelectBarItemSelected(object? sender, string selectedLabel)
   {
     if (_viewModel.IsLoading) return;
@@ -96,6 +112,10 @@ public partial class CharaSelectPage : ContentPage
     _isChanging = false;
   }
 
+  /// <summary>
+  /// Handles a character selection from the UI, validates the choice, prevents concurrent changes, and applies the selection.
+  /// </summary>
+  /// <param name="selectedLabel">The label of the selected character; ignored if null or empty or if it matches the current character.</param>
   private async void OnCharaSelectBarItemSelected(object? sender, string selectedLabel)
   {
     if (_viewModel.IsLoading) return;

@@ -10,12 +10,24 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   public ObservableCollection<CharaDataSummary> CharaDataSummaries { get; } = [];
   private readonly AppStatus _appStatus;
   GetProjectCharaItemsUseCase _useCase;
+  /// <summary>
+  /// Initializes a new ProjectDetailViewModel with the given use case and application status.
+  /// </summary>
+  /// <param name="useCase">Use case responsible for retrieving project character items.</param>
+  /// <param name="appStatus">Application status used to determine per-item selection state.</param>
   public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus)
   {
     _useCase = useCase;
     _appStatus = appStatus;
   }
   public event PropertyChangedEventHandler PropertyChanged;
+  /// <summary>
+  /// Populates the ViewModel's CharaDataSummaries by fetching character items for the given project and grouping them by character and material, while applying selection state from the current AppStatus.
+  /// </summary>
+  /// <param name="ProjectId">The identifier of the project whose character items should be fetched.</param>
+  /// <remarks>
+  /// Clears the existing CharaDataSummaries, adds one CharaDataSummary per distinct (CharaName, MaterialName) group, and sets each item's Number and IsSelected according to the current AppStatus. Updates CharaCount and SelectedCount for each group.
+  /// </remarks>
   public async Task FetchCharaDataAsync(string ProjectId)
   {
     var accessToken = Preferences.Get("app_access_token", string.Empty);

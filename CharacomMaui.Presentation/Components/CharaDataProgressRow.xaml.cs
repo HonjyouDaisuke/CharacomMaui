@@ -107,7 +107,12 @@ public partial class CharaDataProgressRow : ContentView
     }, token);
   }
 
-  //背景色の切り替え
+  /// <summary>
+  /// Handles changes to the IsSelected bindable property and updates the row background accordingly.
+  /// </summary>
+  /// <param name="bindable">The bindable object whose property changed (expected to be a CharaDataProgressRow).</param>
+  /// <param name="oldValue">The previous value of the property.</param>
+  /// <param name="newValue">The new value of the property (expected to be a bool indicating selection state).</param>
   private static void OnIsSelectedChanged(BindableObject bindable, object oldValue, object newValue)
   {
     if (bindable is CharaDataProgressRow row && newValue is bool isSelected)
@@ -117,6 +122,11 @@ public partial class CharaDataProgressRow : ContentView
     }
   }
 
+  /// <summary>
+  /// Resolve a theme-aware color resource by base key.
+  /// </summary>
+  /// <param name="key">The base resource key; "Dark" is appended when the app is using the dark theme.</param>
+  /// <returns>The Color from application resources matching the theme-adjusted key, or <see cref="Colors.Transparent"/> if not found.</returns>
   private static Color GetColor(string key)
   {
     string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
@@ -126,6 +136,12 @@ public partial class CharaDataProgressRow : ContentView
 
     return Colors.Transparent;
   }
+  /// <summary>
+  /// Applies the view's selection styling to match the new BindingContext.
+  /// </summary>
+  /// <remarks>
+  /// If the new BindingContext is a <c>CharaDataSummary</c>, the view's selection state is set to that object's <c>IsSelected</c> value; otherwise the selection state is reset to false.
+  /// </remarks>
   protected override void OnBindingContextChanged()
   {
     base.OnBindingContextChanged();
@@ -141,6 +157,10 @@ public partial class CharaDataProgressRow : ContentView
     }
   }
 
+  /// <summary>
+  /// Apply the visual selection state to the row's background and text colors.
+  /// </summary>
+  /// <param name="isSelected">True to apply the selected theme (secondary background and on-secondary text); false to apply the default surface/on-surface text colors.</param>
   private void UpdateSelectionState(bool isSelected)
   {
     if (isSelected)
@@ -159,6 +179,10 @@ public partial class CharaDataProgressRow : ContentView
       SelectedCountLabel.TextColor = GetColor("OnSurface");
     }
   }
+  /// <summary>
+  /// Updates the row background color based on the parity of the BindingContext's `Number` property.
+  /// </summary>
+  /// <param name="isSelected">Present for API compatibility; this method determines background solely from BindingContext.`Number` parity.</param>
   private void UpdateBackground(bool isSelected)
   {
 

@@ -24,6 +24,12 @@ public partial class ProjectDetailPage : ContentPage
     BindingContext = _viewModel;
   }
 
+  /// <summary>
+  /// Handles the page appearing: logs the event and initiates loading of character items.
+  /// </summary>
+  /// <remarks>
+  /// Appends an entry to LogEditor and starts <see cref="GetCharaItemAsync"/> without awaiting so the fetch runs in the background.
+  /// </remarks>
   protected override void OnAppearing()
   {
     base.OnAppearing();
