@@ -69,7 +69,7 @@ public partial class CharaSelectViewModel : ObservableObject
     try
     {
       IsLoading = true;
-      await LoadCharaItemsCoreAysnc();
+      await LoadCharaItemsCoreAsync();
     }
     finally
     {
@@ -77,7 +77,7 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  public async Task LoadCharaItemsCoreAysnc()
+  public async Task LoadCharaItemsCoreAsync()
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
     {

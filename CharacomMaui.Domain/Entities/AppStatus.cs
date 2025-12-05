@@ -17,6 +17,6 @@ public class AppStatus
 
   public override string ToString()
   {
-    return $"userId = {UserId} userName = {UserName} userRole = {UserRole} avatarUrl = {AvatarUrl} projectName = {ProjectName} CharaName = {CharaName} MatrialName={MaterialName}";
+    return $"userId = {UserId} userName = {UserName} userRole = {UserRole} avatarUrl = {AvatarUrl} projectName = {ProjectName} CharaName = {CharaName} MaterialName={MaterialName}";
   }
 }

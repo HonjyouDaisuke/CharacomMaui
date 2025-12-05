@@ -1,6 +1,7 @@
 namespace CharacomMaui.Presentation.Components;
 
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Helpers;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 public partial class CharaDataProgressRow : ContentView
@@ -117,15 +118,6 @@ public partial class CharaDataProgressRow : ContentView
     }
   }
 
-  private static Color GetColor(string key)
-  {
-    string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
-    key = $"{key}{LorD}";
-    if (MauiApp.Current!.Resources.TryGetValue(key, out var value) && value is Color color)
-      return color;
-
-    return Colors.Transparent;
-  }
   protected override void OnBindingContextChanged()
   {
     base.OnBindingContextChanged();
@@ -145,18 +137,18 @@ public partial class CharaDataProgressRow : ContentView
   {
     if (isSelected)
     {
-      BackgroundBorder.BackgroundColor = GetColor("Secondary");
-      CharaNameLabel.TextColor = GetColor("OnSecondary");
-      MaterialNameLabel.TextColor = GetColor("OnSecondary");
-      CharaCountLabel.TextColor = GetColor("OnSecondary");
-      SelectedCountLabel.TextColor = GetColor("OnSecondary");
+      BackgroundBorder.BackgroundColor = ThemeHelper.GetColor("Secondary");
+      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
     }
     else
     {
-      CharaNameLabel.TextColor = GetColor("OnSurface");
-      MaterialNameLabel.TextColor = GetColor("OnSurface");
-      CharaCountLabel.TextColor = GetColor("OnSurface");
-      SelectedCountLabel.TextColor = GetColor("OnSurface");
+      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
     }
   }
   private void UpdateBackground(bool isSelected)
@@ -176,7 +168,7 @@ public partial class CharaDataProgressRow : ContentView
 
     bool isOdd = number % 2 == 1;
 
-    BackgroundBorder.BackgroundColor = isOdd ? GetColor("Desiabled") : GetColor("Surface");
+    BackgroundBorder.BackgroundColor = isOdd ? ThemeHelper.GetColor("DisabledBackground") : ThemeHelper.GetColor("Surface");
 
   }
 
