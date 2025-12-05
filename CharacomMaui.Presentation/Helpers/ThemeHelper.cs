@@ -3,7 +3,7 @@ using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.Helpers;
 
-public class ThemeHelper
+public static class ThemeHelper
 {
   public static Color GetColor(string key)
   {

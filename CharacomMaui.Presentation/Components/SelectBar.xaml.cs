@@ -122,16 +122,15 @@ public partial class SelectBar : ContentView
     if (Items == null || !Items.Any())
       return;
 
-    string LorD = string.Empty;
-
+    var outline = ThemeHelper.GetColor("Outline");
     foreach (var label in Items)
     {
       var btn = new Button
       {
         Text = label,
         BackgroundColor = Colors.Transparent, // 非選択色
-        TextColor = ThemeHelper.GetColor("Outline"),
-        BorderColor = ThemeHelper.GetColor("Outline"),
+        TextColor = outline,
+        BorderColor = outline,
         BorderWidth = 1,
         WidthRequest = 60,
         CornerRadius = 8,
@@ -171,9 +170,10 @@ public partial class SelectBar : ContentView
     // 非選択色に戻す
     if (_selectedButton != null)
     {
+      var outline = ThemeHelper.GetColor("Outline");
       _selectedButton.BackgroundColor = Colors.Transparent;
-      _selectedButton.TextColor = ThemeHelper.GetColor("Outline");
-      _selectedButton.BorderColor = ThemeHelper.GetColor("Outline");
+      _selectedButton.TextColor = outline;
+      _selectedButton.BorderColor = outline;
       _selectedButton.BorderWidth = 1;
     }
 

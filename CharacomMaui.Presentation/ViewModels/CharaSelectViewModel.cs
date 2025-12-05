@@ -32,8 +32,6 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly FetchBoxItemUseCase _fetchBoxItemUseCase;
   readonly UpdateCharaSelectedUseCase _updateCharaSelectUseCase;
   AppStatus _appStatus;
-  //public List<string> OptionLabels { get; set; } = new();
-
 
   private List<CharaData> allCharaData = new();
 
@@ -44,7 +42,8 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public ObservableCollection<CharaSelectCardData> CurrentCharaItems { get; } = [];
   private readonly IDialogService _dialogService;
-  public bool IsLoading { get; private set; } = false;
+  [ObservableProperty]
+  private bool isLoading = false;
   public CharaSelectViewModel(AppStatus appStatus,
                               GetProjectCharaItemsUseCase useCase,
                               FetchBoxItemUseCase fetchBoxItemUseCase,

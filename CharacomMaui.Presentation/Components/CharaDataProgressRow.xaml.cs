@@ -153,17 +153,11 @@ public partial class CharaDataProgressRow : ContentView
   }
   private void UpdateBackground(bool isSelected)
   {
-
-
     // BindingContext から Number を取り出す
     int number = 0;
-    if (BindingContext != null)
+    if (BindingContext is CharaDataSummary data)
     {
-      var prop = BindingContext.GetType().GetProperty("Number");
-      if (prop != null)
-      {
-        number = (int)(prop.GetValue(BindingContext) ?? 0);
-      }
+      number = data.Number;
     }
 
     bool isOdd = number % 2 == 1;
