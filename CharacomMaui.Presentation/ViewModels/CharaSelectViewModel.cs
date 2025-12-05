@@ -32,8 +32,6 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly FetchBoxItemUseCase _fetchBoxItemUseCase;
   readonly UpdateCharaSelectedUseCase _updateCharaSelectUseCase;
   AppStatus _appStatus;
-  //public List<string> OptionLabels { get; set; } = new();
-
 
   private List<CharaData> allCharaData = new();
 
@@ -44,7 +42,8 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public ObservableCollection<CharaSelectCardData> CurrentCharaItems { get; } = [];
   private readonly IDialogService _dialogService;
-
+  [ObservableProperty]
+  private bool isLoading = false;
   public CharaSelectViewModel(AppStatus appStatus,
                               GetProjectCharaItemsUseCase useCase,
                               FetchBoxItemUseCase fetchBoxItemUseCase,
@@ -65,8 +64,23 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public async Task GetCharaItemAsync()
   {
+    if (IsLoading) return;
+    try
+    {
+      IsLoading = true;
+      await LoadCharaItemsCoreAsync();
+    }
+    finally
+    {
+      IsLoading = false;
+    }
+  }
+
+  private async Task LoadCharaItemsCoreAsync()
+  {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
     {
+      System.Diagnostics.Debug.WriteLine($"始まるよーーん！ chara={_appStatus.CharaName} material={_appStatus.MaterialName}");
       var accessToken = Preferences.Get("app_access_token", string.Empty);
       var Items = await _useCase.ExecuteAsync(accessToken, _appStatus.ProjectId);
       var CharaItems = Items
@@ -90,7 +104,6 @@ public partial class CharaSelectViewModel : ObservableObject
         .Distinct()
         .ToList();
 
-      allCharaData.Clear();
       allCharaData = Items;
 
       CharaNames.Clear();
@@ -118,7 +131,6 @@ public partial class CharaSelectViewModel : ObservableObject
       await UpdateCurrentCharaItemsAsync(accessToken);
     }
   }
-
   private async Task UpdateCurrentCharaItemsAsync(string accessToken)
   {
     CurrentCharaItems.Clear();

@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
-using Microsoft.Maui.Controls;
+using CharacomMaui.Presentation.Helpers;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.Components;
@@ -119,17 +115,6 @@ public partial class SelectBar : ContentView
     control.ApplyInitialSelection();
   }
 
-  private static Color GetColor(string key)
-  {
-    string LorD = MauiApp.Current!.RequestedTheme == AppTheme.Light ? "" : "Dark";
-    key = $"{key}{LorD}";
-    if (MauiApp.Current!.Resources.TryGetValue(key, out var value) && value is Color color)
-      return color;
-
-    return Colors.Transparent;
-  }
-
-
   private void BuildButtons()
   {
     ButtonContainer.Children.Clear();
@@ -137,16 +122,15 @@ public partial class SelectBar : ContentView
     if (Items == null || !Items.Any())
       return;
 
-    string LorD = string.Empty;
-
+    var outline = ThemeHelper.GetColor("Outline");
     foreach (var label in Items)
     {
       var btn = new Button
       {
         Text = label,
         BackgroundColor = Colors.Transparent, // 非選択色
-        TextColor = GetColor("Outline"),
-        BorderColor = GetColor("Outline"),
+        TextColor = outline,
+        BorderColor = outline,
         BorderWidth = 1,
         WidthRequest = 60,
         CornerRadius = 8,
@@ -186,15 +170,16 @@ public partial class SelectBar : ContentView
     // 非選択色に戻す
     if (_selectedButton != null)
     {
+      var outline = ThemeHelper.GetColor("Outline");
       _selectedButton.BackgroundColor = Colors.Transparent;
-      _selectedButton.TextColor = GetColor("Outline");
-      _selectedButton.BorderColor = GetColor("Outline");
+      _selectedButton.TextColor = outline;
+      _selectedButton.BorderColor = outline;
       _selectedButton.BorderWidth = 1;
     }
 
     // 選択色
-    clickedButton.BackgroundColor = GetColor("Primary");
-    clickedButton.TextColor = GetColor("OnPrimary");
+    clickedButton.BackgroundColor = ThemeHelper.GetColor("Primary");
+    clickedButton.TextColor = ThemeHelper.GetColor("OnPrimary");
     clickedButton.BorderWidth = 0;
 
     _selectedButton = clickedButton;

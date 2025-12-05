@@ -1,5 +1,7 @@
 namespace CharacomMaui.Presentation.Components;
 
+using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Helpers;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 public partial class CharaDataProgressRow : ContentView
@@ -11,10 +13,6 @@ public partial class CharaDataProgressRow : ContentView
   public CharaDataProgressRow()
   {
     InitializeComponent();
-    this.BindingContextChanged += (s, e) =>
-    {
-      UpdateBackground(IsSelected);
-    };
   }
 
   public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
@@ -111,48 +109,62 @@ public partial class CharaDataProgressRow : ContentView
   {
     if (bindable is CharaDataProgressRow row && newValue is bool isSelected)
     {
+      System.Diagnostics.Debug.WriteLine($"OnIsSelectedChange -> charaName={row.CharaName} MaterialName={row.MaterialName} isSelect={row.IsSelected} newValue={isSelected}");
+      row.UpdateSelectionState(isSelected);
       row.UpdateBackground(isSelected);
     }
   }
 
-  private void UpdateBackground(bool isSelected)
+  protected override void OnBindingContextChanged()
   {
-    //TODO: リソースから色を取ってくるようにする
-    var primary = (Color)MauiApp.Current!.Resources["Primary"];
-    var oddColor = (Color)MauiApp.Current!.Resources["Gray600"]; // 奇数行用
-    var evenLight = Colors.White;
-    var evenDark = Color.FromArgb("#1E1E1E");
+    base.OnBindingContextChanged();
 
-    if (isSelected)
+    if (BindingContext is CharaDataSummary data)
     {
-      BackgroundBorder.BackgroundColor = primary;
-      return;
-    }
-
-    // BindingContext から Number を取り出す
-    int number = 0;
-    if (BindingContext != null)
-    {
-      var prop = BindingContext.GetType().GetProperty("Number");
-      if (prop != null)
-      {
-        number = (int)(prop.GetValue(BindingContext) ?? 0);
-      }
-    }
-
-    bool isOdd = number % 2 == 1;
-
-    if (isOdd)
-    {
-      BackgroundBorder.BackgroundColor = oddColor;
+      UpdateSelectionState(data.IsSelected);
+      UpdateBackground(data.IsSelected);
     }
     else
     {
-      BackgroundBorder.BackgroundColor =
-          App.Current.RequestedTheme == AppTheme.Light
-              ? evenLight
-              : evenDark;
+      // バインド解除された瞬間にも一応リセット
+      UpdateSelectionState(false);
+      UpdateBackground(false);
     }
+  }
+
+  private void UpdateSelectionState(bool isSelected)
+  {
+    if (isSelected)
+    {
+      BackgroundBorder.BackgroundColor = ThemeHelper.GetColor("Secondary");
+      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
+    }
+    else
+    {
+      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
+    }
+  }
+  private void UpdateBackground(bool isSelected)
+  {
+    // 選択中の場合はUpadateSelectionStateで制御する
+    if (isSelected) return;
+    // BindingContext から Number を取り出す
+    int number = 0;
+    if (BindingContext is CharaDataSummary data)
+    {
+      number = data.Number;
+    }
+
+    bool isOdd = number % 2 == 1;
+    System.Diagnostics.Debug.WriteLine($"選択されていないので、背景決めます {CharaName} : {MaterialName} ->{IsSelected}");
+    BackgroundBorder.BackgroundColor = isOdd ? ThemeHelper.GetColor("DisabledBackground") : ThemeHelper.GetColor("Surface");
+
   }
 
 
