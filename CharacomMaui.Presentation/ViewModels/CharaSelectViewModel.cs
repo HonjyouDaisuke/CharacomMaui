@@ -78,10 +78,25 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public async Task LoadCharaItemsCoreAsync()
   {
-    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
+
+    // Projectデータ読み込み
+    await LoadProjectItems(accessToken);
+
+    // Standard画像
+    await StandardImageUpdateAsync(accessToken);
+
+    // Stroke画像
+    await StrokeImageUpdateAsync(accessToken);
+
+    // Chara選択画像群
+    await UpdateCurrentCharaItemsAsync(accessToken);
+  }
+
+  private async Task LoadProjectItems(string accessToken)
+  {
+    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "プロジェクトデータ取得中・・・\nしばらくお待ち下さい"))
     {
-      System.Diagnostics.Debug.WriteLine($"始まるよーーん！ chara={_appStatus.CharaName} material={_appStatus.MaterialName}");
-      var accessToken = Preferences.Get("app_access_token", string.Empty);
       var Items = await _useCase.ExecuteAsync(accessToken, _appStatus.ProjectId);
       var CharaItems = Items
         .Select(x => x.CharaName)
@@ -121,55 +136,53 @@ public partial class CharaSelectViewModel : ObservableObject
 
       InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault() ?? string.Empty;
       InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault() ?? string.Empty;
-
-      // Standard画像
-      await StandardImageUpdateAsync(accessToken);
-
-      // Stroke画像
-      await StrokeImageUpdateAsync(accessToken);
-
-      // Chara選択画像群
-      await UpdateCurrentCharaItemsAsync(accessToken);
     }
   }
+
   private async Task UpdateCurrentCharaItemsAsync(string accessToken)
   {
     CurrentCharaItems.Clear();
     var sw = System.Diagnostics.Stopwatch.StartNew();
-
+    int CharaCount = allCharaData
+        .Count(x => x.CharaName == _appStatus.CharaName
+                 && x.MaterialName == _appStatus.MaterialName);
+    int count = 1;
     foreach (var currentItem in allCharaData)
     {
       if (currentItem.CharaName != _appStatus.CharaName || currentItem.MaterialName != _appStatus.MaterialName)
       {
         continue;
       }
-      System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
-      var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
-      /**
-      var image = await LoadThumbnailAsync(accessToken, currentItem.FileId, 32, 32) ?? [];
-      if (image.Length == 0)
+      using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", $"画面一覧を準備しています。({count}/{CharaCount})\nしばらくお待ち下さい。"))
       {
-        System.Diagnostics.Debug.WriteLine($"サムネイル取得エラー FileId: {currentItem.FileId}");
-        image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
+        System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
+        var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
+        /**
+        var image = await LoadThumbnailAsync(accessToken, currentItem.FileId, 32, 32) ?? [];
+        if (image.Length == 0)
+        {
+          System.Diagnostics.Debug.WriteLine($"サムネイル取得エラー FileId: {currentItem.FileId}");
+          image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
+        }
+        **/
+        if (image.Length == 0)
+        {
+          System.Diagnostics.Debug.WriteLine($"画像取得エラー FileId: {currentItem.FileId}");
+          continue;
+        }
+        System.Diagnostics.Debug.WriteLine($"CharaId = {currentItem.Id}, FileId = {currentItem.FileId}");
+        CurrentCharaItems.Add(new CharaSelectCardData
+        {
+          CharaId = currentItem.Id,
+          FileId = currentItem.FileId,
+          CharaName = currentItem.CharaName,
+          MaterialName = currentItem.MaterialName,
+          TimesName = currentItem.TimesName,
+          IsSelected = currentItem.IsSelected,
+          RawImageData = image
+        });
+        count++;
       }
-      **/
-      if (image.Length == 0)
-      {
-        System.Diagnostics.Debug.WriteLine($"画像取得エラー FileId: {currentItem.FileId}");
-        continue;
-      }
-      System.Diagnostics.Debug.WriteLine($"CharaId = {currentItem.Id}, FileId = {currentItem.FileId}");
-      CurrentCharaItems.Add(new CharaSelectCardData
-      {
-        CharaId = currentItem.Id,
-        FileId = currentItem.FileId,
-        CharaName = currentItem.CharaName,
-        MaterialName = currentItem.MaterialName,
-        TimesName = currentItem.TimesName,
-        IsSelected = currentItem.IsSelected,
-        RawImageData = image
-      });
-
     }
     sw.Stop();
     System.Diagnostics.Debug.WriteLine($"UpdateCurrentCharaItemsAsync completed in {sw.ElapsedMilliseconds} ms");
@@ -177,26 +190,32 @@ public partial class CharaSelectViewModel : ObservableObject
 
   private async Task StandardImageUpdateAsync(string accessToken)
   {
-    var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
-    var standardBytes = await LoadImageAsync(accessToken, standardFileId);
-    if (standardBytes != null)
+    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "標準字体準備中・・・\nしばらくお待ち下さい。"))
     {
-      using (var ms = new MemoryStream(standardBytes))
+      var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
+      var standardBytes = await LoadImageAsync(accessToken, standardFileId);
+      if (standardBytes != null)
       {
-        StandardBitmap = SKBitmap.Decode(ms);
+        using (var ms = new MemoryStream(standardBytes))
+        {
+          StandardBitmap = SKBitmap.Decode(ms);
+        }
       }
     }
   }
 
   private async Task StrokeImageUpdateAsync(string accessToken)
   {
-    var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
-    var strokeBytes = await LoadImageAsync(accessToken, strokeFileId);
-    if (strokeBytes != null)
+    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "筆順画像準備中・・・\nしばらくお待ち下さい。"))
     {
-      using (var ms = new MemoryStream(strokeBytes))
+      var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
+      var strokeBytes = await LoadImageAsync(accessToken, strokeFileId);
+      if (strokeBytes != null)
       {
-        StrokeBitmap = SKBitmap.Decode(ms);
+        using (var ms = new MemoryStream(strokeBytes))
+        {
+          StrokeBitmap = SKBitmap.Decode(ms);
+        }
       }
     }
   }
@@ -262,6 +281,7 @@ public partial class CharaSelectViewModel : ObservableObject
   {
     var accessToken = Preferences.Get("app_access_token", string.Empty);
     var result = await _updateCharaSelectUseCase.ExecuteAsync(accessToken, charaId, isSelected);
+
     foreach (var item in CurrentCharaItems)
     {
       if (item.CharaId == charaId) item.IsSelected = isSelected;
