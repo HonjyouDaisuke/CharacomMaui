@@ -76,7 +76,7 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  public async Task LoadCharaItemsCoreAsync()
+  private async Task LoadCharaItemsCoreAsync()
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
     {
@@ -104,7 +104,6 @@ public partial class CharaSelectViewModel : ObservableObject
         .Distinct()
         .ToList();
 
-      allCharaData.Clear();
       allCharaData = Items;
 
       CharaNames.Clear();
