@@ -95,7 +95,7 @@ public partial class CharaSelectViewModel : ObservableObject
 
   private async Task LoadProjectItems(string accessToken)
   {
-    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "プロジェクトデータ取得中・・・\nしばらくお待ち下さい"))
+    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "プロジェクトデータ取得中・・・\nしばらくお待ち下さい。"))
     {
       var Items = await _useCase.ExecuteAsync(accessToken, _appStatus.ProjectId);
       var CharaItems = Items
@@ -244,7 +244,7 @@ public partial class CharaSelectViewModel : ObservableObject
 
     var previousCharaName = _appStatus.CharaName;
 
-    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。少々お待ちください。"))
+    using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。しばらくお待ち下さい。"))
     {
       System.Diagnostics.Debug.WriteLine($"OnChangeSelect: Chara={charaName}, Material={materialName} -- 前回 Chara={_appStatus.CharaName}, Material={_appStatus.MaterialName}  ");
       var accessToken = Preferences.Get("app_access_token", string.Empty);
@@ -324,7 +324,7 @@ public partial class CharaSelectViewModel : ObservableObject
       if (item == null) continue;
       if (item.IsSelected == true)
       {
-        using (await _dialogService.DisplayProgressAsync($"画像処理中...({num} / {count})", "画面を準備しています。少々お待ちください。"))
+        using (await _dialogService.DisplayProgressAsync($"画像処理中...({num} / {count})", "画面を準備しています。しばらくお待ち下さい。"))
         {
           System.Diagnostics.Debug.WriteLine($"item.fileId = {item.FileId}");
           SKBitmap src = SKBitmap.Decode(item.RawImageData);
