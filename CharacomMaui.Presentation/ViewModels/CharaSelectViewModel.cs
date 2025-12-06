@@ -156,6 +156,7 @@ public partial class CharaSelectViewModel : ObservableObject
       {
         System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
         var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
+        // TODO:後ほど削除
         /**
         var image = await LoadThumbnailAsync(accessToken, currentItem.FileId, 32, 32) ?? [];
         if (image.Length == 0)
