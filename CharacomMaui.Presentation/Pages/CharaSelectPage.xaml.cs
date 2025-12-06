@@ -51,7 +51,16 @@ public partial class CharaSelectPage : ContentPage
 
     if (_pageCharaName != _appStatus.CharaName || _pageMaterialName != _appStatus.MaterialName)
     {
-      await _viewModel.GetCharaItemAsync();
+      try
+      {
+        await _viewModel.GetCharaItemAsync();
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine($"Error loading chara items: {ex.Message}");
+        // TODO: ユーザーにエラーを通知
+      }
+
       _pageCharaName = _appStatus.CharaName!;
       _pageMaterialName = _appStatus.MaterialName;
     }
