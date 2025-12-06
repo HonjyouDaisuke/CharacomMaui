@@ -76,7 +76,7 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  public async Task LoadCharaItemsCoreAsync()
+  private async Task LoadCharaItemsCoreAsync()
   {
     var accessToken = Preferences.Get("app_access_token", string.Empty);
 
@@ -119,7 +119,6 @@ public partial class CharaSelectViewModel : ObservableObject
         .Distinct()
         .ToList();
 
-      allCharaData.Clear();
       allCharaData = Items;
 
       CharaNames.Clear();

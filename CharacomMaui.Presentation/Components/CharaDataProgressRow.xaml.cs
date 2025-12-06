@@ -13,10 +13,6 @@ public partial class CharaDataProgressRow : ContentView
   public CharaDataProgressRow()
   {
     InitializeComponent();
-    this.BindingContextChanged += (s, e) =>
-    {
-      UpdateBackground(IsSelected);
-    };
   }
 
   public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
@@ -113,7 +109,8 @@ public partial class CharaDataProgressRow : ContentView
   {
     if (bindable is CharaDataProgressRow row && newValue is bool isSelected)
     {
-      System.Diagnostics.Debug.WriteLine($"OnIsSelectedChange -> charaName={row.CharaName} MaterialName={row.MaterialName} isSelect={row.IsSelected}");
+      System.Diagnostics.Debug.WriteLine($"OnIsSelectedChange -> charaName={row.CharaName} MaterialName={row.MaterialName} isSelect={row.IsSelected} newValue={isSelected}");
+      row.UpdateSelectionState(isSelected);
       row.UpdateBackground(isSelected);
     }
   }
@@ -125,11 +122,13 @@ public partial class CharaDataProgressRow : ContentView
     if (BindingContext is CharaDataSummary data)
     {
       UpdateSelectionState(data.IsSelected);
+      UpdateBackground(data.IsSelected);
     }
     else
     {
       // バインド解除された瞬間にも一応リセット
       UpdateSelectionState(false);
+      UpdateBackground(false);
     }
   }
 
@@ -153,6 +152,8 @@ public partial class CharaDataProgressRow : ContentView
   }
   private void UpdateBackground(bool isSelected)
   {
+    // 選択中の場合はUpadateSelectionStateで制御する
+    if (isSelected) return;
     // BindingContext から Number を取り出す
     int number = 0;
     if (BindingContext is CharaDataSummary data)
@@ -161,7 +162,7 @@ public partial class CharaDataProgressRow : ContentView
     }
 
     bool isOdd = number % 2 == 1;
-
+    System.Diagnostics.Debug.WriteLine($"選択されていないので、背景決めます {CharaName} : {MaterialName} ->{IsSelected}");
     BackgroundBorder.BackgroundColor = isOdd ? ThemeHelper.GetColor("DisabledBackground") : ThemeHelper.GetColor("Surface");
 
   }
