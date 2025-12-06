@@ -192,7 +192,12 @@ public partial class CharaSelectViewModel : ObservableObject
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "標準字体準備中・・・\nしばらくお待ち下さい。"))
     {
-      var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
+      if (string.IsNullOrEmpty(_appStatus.CharaName))
+      {
+        System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping standard image update.");
+        return;
+      }
+      var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
       var standardBytes = await LoadImageAsync(accessToken, standardFileId);
       if (standardBytes != null)
       {
@@ -208,7 +213,12 @@ public partial class CharaSelectViewModel : ObservableObject
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "筆順画像準備中・・・\nしばらくお待ち下さい。"))
     {
-      var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName!);
+      if (string.IsNullOrEmpty(_appStatus.CharaName))
+      {
+        System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping standard image update.");
+        return;
+      }
+      var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
       var strokeBytes = await LoadImageAsync(accessToken, strokeFileId);
       if (strokeBytes != null)
       {
