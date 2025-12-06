@@ -215,7 +215,7 @@ public partial class CharaSelectViewModel : ObservableObject
     {
       if (string.IsNullOrEmpty(_appStatus.CharaName))
       {
-        System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping standard image update.");
+        System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping stroke image update.");
         return;
       }
       var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
