@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using CharacomMaui.Presentation.Models;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Presentation.Services;
 using CharacomMaui.Domain.Entities;
-
 namespace CharacomMaui.Presentation.ViewModels;
 
 public class ProjectDetailViewModel : INotifyPropertyChanged

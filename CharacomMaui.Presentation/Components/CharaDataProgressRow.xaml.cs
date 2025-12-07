@@ -3,6 +3,7 @@ namespace CharacomMaui.Presentation.Components;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Helpers;
 using MauiApp = Microsoft.Maui.Controls.Application;
+using CharacomMaui.Presentation.Models;
 
 public partial class CharaDataProgressRow : ContentView
 {
