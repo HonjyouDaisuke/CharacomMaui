@@ -80,21 +80,11 @@ public partial class ProjectDetailPage : ContentPage
 
     if (sender is CharaDataProgressRow clickedRow)
     {
-      // 前のカードの選択を解除
-      if (_selectedRow != null && _selectedRow != clickedRow)
-        _selectedRow.IsSelected = false;
+      System.Diagnostics.Debug.WriteLine("ダブルクリックされました");
+      SelectRow(sender); // 選択状態の更新は ViewModel/CharaDataSummary に委譲
 
-      // 今回のカードを選択
-      clickedRow.IsSelected = true;
-      _selectedRow = clickedRow;
-      _appStatus.CharaName = clickedRow.CharaName;
-      _appStatus.MaterialName = clickedRow.MaterialName;
-      System.Diagnostics.Debug.WriteLine($"appStatus用意{_appStatus.CharaName}");
-
+      System.Diagnostics.Debug.WriteLine("Go!");
+      await Shell.Current.GoToAsync("///CharaSelectPage");
     }
-    System.Diagnostics.Debug.WriteLine("Go!");
-    await Shell.Current.GoToAsync(
-        $"///CharaSelectPage"
-    );
   }
 }
