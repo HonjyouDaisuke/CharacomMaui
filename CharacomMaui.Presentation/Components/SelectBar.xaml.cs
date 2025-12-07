@@ -29,21 +29,7 @@ public partial class SelectBar : ContentView
     get => (IEnumerable<SelectBarContents>)GetValue(ItemsProperty);
     set => SetValue(ItemsProperty, value);
   }
-  /**
-  public static readonly BindableProperty ItemsProperty =
-      BindableProperty.Create(
-          nameof(Items),
-          typeof(IEnumerable<string>),
-          typeof(SelectBar),
-          null,
-          propertyChanged: OnItemsChanged);
 
-  public IEnumerable<string> Items
-  {
-    get => (IEnumerable<string>)GetValue(ItemsProperty);
-    set => SetValue(ItemsProperty, value);
-  }
-  ***/
   // ========= テーマ =========
   public static readonly BindableProperty ThemeKeyProperty =
     BindableProperty.Create(
@@ -208,6 +194,7 @@ public partial class SelectBar : ContentView
     _selectedButton = clickedButton;
     // Bindingされているデータを取得
     var data = clickedButton.BindingContext as SelectBarContents;
+    if (data == null) return;
     // イベント発火
     System.Diagnostics.Debug.WriteLine($"Selected: {data.Name} title = {clickedButton.Text}");
     ItemSelected?.Invoke(this, new SelectBarEventArgs
