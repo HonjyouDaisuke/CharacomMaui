@@ -94,7 +94,7 @@ public partial class CharaSelectViewModel : ObservableObject
     await UpdateCurrentCharaItemsAsync(accessToken);
   }
 
-  private async Task UpdateMatrialNamesAsync()
+  private void UpdateMaterialNames()
   {
     MaterialNames.Clear();
     var Items = allCharaData
@@ -105,12 +105,13 @@ public partial class CharaSelectViewModel : ObservableObject
 
     foreach (var materialItem in Items)
     {
+      var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
       MaterialNames.Add(new SelectBarContents
       {
         Name = materialItem,
-        Count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName),
-        Title = $"{materialItem} ({allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName)})",
-        IsDisabled = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName) <= 0,
+        Count = count,
+        Title = $"{materialItem} ({count})",
+        IsDisabled = count <= 0,
       });
     }
   }
@@ -146,25 +147,28 @@ public partial class CharaSelectViewModel : ObservableObject
       CharaNames.Clear();
       foreach (var charaItem in CharaItems)
       {
+        var count = CurrentItems.Count(x => x.CharaName == charaItem);
         CharaNames.Add(new SelectBarContents
         {
           Name = charaItem,
-          Count = CurrentItems.Count(x => x.CharaName == charaItem),
-          Title = $"{charaItem} ({CurrentItems.Count(x => x.CharaName == charaItem)})",
-          IsDisabled = CurrentItems.Count(x => x.CharaName == charaItem) <= 0,
+          Count = count,
+          Title = $"{charaItem} ({count})",
+          IsDisabled = count <= 0,
         });
       }
 
       MaterialNames.Clear();
       foreach (var materialItem in MaterialItems)
       {
+        var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
         MaterialNames.Add(new SelectBarContents
         {
           Name = materialItem,
-          Count = CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName),
-          Title = $"{materialItem} ({CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName)})",
-          IsDisabled = CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName) <= 0,
+          Count = count,
+          Title = $"{materialItem} ({count})",
+          IsDisabled = count <= 0,
         });
+
       }
       InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
       InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
@@ -291,7 +295,7 @@ public partial class CharaSelectViewModel : ObservableObject
         // Stroke画像
         await StrokeImageUpdateAsync(accessToken);
         // 資料名の数え直し
-        await UpdateMatrialNamesAsync();
+        UpdateMaterialNames();
       }
       // Chara選択画像群
       await UpdateCurrentCharaItemsAsync(accessToken);
