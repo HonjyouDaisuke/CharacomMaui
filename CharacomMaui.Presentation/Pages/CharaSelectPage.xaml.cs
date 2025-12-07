@@ -81,50 +81,51 @@ public partial class CharaSelectPage : ContentPage
     }
   }
 
-  private async void OnMaterialSelectBarItemSelected(object? sender, string selectedLabel)
+  private async void OnMaterialSelectBarItemSelected(object? sender, SelectBarEventArgs item)
   {
+
     if (_viewModel.IsLoading) return;
     System.Diagnostics.Debug.WriteLine($"OnMaterialSelectBarItemSelected isChanging = {_isChanging}");
-    LogEditor.Text += $"選択された資料名: {selectedLabel} pageMaterialName={_pageMaterialName}\n";
-    if (string.IsNullOrEmpty(selectedLabel)) return;
+    LogEditor.Text += $"選択された資料名: {item.SelectedName} pageMaterialName={_pageMaterialName}\n";
+    if (string.IsNullOrEmpty(item.SelectedName)) return;
     if (string.IsNullOrEmpty(_appStatus.CharaName)) return;
-    if (_appStatus.MaterialName == selectedLabel)
+    if (_appStatus.MaterialName == item.SelectedName)
     {
       System.Diagnostics.Debug.WriteLine($"同じ資料名が選択されました: {_appStatus.MaterialName}");
       return;
     }
     else
     {
-      System.Diagnostics.Debug.WriteLine($"異なる資料名が選択されました: {_appStatus.MaterialName} -> {selectedLabel}");
+      System.Diagnostics.Debug.WriteLine($"異なる資料名が選択されました: {_appStatus.MaterialName} -> {item.SelectedName}");
     }
     // TODO: エラーメッセージを出す
     if (_isChanging) return;
     _isChanging = true;
-    await _viewModel.OnChangeSelect(_appStatus.CharaName, selectedLabel);
+    await _viewModel.OnChangeSelect(_appStatus.CharaName, item.SelectedName);
     _pageMaterialName = _appStatus.MaterialName;
     _isChanging = false;
   }
 
-  private async void OnCharaSelectBarItemSelected(object? sender, string selectedLabel)
+  private async void OnCharaSelectBarItemSelected(object? sender, SelectBarEventArgs item)
   {
     if (_viewModel.IsLoading) return;
     System.Diagnostics.Debug.WriteLine($"OnCharaSelectBarItemSelected isChanging = {_isChanging}");
-    LogEditor.Text += $"選択された文字種: {selectedLabel} pageCharaName={_pageCharaName}\n";
-    if (string.IsNullOrEmpty(selectedLabel)) return;
+    LogEditor.Text += $"選択された文字種: {item.SelectedName} pageCharaName={_pageCharaName}\n";
+    if (string.IsNullOrEmpty(item.SelectedName)) return;
     if (string.IsNullOrEmpty(_appStatus.MaterialName)) return;
-    if (_appStatus.CharaName == selectedLabel)
+    if (_appStatus.CharaName == item.SelectedName)
     {
       System.Diagnostics.Debug.WriteLine($"同じ文字種が選択されました: {_appStatus.CharaName}");
       return;
     }
     else
     {
-      System.Diagnostics.Debug.WriteLine($"異なる文字種が選択されました: {_appStatus.CharaName} -> {selectedLabel}");
+      System.Diagnostics.Debug.WriteLine($"異なる文字種が選択されました: {_appStatus.CharaName} -> {item.SelectedName}");
     }
     // TODO: エラーメッセージを出す
     if (_isChanging) return;
     _isChanging = true;
-    await _viewModel.OnChangeSelect(selectedLabel, _appStatus.MaterialName);
+    await _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName);
     _pageCharaName = _appStatus.CharaName!;
     _isChanging = false;
   }

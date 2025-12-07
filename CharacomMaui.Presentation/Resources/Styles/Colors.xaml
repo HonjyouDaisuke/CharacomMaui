@@ -34,7 +34,7 @@
   <Color x:Key="OnError">#FFFFFF</Color>
   <Color x:Key="OnErrorContainer">#370B1E</Color>
 
-  <Color x:Key="Outline">#313033</Color>
+  <Color x:Key="Outline">#202020</Color>
   <Color x:Key="OutlineVariant">#C4C7C5</Color>
   <Color x:Key="Shadow">#000000</Color>
 
@@ -84,6 +84,8 @@
 
   <Color x:Key="DisabledText">#ba919191</Color>
   <Color x:Key="DisabledBackground">#80919191</Color>
+  <Color x:Key="DisabledTextDark">#ba919191</Color>
+  <Color x:Key="DisabledBackgroundDark">#80919191</Color>
 
 
   <!--MAUI COLORS-->
