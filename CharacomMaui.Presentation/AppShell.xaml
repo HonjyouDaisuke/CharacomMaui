@@ -5,15 +5,14 @@
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
-  Title="CharacomMaui">
-  <ShellContent
-    Title="Homeホーム"
-    ContentTemplate="{DataTemplate local:Pages.HomePage}"
-    Route="HomePage"/>
-  <ShellContent
-    Title="Chart"
-    ContentTemplate="{DataTemplate local:Pages.ChartPage}"
-    Route="ChartPage"/>
+  Title="CharacomMaui"
+  Shell.NavBarIsVisible="True"
+  Shell.TitleColor="{AppThemeBinding Light={DynamicResource OnBackground}, Dark={DynamicResource OnBackgroundDark}}"
+  Shell.ForegroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+  Shell.BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+  Shell.DisabledColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledText}}"
+  Shell.UnselectedColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurface}}">
+
   <ShellContent
     Title="ProjectList"
     ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
@@ -26,4 +25,12 @@
     Title="CharaSelect"
     ContentTemplate="{DataTemplate local:Pages.CharaSelectPage}"
     Route="CharaSelectPage"/>
+  <ShellContent
+    Title="Chart"
+    ContentTemplate="{DataTemplate local:Pages.ChartPage}"
+    Route="ChartPage"/>
+  <ShellContent
+    Title="Homeホーム"
+    ContentTemplate="{DataTemplate local:Pages.HomePage}"
+    Route="HomePage"/>
 </Shell>
