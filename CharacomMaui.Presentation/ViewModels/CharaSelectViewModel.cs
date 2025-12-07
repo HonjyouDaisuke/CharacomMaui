@@ -39,7 +39,7 @@ public partial class CharaSelectViewModel : ObservableObject
   // ObservableCollection(UI動的追加用)
   public ObservableCollection<SelectBarContents> CharaNames { get; } = [];
   public ObservableCollection<SelectBarContents> MaterialNames { get; } = [];
-  public IAsyncRelayCommand<string> CharaButtonCommand { get; }
+  public IAsyncRelayCommand<string>? CharaButtonCommand { get; }
 
   public ObservableCollection<CharaSelectCardData> CurrentCharaItems { get; } = [];
   private readonly IDialogService _dialogService;
@@ -161,14 +161,13 @@ public partial class CharaSelectViewModel : ObservableObject
         MaterialNames.Add(new SelectBarContents
         {
           Name = materialItem,
-          Count = CurrentItems.Count(x => x.MaterialName == materialItem),
+          Count = CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName),
           Title = $"{materialItem} ({CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName)})",
           IsDisabled = CurrentItems.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName) <= 0,
         });
       }
-
-      InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault().Name ?? string.Empty;
-      InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault().Name ?? string.Empty;
+      InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
+      InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
     }
   }
 

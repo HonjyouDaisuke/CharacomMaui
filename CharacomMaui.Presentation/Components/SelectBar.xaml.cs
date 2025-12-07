@@ -162,7 +162,7 @@ public partial class SelectBar : ContentView
         .OfType<Button>()
         .FirstOrDefault(b =>
             b.BindingContext is SelectBarContents data &&
-            data.Name == InitialSelectedLabel);
+            data.Name == InitialSelectedLabel && !data.IsDisabled);
 
     if (btn != null)
       SelectButton(btn);
