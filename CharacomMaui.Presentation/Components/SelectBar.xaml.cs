@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using CharacomMaui.Presentation.Helpers;
+using CharacomMaui.Presentation.Models;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.Components;
@@ -18,19 +19,21 @@ public partial class SelectBar : ContentView
   public static readonly BindableProperty ItemsProperty =
       BindableProperty.Create(
           nameof(Items),
-          typeof(IEnumerable<string>),
+          typeof(IEnumerable<SelectBarContents>),
           typeof(SelectBar),
           null,
           propertyChanged: OnItemsChanged);
 
-  public IEnumerable<string> Items
+  public IEnumerable<SelectBarContents> Items
   {
-    get => (IEnumerable<string>)GetValue(ItemsProperty);
+    get => (IEnumerable<SelectBarContents>)GetValue(ItemsProperty);
     set => SetValue(ItemsProperty, value);
   }
+
   // ========= テーマ =========
   public static readonly BindableProperty ThemeKeyProperty =
     BindableProperty.Create(
+
         nameof(ThemeKey),
         typeof(string),
         typeof(SelectBar),
@@ -58,7 +61,7 @@ public partial class SelectBar : ContentView
   }
 
   // ========= 押されたときのイベント =========
-  public event EventHandler<string>? ItemSelected;
+  public event EventHandler<SelectBarEventArgs>? ItemSelected;
 
   private static void OnItemsChanged(BindableObject bindable, object oldValue, object newValue)
   {
@@ -123,19 +126,26 @@ public partial class SelectBar : ContentView
       return;
 
     var outline = ThemeHelper.GetColor("Outline");
-    foreach (var label in Items)
+    var disableBackground = ThemeHelper.GetColor("DisabledBackground");
+    var disableText = ThemeHelper.GetColor("DisabledText");
+    foreach (var item in Items)
     {
+      //item.Title = string.IsNullOrEmpty(item.Title) ? $"{item.Name}({item.Count})" : item.Title;
+      //item.IsDisabled = item.Count <= 0;
+      System.Diagnostics.Debug.WriteLine($"SelectBar Button: {item.Title} Disabled:{item.IsDisabled}");
       var btn = new Button
       {
-        Text = label,
+        Text = item.Title,
         BackgroundColor = Colors.Transparent, // 非選択色
-        TextColor = outline,
-        BorderColor = outline,
+        TextColor = item.IsDisabled ? disableText : outline,
+        BorderColor = item.IsDisabled ? disableBackground : outline,
+        IsEnabled = !item.IsDisabled,
         BorderWidth = 1,
-        WidthRequest = 60,
+        WidthRequest = 100,
         CornerRadius = 8,
         Padding = new Thickness(16, 10),
         Margin = new Thickness(6),
+        BindingContext = item,
       };
       btn.Clicked += OnButtonClicked;
       ButtonContainer.Children.Add(btn);
@@ -146,17 +156,16 @@ public partial class SelectBar : ContentView
 
   private void ApplyInitialSelection()
   {
-    if (string.IsNullOrEmpty(InitialSelectedLabel) || ButtonContainer.Children.Count == 0)
-      return;
+    if (string.IsNullOrEmpty(InitialSelectedLabel)) return;
 
-    foreach (var child in ButtonContainer.Children)
-    {
-      if (child is Button btn && btn.Text == InitialSelectedLabel)
-      {
-        SelectButton(btn);
-        break;
-      }
-    }
+    var btn = ButtonContainer.Children
+        .OfType<Button>()
+        .FirstOrDefault(b =>
+            b.BindingContext is SelectBarContents data &&
+            data.Name == InitialSelectedLabel && !data.IsDisabled);
+
+    if (btn != null)
+      SelectButton(btn);
   }
 
   private void OnButtonClicked(object? sender, EventArgs e)
@@ -183,10 +192,19 @@ public partial class SelectBar : ContentView
     clickedButton.BorderWidth = 0;
 
     _selectedButton = clickedButton;
-
+    // Bindingされているデータを取得
+    var data = clickedButton.BindingContext as SelectBarContents;
+    if (data == null) return;
     // イベント発火
-    ItemSelected?.Invoke(this, clickedButton.Text);
+    System.Diagnostics.Debug.WriteLine($"Selected: {data.Name} title = {clickedButton.Text}");
+    ItemSelected?.Invoke(this, new SelectBarEventArgs
+    {
+      SelectedName = data.Name,
+    });
 
-    System.Diagnostics.Debug.WriteLine($"Selected: {clickedButton.Text}");
   }
+}
+public class SelectBarEventArgs : EventArgs
+{
+  public string SelectedName { get; set; } = string.Empty;
 }

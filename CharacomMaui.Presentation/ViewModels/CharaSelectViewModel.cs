@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SkiaSharp;
@@ -36,9 +37,9 @@ public partial class CharaSelectViewModel : ObservableObject
   private List<CharaData> allCharaData = new();
 
   // ObservableCollection(UI動的追加用)
-  public ObservableCollection<string> CharaNames { get; } = [];
-  public ObservableCollection<string> MaterialNames { get; } = [];
-  public IAsyncRelayCommand<string> CharaButtonCommand { get; }
+  public ObservableCollection<SelectBarContents> CharaNames { get; } = [];
+  public ObservableCollection<SelectBarContents> MaterialNames { get; } = [];
+  public IAsyncRelayCommand<string>? CharaButtonCommand { get; }
 
   public ObservableCollection<CharaSelectCardData> CurrentCharaItems { get; } = [];
   private readonly IDialogService _dialogService;
@@ -93,6 +94,28 @@ public partial class CharaSelectViewModel : ObservableObject
     await UpdateCurrentCharaItemsAsync(accessToken);
   }
 
+  private void UpdateMaterialNames()
+  {
+    MaterialNames.Clear();
+    var Items = allCharaData
+      .Where(x => x.CharaName == _appStatus.CharaName)
+      .Select(x => x.MaterialName)
+      .Distinct()
+      .ToList();
+
+    foreach (var materialItem in Items)
+    {
+      var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
+      MaterialNames.Add(new SelectBarContents
+      {
+        Name = materialItem,
+        Count = count,
+        Title = $"{materialItem} ({count})",
+        IsDisabled = count <= 0,
+      });
+    }
+  }
+
   private async Task LoadProjectItems(string accessToken)
   {
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "プロジェクトデータ取得中・・・\nしばらくお待ち下さい。"))
@@ -124,17 +147,31 @@ public partial class CharaSelectViewModel : ObservableObject
       CharaNames.Clear();
       foreach (var charaItem in CharaItems)
       {
-        CharaNames.Add(charaItem);
+        var count = CurrentItems.Count(x => x.CharaName == charaItem);
+        CharaNames.Add(new SelectBarContents
+        {
+          Name = charaItem,
+          Count = count,
+          Title = $"{charaItem} ({count})",
+          IsDisabled = count <= 0,
+        });
       }
 
       MaterialNames.Clear();
       foreach (var materialItem in MaterialItems)
       {
-        MaterialNames.Add(materialItem);
-      }
+        var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
+        MaterialNames.Add(new SelectBarContents
+        {
+          Name = materialItem,
+          Count = count,
+          Title = $"{materialItem} ({count})",
+          IsDisabled = count <= 0,
+        });
 
-      InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault() ?? string.Empty;
-      InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault() ?? string.Empty;
+      }
+      InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
+      InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
     }
   }
 
@@ -257,6 +294,8 @@ public partial class CharaSelectViewModel : ObservableObject
         await StandardImageUpdateAsync(accessToken);
         // Stroke画像
         await StrokeImageUpdateAsync(accessToken);
+        // 資料名の数え直し
+        UpdateMaterialNames();
       }
       // Chara選択画像群
       await UpdateCurrentCharaItemsAsync(accessToken);
