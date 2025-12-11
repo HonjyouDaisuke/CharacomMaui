@@ -64,7 +64,7 @@ public partial class CreateProjectDialog : Popup
   private async void CreateProjectDialog_Opened(object? sender, EventArgs e)
   {
     if (_project == null) return;
-    if (_project.FolderId == null) return;
+    if (string.IsNullOrEmpty(_project.FolderId)) return;
 
     // プロジェクト名と説明をプリセット
     ProjectNameEntry.Text = _project.Name;
@@ -72,18 +72,19 @@ public partial class CreateProjectDialog : Popup
     // プロジェクトフォルダをプリセット
     foreach (var folder in _topFolders)
     {
-      if (folder.Id == _project.FolderId)
-      {
-        TopFolderDropdown.SelectedItem = folder;
-        break;
-      }
+      if (folder.Id != _project.FolderId) continue;
+
+      TopFolderDropdown.SelectedItem = folder;
+      break;
     }
-    if (_project.CharaFolderId == null) return;
+
+    if (string.IsNullOrEmpty(_project.CharaFolderId)) return;
     // charaフォルダをプリセット
     var charaFolders = await _viewModel.GetFolderItemsAsync(_project.FolderId);
     foreach (var charaFolder in charaFolders)
     {
-      System.Diagnostics.Debug.WriteLine($"CharaFolder: {charaFolder.Name} ID={charaFolder.Id}");
+      if (charaFolder.Id != _project.FolderId) continue;
+
       CharaFolderDropdown.SelectedItem = charaFolder;
       break;
     }
@@ -119,13 +120,14 @@ public partial class CreateProjectDialog : Popup
       // エントリーの作成
       var project = new Project
       {
+        Id = _project?.Id ?? string.Empty,
         Name = ProjectName,
         Description = ProjectDescription,
         FolderId = SelectedTopFolder.Id,
         CharaFolderId = SelectedCharaFolder.Id,
       };
 
-      var res = await _viewModel.CreateProjectAsync(project);
+      var res = await _viewModel.CreateOrUpdateProjectAsync(project);
       System.Diagnostics.Debug.WriteLine(res.ToString());
     }
     await CloseAsync(); // Close に渡す値は任意。複数渡したい場合は Tuple かクラスにまとめる

@@ -52,7 +52,7 @@ public partial class CreateProjectViewModel : ObservableObject
     return await _getFolderItemsUsecase.ExecuteAsync(accessToken, folderId);
   }
 
-  public async Task<SimpleApiResult> CreateProjectAsync(Project project)
+  public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(Project project)
   {
     var access_token = Preferences.Get("app_access_token", string.Empty);
     return await _createProjectUsecase.ExecuteAsync(access_token, project);

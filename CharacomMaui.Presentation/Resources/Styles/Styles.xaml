@@ -22,7 +22,7 @@
     <Setter Property="StrokeShape"
             Value="Rectangle"/>
     <Setter Property="StrokeThickness"
-            Value="8"/>
+            Value="1"/>
   </Style>
 
   <Style TargetType="BoxView">

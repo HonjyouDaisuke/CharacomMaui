@@ -38,14 +38,15 @@
               RowSpacing="10">
           <material:TextField x:Name="ProjectNameEntry"
                               Title="プロジェクト名"
-                              AllowClear="True">
+                              AllowClear="True"
+                              Grid.Row="0">
             <validation:RequiredValidation/>
           </material:TextField>
 
           <material:TextField x:Name="ProjectDescriptionEditor"
                               Title="プロジェクトの説明"
                               AllowClear="True"
-                              Grid.Row="2">
+                              Grid.Row="1">
             <validation:RequiredValidation/>
           </material:TextField>
         </Grid>
