@@ -33,6 +33,7 @@ public static class ServicesRegistration
     services.AddTransient<GetStandardFileIdUseCase>();
     services.AddTransient<GetStrokeFileIdUseCase>();
     services.AddTransient<UpdateCharaSelectedUseCase>();
+    services.AddTransient<DeleteProjectUseCase>();
 
     // Repository
     services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();

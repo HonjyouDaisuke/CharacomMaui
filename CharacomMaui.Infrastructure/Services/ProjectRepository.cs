@@ -130,4 +130,49 @@ public class ProjectRepository : IProjectRepository
 
     return projects;
   }
+
+  public async Task<SimpleApiResult> DeleteProjectAsync(string accessToken, string projectId)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      project_id = projectId,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    var res = await _http.PostAsync("project_delete.php", content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------delete Project server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+    try
+    {
+      var root = JsonDocument.Parse(responseBody).RootElement;
+
+      if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
+      {
+        System.Diagnostics.Debug.WriteLine("こっち");
+        return new SimpleApiResult
+        {
+          Success = true,
+          Message = "Success Delete Project...",
+        };
+      }
+      var message = root.GetProperty("message").GetString();
+      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"サーバーエラー: {message}",
+      };
+    }
+    catch (Exception ex)
+    {
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"想定外のエラーが発生しました。。。{ex.Message}",
+      };
+    }
+  }
 }
