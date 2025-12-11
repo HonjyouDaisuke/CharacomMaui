@@ -4,6 +4,7 @@
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  WidthRequest="300"
   x:Name="This">
 
   <Border
@@ -16,13 +17,28 @@
     Stroke="{DynamicResource Gray200}"
     StrokeShape="RoundRectangle 6"
     StrokeThickness="1">
+    <FlyoutBase.ContextFlyout>
+      <MenuFlyout>
+        <MenuFlyoutItem Text="プロジェクトを更新"
+                        Clicked="OnEditProject"/>
+        <MenuFlyoutItem Text="プロジェクトに招待"
+                        Clicked="OnInviteProject"/>
+        <MenuFlyoutSeparator/>
+        <MenuFlyoutItem Text="プロジェクトを削除"
+                        Clicked="OnDeleteProject"/>
+      </MenuFlyout>
+    </FlyoutBase.ContextFlyout>
     <Border.GestureRecognizers>
       <TapGestureRecognizer Tapped="OnCardTapped"/>
     </Border.GestureRecognizers>
-    <VerticalStackLayout HorizontalOptions="Center"
+    <VerticalStackLayout HorizontalOptions="Fill"
                          Spacing="6">
-      <Label FontAttributes="Bold"
-             Text="{Binding ProjectName, Source={x:Reference This}}"/>
+
+      <Label
+        FontAttributes="Bold"
+        VerticalOptions="Center"
+        Text="{Binding ProjectName, Source={x:Reference This}}"/>
+
       <BoxView HeightRequest="1"
                BackgroundColor="#444"
                HorizontalOptions="Fill"/>

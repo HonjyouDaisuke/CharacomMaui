@@ -20,11 +20,12 @@ public class ProjectRepository : IProjectRepository
     _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
-  public async Task<SimpleApiResult> CreateProjectAsync(string accessToken, Project project)
+  public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(string accessToken, Project project)
   {
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
+      id = project.Id,
       name = project.Name,
       description = project.Description,
       project_folder_id = project.FolderId,
@@ -33,10 +34,9 @@ public class ProjectRepository : IProjectRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("create_project.php", content);
+    var res = await _http.PostAsync("create_or_update_project.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------create Project server res--------------");
-    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
     System.Diagnostics.Debug.WriteLine(responseBody);
     try
     {
@@ -82,7 +82,6 @@ public class ProjectRepository : IProjectRepository
     var res = await _http.PostAsync("get_user_projects.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
-    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
     System.Diagnostics.Debug.WriteLine(responseBody);
     var response = JsonDocument.Parse(responseBody);
 
@@ -105,7 +104,6 @@ public class ProjectRepository : IProjectRepository
     var res = await _http.PostAsync("get_user_projects.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
-    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
     System.Diagnostics.Debug.WriteLine(responseBody);
     var response = JsonDocument.Parse(responseBody);
 
@@ -124,6 +122,8 @@ public class ProjectRepository : IProjectRepository
         Id = x.Project_Id,
         Name = x.Name,
         Description = x.Description,
+        FolderId = x.Folder_Id,
+        CharaFolderId = x.Chara_Folder_Id,
         CharaCount = x.Chara_Count,
         UserCount = x.User_Count
     })];

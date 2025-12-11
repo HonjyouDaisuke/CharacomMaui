@@ -21,7 +21,7 @@
   <Color x:Key="TertiaryContainer">#786301</Color>
   <Color x:Key="OnTertiaryContainer">#fef1b0</Color>
 
-  <Color x:Key="Surface">#F6F6F6</Color>
+  <Color x:Key="Surface">#E0E0E0</Color>
   <Color x:Key="OnSurface">#222222</Color>
   <Color x:Key="SurfaceVariant">#E7E0EC</Color>
   <Color x:Key="OnSurfaceVariant">#49454E</Color>

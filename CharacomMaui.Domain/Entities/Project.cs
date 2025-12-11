@@ -29,6 +29,8 @@ public class ProjectItem
   public string Project_Id { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;
   public string Description { get; set; } = string.Empty;
+  public string Folder_Id { get; set; } = string.Empty;
+  public string Chara_Folder_Id { get; set; } = string.Empty;
   public int Chara_Count { get; set; }
   public int User_Count { get; set; }
 }

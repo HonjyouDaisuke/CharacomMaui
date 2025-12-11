@@ -4,6 +4,7 @@ using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using CharacomMaui.Presentation.ViewModels;
+using System.Threading.Tasks;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -15,15 +16,35 @@ public partial class CreateProjectDialog : Popup
   public BoxItem SelectedCharaFolder => (BoxItem)CharaFolderDropdown.SelectedItem;
   private IDialogService _dialogService;
   private CreateProjectViewModel _viewModel;
+  private readonly Project? _project;
+  private readonly List<BoxItem> _topFolders = new List<BoxItem>();
 
-  public CreateProjectDialog(List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel)
+  // ========== Title ==========
+  public static readonly BindableProperty TitleProperty =
+      BindableProperty.Create(
+        nameof(Title),
+        typeof(string),
+        typeof(CreateProjectDialog),
+        string.Empty);
+  public string Title
+  {
+    get => (string)GetValue(TitleProperty);
+    set => SetValue(TitleProperty, value);
+  }
+  public CreateProjectDialog(string title, List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel, Project? project = null)
   {
     InitializeComponent();
     _dialogService = dialogService;
     _viewModel = viewModel;
-    Debug.WriteLine($"CreateProjectDialog start...");
+
+    // Popupが開いたら呼ばれる
+    this.Opened += CreateProjectDialog_Opened;
+
+    _project = project;
+    _topFolders = topFolders;
+    Title = title;
+
     TopFolderDropdown.ItemsSource = topFolders;
-    Debug.WriteLine($"TopFolders Count = {topFolders.Count}");
     TopFolderDropdown.ItemDisplayBinding = new Binding("Name");
     // PropertyChanged で SelectedItem の変更を監視
     TopFolderDropdown.PropertyChanged += TopFolderDropdownPropertyChanged;
@@ -40,6 +61,35 @@ public partial class CreateProjectDialog : Popup
     CharaFolderDropdown.ItemDisplayBinding = new Binding("Name");
   }
 
+  private async void CreateProjectDialog_Opened(object? sender, EventArgs e)
+  {
+    if (_project == null) return;
+    // プロジェクト名と説明をプリセット
+    ProjectNameEntry.Text = _project.Name;
+    ProjectDescriptionEditor.Text = _project.Description;
+
+    if (string.IsNullOrEmpty(_project.FolderId)) return;
+    // プロジェクトフォルダをプリセット
+    foreach (var folder in _topFolders)
+    {
+      if (folder.Id != _project.FolderId) continue;
+
+      TopFolderDropdown.SelectedItem = folder;
+      break;
+    }
+
+    if (string.IsNullOrEmpty(_project.CharaFolderId)) return;
+    // charaフォルダをプリセット
+    var charaFolders = await _viewModel.GetFolderItemsAsync(_project.FolderId);
+    foreach (var charaFolder in charaFolders)
+    {
+      if (charaFolder.Id != _project.CharaFolderId) continue;
+
+      CharaFolderDropdown.SelectedItem = charaFolder;
+      break;
+    }
+
+  }
   private async void TopFolderDropdownPropertyChanged(object? sender, PropertyChangedEventArgs e)
   {
 
@@ -70,13 +120,14 @@ public partial class CreateProjectDialog : Popup
       // エントリーの作成
       var project = new Project
       {
+        Id = _project?.Id ?? string.Empty,
         Name = ProjectName,
         Description = ProjectDescription,
         FolderId = SelectedTopFolder.Id,
         CharaFolderId = SelectedCharaFolder.Id,
       };
 
-      var res = await _viewModel.CreateProjectAsync(project);
+      var res = await _viewModel.CreateOrUpdateProjectAsync(project);
       System.Diagnostics.Debug.WriteLine(res.ToString());
     }
     await CloseAsync(); // Close に渡す値は任意。複数渡したい場合は Tuple かクラスにまとめる
@@ -86,5 +137,4 @@ public partial class CreateProjectDialog : Popup
   {
     CloseAsync();
   }
-
 }

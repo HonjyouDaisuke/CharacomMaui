@@ -18,7 +18,7 @@ public static class ServicesRegistration
     // UseCaseのDI
     services.AddTransient<ProcessImageFromBoxUseCase>();
     services.AddTransient<GetBoxConfigUseCase>();
-    services.AddTransient<CreateProjectUseCase>();
+    services.AddTransient<CreateOrUpdateProjectUseCase>();
     services.AddTransient<GetUserProjectsUseCase>();
     services.AddTransient<GetUserInfoUseCase>();
     services.AddTransient<GetProjectCharaItemsUseCase>();
