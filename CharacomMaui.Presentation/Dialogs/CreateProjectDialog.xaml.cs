@@ -64,11 +64,11 @@ public partial class CreateProjectDialog : Popup
   private async void CreateProjectDialog_Opened(object? sender, EventArgs e)
   {
     if (_project == null) return;
-    if (string.IsNullOrEmpty(_project.FolderId)) return;
-
     // プロジェクト名と説明をプリセット
     ProjectNameEntry.Text = _project.Name;
     ProjectDescriptionEditor.Text = _project.Description;
+
+    if (string.IsNullOrEmpty(_project.FolderId)) return;
     // プロジェクトフォルダをプリセット
     foreach (var folder in _topFolders)
     {

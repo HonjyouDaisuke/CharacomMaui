@@ -33,13 +33,13 @@ public partial class CreateProjectViewModel : ObservableObject
   public event PropertyChangedEventHandler PropertyChanged;
 
   public CreateProjectViewModel(GetBoxFolderItemsUseCase getBoxFolderItemsUseCase,
-                                CreateOrUpdateProjectUseCase createOrUpdateProjectUsecase,
+                                CreateOrUpdateProjectUseCase createOrUpdateProjectUseCase,
                                 GetUserProjectsUseCase getUserProjectsUseCase,
                                 UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
                                 UpdateStandardMasterUseCase updateStandardMasterUseCase)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
-    _createOrUpdateProjectUsecase = createOrUpdateProjectUsecase;
+    _createOrUpdateProjectUsecase = createOrUpdateProjectUseCase;
     _getUserProjectsUseCase = getUserProjectsUseCase;
     _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
     _updateStandardMasterUseCase = updateStandardMasterUseCase;
