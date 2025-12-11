@@ -4,6 +4,7 @@ using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using CharacomMaui.Presentation.ViewModels;
+using System.Threading.Tasks;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -15,15 +16,22 @@ public partial class CreateProjectDialog : Popup
   public BoxItem SelectedCharaFolder => (BoxItem)CharaFolderDropdown.SelectedItem;
   private IDialogService _dialogService;
   private CreateProjectViewModel _viewModel;
+  private readonly Project? _project;
+  private readonly List<BoxItem> _topFolders = new List<BoxItem>();
 
-  public CreateProjectDialog(List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel)
+  public CreateProjectDialog(List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel, Project? project = null)
   {
     InitializeComponent();
     _dialogService = dialogService;
     _viewModel = viewModel;
-    Debug.WriteLine($"CreateProjectDialog start...");
+
+    // Popupが開いたら呼ばれる
+    this.Opened += CreateProjectDialog_Opened;
+
+    _project = project;
+    _topFolders = topFolders;
+
     TopFolderDropdown.ItemsSource = topFolders;
-    Debug.WriteLine($"TopFolders Count = {topFolders.Count}");
     TopFolderDropdown.ItemDisplayBinding = new Binding("Name");
     // PropertyChanged で SelectedItem の変更を監視
     TopFolderDropdown.PropertyChanged += TopFolderDropdownPropertyChanged;
@@ -40,6 +48,34 @@ public partial class CreateProjectDialog : Popup
     CharaFolderDropdown.ItemDisplayBinding = new Binding("Name");
   }
 
+  private async void CreateProjectDialog_Opened(object? sender, EventArgs e)
+  {
+    if (_project == null) return;
+    if (_project.FolderId == null) return;
+
+    // プロジェクト名と説明をプリセット
+    ProjectNameEntry.Text = _project.Name;
+    ProjectDescriptionEditor.Text = _project.Description;
+    // プロジェクトフォルダをプリセット
+    foreach (var folder in _topFolders)
+    {
+      if (folder.Id == _project.FolderId)
+      {
+        TopFolderDropdown.SelectedItem = folder;
+        break;
+      }
+    }
+    if (_project.CharaFolderId == null) return;
+    // charaフォルダをプリセット
+    var charaFolders = await _viewModel.GetFolderItemsAsync(_project.FolderId);
+    foreach (var charaFolder in charaFolders)
+    {
+      System.Diagnostics.Debug.WriteLine($"CharaFolder: {charaFolder.Name} ID={charaFolder.Id}");
+      CharaFolderDropdown.SelectedItem = charaFolder;
+      break;
+    }
+
+  }
   private async void TopFolderDropdownPropertyChanged(object? sender, PropertyChangedEventArgs e)
   {
 
@@ -87,4 +123,12 @@ public partial class CreateProjectDialog : Popup
     CloseAsync();
   }
 
+}
+public class ProjectInfo
+{
+  public string ProjectId { get; set; } = string.Empty;
+  public string ProjectName { get; set; } = string.Empty;
+  public string ProjectDescription { get; set; } = string.Empty;
+  public string TopFolderName { get; set; } = string.Empty;
+  public string CharaFolderName { get; set; } = string.Empty;
 }

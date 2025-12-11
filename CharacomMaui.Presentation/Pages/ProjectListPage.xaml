@@ -31,24 +31,39 @@
       x:Name="StrokeBtn"
       Text="筆順画像生成"
       Clicked="OnStrokeBtnClicked"/>
-    <CollectionView
-      x:Name="ProjectsCollection"
-      HeightRequest="400"
-      ItemsLayout="VerticalGrid, 6"
-      ItemsSource="{Binding Files2}"
-      SelectionMode="None">
-      <CollectionView.ItemTemplate>
-        <DataTemplate>
-          <components:ProjectInfoCard
-            ProjectId="{Binding Id}"
-            ProjectName="{Binding Name}"
-            CharaCount="{Binding CharaCount}"
-            UserCount="{Binding UserCount}"
-            CardClicked="OnCardClicked"
-            CardDoubleClicked="OnCardDoubleClicked"/>
-        </DataTemplate>
-      </CollectionView.ItemTemplate>
-    </CollectionView>
+    <ScrollView
+      x:Name="ProjectsScrollView"
+      Orientation="Vertical"
+      HeightRequest="400">
+
+      <FlexLayout
+        x:Name="ProjectsFlex"
+        Direction="Row"
+        Wrap="Wrap"
+        JustifyContent="Start"
+        AlignItems="Start">
+
+        <BindableLayout.ItemTemplate>
+          <DataTemplate>
+            <components:ProjectInfoCard
+              EditRequested="OnEditRequested"
+              InviteRequested="OnInviteRequested"
+              DeleteRequested="OnDeleteRequested"
+              ProjectFolderId="{Binding FolderId}"
+              CharaFolderId="{Binding CharaFolderId}"
+              ProjectId="{Binding Id}"
+              ProjectName="{Binding Name}"
+              ProjectDescription="{Binding Description}"
+              CharaCount="{Binding CharaCount}"
+              UserCount="{Binding UserCount}"
+              CardClicked="OnCardClicked"
+              CardDoubleClicked="OnCardDoubleClicked"
+              Margin="5"/>
+          </DataTemplate>
+        </BindableLayout.ItemTemplate>
+
+      </FlexLayout>
+    </ScrollView>
     <ScrollView x:Name="LogScrollView"
                 HeightRequest="300">
       <Editor x:Name="LogEditor"

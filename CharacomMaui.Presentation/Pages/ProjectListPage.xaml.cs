@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.Marshalling;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
@@ -39,32 +40,66 @@ public partial class ProjectListPage : ContentPage
     var projects = await _viewModel.GetProjectsAsync();
     if (projects == null) return;
     // TODO:いる？
-    _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
-    ProjectsCollection.ItemsSource = projects;
+    // _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
+    BindableLayout.SetItemsSource(ProjectsFlex, projects);
     foreach (var project in projects)
     {
-      var card = new ProjectInfoCard
-      {
-        ProjectName = project.Name,
-        CharaCount = project.CharaCount,
-        UserCount = project.UserCount
-      };
-
-      //ProjectsContainer.Children.Add(card);
-
-      LogEditor.Text += $"projectName = {project.Name}\n";
-      LogEditor.Text += $"projectDescription = {project.Description}\n";
-      LogEditor.Text += $"UserCount = {project.UserCount}\n";
-      LogEditor.Text += $"CharaCount = {project.CharaCount}\n";
-      LogEditor.Text += "---------------------------------\n";
+      System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
   }
-  private async void OnDialogButtonClicked(object sender, EventArgs e)
+
+  private async void OnEditRequested(object? sender, ProjectInfoEventArgs e)
   {
-    var result = await this.DisplayRadioButtonPromptAsync(
-            "Pick some of them below",
-            new[] { "Option 1", "Option 2", "Option 3" });
+    System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription})\n");
+    LogEditor.Text += $"編集: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} {e.ProjectFolderId} {e.CharaFolderId}\n";
+    LogEditor.Text += "プロジェクトの更新！！\n";
+    // var accessToken = Preferences.Get("app_access_token", string.Empty);
+    var topFolderItems = await _viewModel.GetFolderItemsAsync();
+    var project = new Project
+    {
+      Id = e.ProjectId,
+      Name = e.ProjectName,
+      Description = e.ProjectDescription,
+      FolderId = e.ProjectFolderId,
+      CharaFolderId = e.CharaFolderId,
+    };
+
+    var dialog = new CreateProjectDialog(topFolderItems, _dialogService, _viewModel, project);
+    await this.ShowPopupAsync(dialog);
+
+    // ダイアログから返ってきてから。。。
+    if (dialog.SelectedTopFolder == null)
+    {
+      LogEditor.Text += "選択されていない";
+      return;
+    }
+
+    var projectName = dialog.ProjectName;
+    var projectDescription = dialog.ProjectDescription;
+    var selectedFolder = dialog.SelectedTopFolder;
+    var selectedCharaFolder = dialog.SelectedCharaFolder;
+
+    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
+    // 例えば編集画面を開く
+    // await Navigation.PushAsync(new EditProjectPage(e.ProjectId));
   }
+
+  private void OnDeleteRequested(object? sender, ProjectInfoEventArgs e)
+  {
+    LogEditor.Text += $"削除: {e.ProjectName} (ID: {e.ProjectId})\n";
+
+    // 例: ダイアログ表示
+    // await _dialogService.ShowAlertAsync($"Delete {e.ProjectName}?");
+  }
+
+  private void OnInviteRequested(object? sender, ProjectInfoEventArgs e)
+  {
+    LogEditor.Text += $"招待: {e.ProjectName} (ID: {e.ProjectId})\n";
+
+    // 例: 招待ダイアログ
+    // await Navigation.PushAsync(new InvitePage(e.ProjectId));
+  }
+
   private async void OnCreateProjectBtn(object? sender, EventArgs e)
   {
     LogEditor.Text += "プロジェクトの新規作成\n";

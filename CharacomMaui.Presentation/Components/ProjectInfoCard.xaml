@@ -4,6 +4,7 @@
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  WidthRequest="300"
   x:Name="This">
 
   <Border
@@ -16,13 +17,79 @@
     Stroke="{DynamicResource Gray200}"
     StrokeShape="RoundRectangle 6"
     StrokeThickness="1">
+    <FlyoutBase.ContextFlyout>
+      <MenuFlyout>
+        <MenuFlyoutItem Text="プロジェクトを更新"
+                        Clicked="OnEditProject"/>
+        <MenuFlyoutItem Text="プロジェクトに招待"
+                        Clicked="OnInviteProject"/>
+        <MenuFlyoutSeparator/>
+        <MenuFlyoutItem Text="プロジェクトを削除"
+                        Clicked="OnDeleteProject"/>
+
+
+      </MenuFlyout>
+    </FlyoutBase.ContextFlyout>
     <Border.GestureRecognizers>
       <TapGestureRecognizer Tapped="OnCardTapped"/>
     </Border.GestureRecognizers>
-    <VerticalStackLayout HorizontalOptions="Center"
+    <VerticalStackLayout HorizontalOptions="Fill"
                          Spacing="6">
-      <Label FontAttributes="Bold"
-             Text="{Binding ProjectName, Source={x:Reference This}}"/>
+
+      <Label
+        FontAttributes="Bold"
+        VerticalOptions="Center"
+        Text="{Binding ProjectName, Source={x:Reference This}}"/>
+
+      <!-- 右側：メニューアイコン -->
+      <!-- TODO; メモで残すが、後で必ず消す
+        <Button Grid.Column="1"
+                Text="&#xe5d3;"
+                TextColor="{AppThemeBinding Light={DynamicResource Outline},
+                                        Dark={DynamicResource OutlineDark}}"
+                FontFamily="{x:Static models:Icons.FontFamily}"
+                FontSize="24"
+                Padding="0"
+                HeightRequest="0"
+                WidthRequest="0"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface},
+                                        Dark={DynamicResource SurfaceDark}}"
+                VerticalOptions="Center">
+
+          <VisualStateManager.VisualStateGroups>
+            <VisualStateGroupList>
+
+               Hover 状態
+              <VisualStateGroup x:Name="CommonStates">
+                <VisualState x:Name="PointerOver">
+                  <VisualState.Setters>
+                    <Setter Property="BackgroundColor"
+                            Value="{AppThemeBinding Light={DynamicResource Secondary},
+                                        Dark={DynamicResource SecondaryDark}}"/>
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={DynamicResource OnSecondary},
+                                        Dark={DynamicResource OnSecondaryDark}}"/>
+                  </VisualState.Setters>
+                </VisualState>
+
+                 通常
+                <VisualState x:Name="Normal">
+                  <VisualState.Setters>
+                    <Setter Property="BackgroundColor"
+                            Value="{AppThemeBinding Light={DynamicResource Surface},
+                                        Dark={DynamicResource SurfaceDark}}"/>
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={DynamicResource Outline},
+                                        Dark={DynamicResource OutlineDark}}"/>
+                  </VisualState.Setters>
+                </VisualState>
+              </VisualStateGroup>
+
+            </VisualStateGroupList>
+          </VisualStateManager.VisualStateGroups>
+        </Button>
+        -->
+
       <BoxView HeightRequest="1"
                BackgroundColor="#444"
                HorizontalOptions="Fill"/>

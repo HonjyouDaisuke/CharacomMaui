@@ -124,6 +124,8 @@ public class ProjectRepository : IProjectRepository
         Id = x.Project_Id,
         Name = x.Name,
         Description = x.Description,
+        FolderId = x.Folder_Id,
+        CharaFolderId = x.Chara_Folder_Id,
         CharaCount = x.Chara_Count,
         UserCount = x.User_Count
     })];
