@@ -20,7 +20,7 @@ public class ProjectRepository : IProjectRepository
     _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
-  public async Task<SimpleApiResult> CreateProjectAsync(string accessToken, Project project)
+  public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(string accessToken, Project project)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -33,7 +33,7 @@ public class ProjectRepository : IProjectRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("create_project.php", content);
+    var res = await _http.PostAsync("create_or_update_project.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------create Project server res--------------");
     System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");

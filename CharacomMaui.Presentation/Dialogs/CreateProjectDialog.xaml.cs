@@ -137,13 +137,4 @@ public partial class CreateProjectDialog : Popup
   {
     CloseAsync();
   }
-
-}
-public class ProjectInfo
-{
-  public string ProjectId { get; set; } = string.Empty;
-  public string ProjectName { get; set; } = string.Empty;
-  public string ProjectDescription { get; set; } = string.Empty;
-  public string TopFolderName { get; set; } = string.Empty;
-  public string CharaFolderName { get; set; } = string.Empty;
 }

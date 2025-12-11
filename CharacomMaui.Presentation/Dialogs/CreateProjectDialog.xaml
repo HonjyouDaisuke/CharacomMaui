@@ -23,7 +23,8 @@
              FontSize="20"
              FontAttributes="Bold"
              Padding="15"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryContainer}, Dark={DynamicResource PrimaryContainerDark}}"
+             TextColor="{AppThemeBinding Light={DynamicResource OnPrimaryContainer}, Dark={DynamicResource OnPrimaryContainerDark}}"
              HorizontalTextAlignment="Center"
              HorizontalOptions="Fill"
              Grid.Row="0"/>
@@ -94,7 +95,9 @@
             ColumnSpacing="10">
 
         <Button Text="OK"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource OnPrimary}, Dark={StaticResource OnPrimaryDark}}"
+                Grid.Column="0"
                 HorizontalOptions="End"
                 Clicked="OnOkClicked"/>
 

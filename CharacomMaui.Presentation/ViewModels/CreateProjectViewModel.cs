@@ -9,7 +9,7 @@ namespace CharacomMaui.Presentation.ViewModels;
 public partial class CreateProjectViewModel : ObservableObject
 {
   private readonly GetBoxFolderItemsUseCase _getFolderItemsUsecase;
-  private readonly CreateProjectUseCase _createProjectUsecase;
+  private readonly CreateOrUpdateProjectUseCase _createOrUpdateProjectUsecase;
   private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
   private readonly UpdateStrokeMasterUseCase _updateStrokeMasterUseCase;
   private readonly UpdateStandardMasterUseCase _updateStandardMasterUseCase;
@@ -33,13 +33,13 @@ public partial class CreateProjectViewModel : ObservableObject
   public event PropertyChangedEventHandler PropertyChanged;
 
   public CreateProjectViewModel(GetBoxFolderItemsUseCase getBoxFolderItemsUseCase,
-                                CreateProjectUseCase createProjectUseCase,
+                                CreateOrUpdateProjectUseCase createOrUpdateProjectUsecase,
                                 GetUserProjectsUseCase getUserProjectsUseCase,
                                 UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
                                 UpdateStandardMasterUseCase updateStandardMasterUseCase)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
-    _createProjectUsecase = createProjectUseCase;
+    _createOrUpdateProjectUsecase = createOrUpdateProjectUsecase;
     _getUserProjectsUseCase = getUserProjectsUseCase;
     _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
     _updateStandardMasterUseCase = updateStandardMasterUseCase;
@@ -55,7 +55,7 @@ public partial class CreateProjectViewModel : ObservableObject
   public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(Project project)
   {
     var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _createProjectUsecase.ExecuteAsync(access_token, project);
+    return await _createOrUpdateProjectUsecase.ExecuteAsync(access_token, project);
   }
 
   public async Task<List<Project>?> GetProjectsAsync()
