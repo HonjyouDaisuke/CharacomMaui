@@ -19,7 +19,19 @@ public partial class CreateProjectDialog : Popup
   private readonly Project? _project;
   private readonly List<BoxItem> _topFolders = new List<BoxItem>();
 
-  public CreateProjectDialog(List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel, Project? project = null)
+  // ========== Title ==========
+  public static readonly BindableProperty TitleProperty =
+      BindableProperty.Create(
+        nameof(Title),
+        typeof(string),
+        typeof(CreateProjectDialog),
+        string.Empty);
+  public string Title
+  {
+    get => (string)GetValue(TitleProperty);
+    set => SetValue(TitleProperty, value);
+  }
+  public CreateProjectDialog(string title, List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel, Project? project = null)
   {
     InitializeComponent();
     _dialogService = dialogService;
@@ -30,6 +42,7 @@ public partial class CreateProjectDialog : Popup
 
     _project = project;
     _topFolders = topFolders;
+    Title = title;
 
     TopFolderDropdown.ItemsSource = topFolders;
     TopFolderDropdown.ItemDisplayBinding = new Binding("Name");

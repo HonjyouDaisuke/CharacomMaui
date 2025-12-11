@@ -64,7 +64,7 @@ public partial class ProjectListPage : ContentPage
       CharaFolderId = e.CharaFolderId,
     };
 
-    var dialog = new CreateProjectDialog(topFolderItems, _dialogService, _viewModel, project);
+    var dialog = new CreateProjectDialog("プロジェクトの更新", topFolderItems, _dialogService, _viewModel, project);
     await this.ShowPopupAsync(dialog);
 
     // ダイアログから返ってきてから。。。
@@ -106,7 +106,7 @@ public partial class ProjectListPage : ContentPage
     // var accessToken = Preferences.Get("app_access_token", string.Empty);
     var topFolderItems = await _viewModel.GetFolderItemsAsync();
 
-    var dialog = new CreateProjectDialog(topFolderItems, _dialogService, _viewModel);
+    var dialog = new CreateProjectDialog("プロジェクトの新規作成", topFolderItems, _dialogService, _viewModel);
     await this.ShowPopupAsync(dialog);
     if (dialog.SelectedTopFolder == null)
     {
