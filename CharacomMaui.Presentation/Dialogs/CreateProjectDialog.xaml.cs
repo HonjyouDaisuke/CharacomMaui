@@ -83,7 +83,7 @@ public partial class CreateProjectDialog : Popup
     var charaFolders = await _viewModel.GetFolderItemsAsync(_project.FolderId);
     foreach (var charaFolder in charaFolders)
     {
-      if (charaFolder.Id != _project.FolderId) continue;
+      if (charaFolder.Id != _project.CharaFolderId) continue;
 
       CharaFolderDropdown.SelectedItem = charaFolder;
       break;
