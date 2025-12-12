@@ -13,6 +13,7 @@ public partial class CreateProjectViewModel : ObservableObject
   private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
   private readonly UpdateStrokeMasterUseCase _updateStrokeMasterUseCase;
   private readonly UpdateStandardMasterUseCase _updateStandardMasterUseCase;
+  private readonly DeleteProjectUseCase _deleteProjectUseCase;
   private BoxItem _selectedFolder = new();
 
   public AppStatus _appStatus = new();
@@ -36,13 +37,15 @@ public partial class CreateProjectViewModel : ObservableObject
                                 CreateOrUpdateProjectUseCase createOrUpdateProjectUseCase,
                                 GetUserProjectsUseCase getUserProjectsUseCase,
                                 UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
-                                UpdateStandardMasterUseCase updateStandardMasterUseCase)
+                                UpdateStandardMasterUseCase updateStandardMasterUseCase,
+                                DeleteProjectUseCase deleteProjectUseCase)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
     _createOrUpdateProjectUsecase = createOrUpdateProjectUseCase;
     _getUserProjectsUseCase = getUserProjectsUseCase;
     _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
     _updateStandardMasterUseCase = updateStandardMasterUseCase;
+    _deleteProjectUseCase = deleteProjectUseCase;
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string? folderId = null)
@@ -92,6 +95,12 @@ public partial class CreateProjectViewModel : ObservableObject
   {
     var access_token = Preferences.Get("app_access_token", string.Empty);
     return await _updateStandardMasterUseCase.ExecuteAsync(access_token);
+  }
+
+  public async Task<SimpleApiResult> DeleteProjectAsync(string projectId)
+  {
+    var access_token = Preferences.Get("app_access_token", string.Empty);
+    return await _deleteProjectUseCase.ExecuteAsync(access_token, projectId);
   }
 }
 

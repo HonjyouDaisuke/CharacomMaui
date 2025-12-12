@@ -47,6 +47,17 @@ public partial class ProjectListPage : ContentPage
       System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
   }
+  private Project makeProjectFromEventArgs(ProjectInfoEventArgs e)
+  {
+    return new Project
+    {
+      Id = e.ProjectId,
+      Name = e.ProjectName,
+      Description = e.ProjectDescription,
+      FolderId = e.ProjectFolderId,
+      CharaFolderId = e.CharaFolderId,
+    };
+  }
 
   private async void OnEditRequested(object? sender, ProjectInfoEventArgs e)
   {
@@ -55,14 +66,7 @@ public partial class ProjectListPage : ContentPage
     LogEditor.Text += "プロジェクトの更新！！\n";
     // var accessToken = Preferences.Get("app_access_token", string.Empty);
     var topFolderItems = await _viewModel.GetFolderItemsAsync();
-    var project = new Project
-    {
-      Id = e.ProjectId,
-      Name = e.ProjectName,
-      Description = e.ProjectDescription,
-      FolderId = e.ProjectFolderId,
-      CharaFolderId = e.CharaFolderId,
-    };
+    var project = makeProjectFromEventArgs(e);
 
     var dialog = new CreateProjectDialog("プロジェクトの更新", topFolderItems, _dialogService, _viewModel, project);
     await this.ShowPopupAsync(dialog);
@@ -84,12 +88,37 @@ public partial class ProjectListPage : ContentPage
     // await Navigation.PushAsync(new EditProjectPage(e.ProjectId));
   }
 
-  private void OnDeleteRequested(object? sender, ProjectInfoEventArgs e)
+  private async void OnDeleteRequested(object? sender, ProjectInfoEventArgs e)
   {
     LogEditor.Text += $"削除: {e.ProjectName} (ID: {e.ProjectId})\n";
+    var project = makeProjectFromEventArgs(e);
 
-    // 例: ダイアログ表示
-    // await _dialogService.ShowAlertAsync($"Delete {e.ProjectName}?");
+    var dialog = new ConfirmDeleteDialog("プロジェクトの削除確認", _dialogService, project);
+    await this.ShowPopupAsync(dialog);
+
+    if (dialog.IsConfirmed)
+    {
+      using (await _dialogService.DisplayProgressAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・\nしばらくお待ち下さい。"))
+      {
+        LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+        var result = await _viewModel.DeleteProjectAsync(e.ProjectId);
+        LogEditor.Text += $"削除結果: {result.Success}\n";
+        if (!result.Success)
+        {
+          await _dialogService.DisplayTextPromptAsync("削除エラー", result.Message, "OK");
+          return;
+        }
+        // プロジェクトリストを再取得
+        var projects = await _viewModel.GetProjectsAsync();
+
+        if (projects == null) return;
+        BindableLayout.SetItemsSource(ProjectsFlex, projects);
+      }
+    }
+    else
+    {
+      LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
+    }
   }
 
   private void OnInviteRequested(object? sender, ProjectInfoEventArgs e)
