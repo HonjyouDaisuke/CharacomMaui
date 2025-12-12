@@ -142,6 +142,15 @@ public class ProjectRepository : IProjectRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync("project_delete.php", content);
+    if (!res.IsSuccessStatusCode)
+    {
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"HTTPエラー: {res.StatusCode}",
+      };
+    }
+
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------delete Project server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
@@ -158,7 +167,10 @@ public class ProjectRepository : IProjectRepository
           Message = "Success Delete Project...",
         };
       }
-      var message = root.GetProperty("message").GetString();
+      var message = root.TryGetProperty("message", out var msgProp)
+        ? msgProp.GetString()
+        : "不明なエラー";
+
       System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
       return new SimpleApiResult
       {

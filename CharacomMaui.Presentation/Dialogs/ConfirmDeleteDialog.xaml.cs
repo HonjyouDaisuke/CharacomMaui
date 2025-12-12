@@ -1,10 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
 using UraniumUI.Dialogs;
-using System.ComponentModel;
-using System.Diagnostics;
-using CharacomMaui.Presentation.ViewModels;
-using System.Threading.Tasks;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -53,12 +49,12 @@ public partial class ConfirmDeleteDialog : Popup
   private async void OnOkClicked(object sender, EventArgs e)
   {
     IsConfirmed = true;
-    await CloseAsync(); // Close に渡す値は任意。複数渡したい場合は Tuple かクラスにまとめる
+    await CloseAsync();
   }
 
-  private void OnCancelClicked(object sender, EventArgs e)
+  private async void OnCancelClicked(object sender, EventArgs e)
   {
     IsConfirmed = false;
-    CloseAsync();
+    await CloseAsync();
   }
 }
