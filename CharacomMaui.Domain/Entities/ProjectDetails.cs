@@ -31,5 +31,5 @@ public class ProjectDetails
 public class ProjectDetailsResponse
 {
   public bool Success { get; set; }
-  public ProjectDetails Data { get; set; } = default!;
+  public ProjectDetails? Data { get; set; }
 }

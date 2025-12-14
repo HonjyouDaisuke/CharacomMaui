@@ -76,7 +76,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     _appStatus = appStatus;
     _getProjectDetailsUseCase = getProjectDetailsUseCase;
   }
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
   protected bool SetProperty<T>(
           ref T backingStore,
           T value,

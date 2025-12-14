@@ -126,7 +126,11 @@ public partial class ProjectDetailPage : ContentPage
       LogEditor.Text += "選択されていない";
       return;
     }
-
+    if (dialog.SelectedCharaFolder == null)
+    {
+      LogEditor.Text += "個別文字フォルダが選択されていない";
+      return;
+    }
     project.Name = dialog.ProjectName;
     project.Description = dialog.ProjectDescription;
     project.FolderId = dialog.SelectedTopFolder.Id;
