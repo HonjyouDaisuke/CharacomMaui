@@ -2,76 +2,150 @@
 <ContentView
   x:Class="CharacomMaui.Presentation.Components.ProjectDetailCard"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  x:Name="This">
 
   <Border
-    x:Name="BackGraoundBorder"
     Margin="8"
     Padding="16"
     StrokeShape="RoundRectangle 12"
     Shadow="5"
-    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1A1A1A}"
-    Stroke="{AppThemeBinding Light=#E5E5E5, Dark=#333333}"
+    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+    Stroke="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
     StrokeThickness="1">
 
-    <VerticalStackLayout Spacing="12">
+    <Grid
+      ColumnDefinitions="Auto,*,Auto,Auto"
+      RowDefinitions="Auto,Auto,Auto,Auto"
+      RowSpacing="10"
+      ColumnSpacing="12">
 
       <!-- プロジェクト名 -->
-      <VerticalStackLayout Spacing="4">
-        <Label Text="プロジェクト名"
-               FontSize="13"
-               TextColor="{AppThemeBinding Light=#666, Dark=#AAA}"/>
+      <Label
+        Grid.Row="0"
+        Grid.Column="0"
+        Text="プロジェクト名:"
+        FontSize="24"
+        TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
 
-        <Label Text="サンプルプロジェクトX"
-               FontSize="18"
-               FontAttributes="Bold"
-               TextColor="{AppThemeBinding Light=#222, Dark=#FFF}"/>
-      </VerticalStackLayout>
+      <Label
+        Grid.Row="0"
+        Grid.Column="1"
+        Text="{Binding ProjectName, Source={x:Reference This}}"
+        FontSize="24"
+        FontAttributes="Bold"
+        TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
 
-
-      <!-- 説明 -->
-      <VerticalStackLayout Spacing="4">
-        <Label Text="説明"
-               FontSize="13"
-               TextColor="{AppThemeBinding Light=#666, Dark=#AAA}"/>
-
-        <Label Text="プロジェクトの説明になります。少し長い文章が入ります。"
-               FontSize="14"
-               TextColor="{AppThemeBinding Light=#333, Dark=#DDD}"
-               LineBreakMode="WordWrap"/>
-      </VerticalStackLayout>
-
-
-      <!-- 日付情報 -->
-      <Grid ColumnDefinitions="*,Auto"
-          RowDefinitions="Auto,Auto"
-          RowSpacing="6">
-
-        <Label Grid.Row="0"
-            Grid.Column="0"
-               Text="作成日"
-               FontSize="13"
-               TextColor="{AppThemeBinding Light=#666, Dark=#AAA}"/>
-
-        <Label Grid.Row="0"
-            Grid.Column="1"
-               Text="2025年11月22日"
-               FontSize="14"
-               TextColor="{AppThemeBinding Light=#333, Dark=#DDD}"/>
-
-        <Label Grid.Row="1"
-            Grid.Column="0"
-               Text="最終更新日"
-               FontSize="13"
-               TextColor="{AppThemeBinding Light=#666, Dark=#AAA}"/>
-
-        <Label Grid.Row="1"
-            Grid.Column="1"
-               Text="2025.11.22"
-               FontSize="14"
-               TextColor="{AppThemeBinding Light=#333, Dark=#DDD}"/>
+      <Grid
+        Grid.Row="0"
+        Grid.Column="2"
+        ColumnSpacing="10"
+        ColumnDefinitions="Auto, Auto">
+        <Button
+          Grid.Column="0"
+          x:Name="updateBtn"
+          TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
+          BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+          Clicked="OnUpdateClicked"
+          Text="アップデート"/>
+        <Button
+          Grid.Column="1"
+          x:Name="InviteBtn"
+          TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
+          BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+          Clicked="OnInviteClicked"
+          Text="招待"/>
       </Grid>
+      <Button
+        Grid.Row="0"
+        Grid.Column="3"
+        TextColor="{AppThemeBinding Light={DynamicResource OnError}, Dark={DynamicResource OnErrorDark}}"
+        BackgroundColor="{AppThemeBinding Light={DynamicResource Error}, Dark={DynamicResource ErrorDark}}"
+        Clicked="OnDeleteClicked"
+        x:Name="deleteBtn"
+        FontFamily="{x:Static models:Icons.FontFamily}"
+        Text="&#xE872; 削除"/>
+      <!-- 説明 -->
+      <Label
+        Grid.Row="1"
+        Grid.Column="0"
+        Text="説明:"
+        FontSize="18"
+        TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
 
-    </VerticalStackLayout>
+      <Label
+        Grid.Row="1"
+        Grid.Column="1"
+        Grid.ColumnSpan="3"
+        Text="{Binding ProjectDescription, Source={x:Reference This}}"
+        FontSize="18"
+        TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
+        LineBreakMode="WordWrap"/>
+
+      <!-- 作成日 -->
+      <Grid
+        Grid.Row="2"
+        Grid.Column="0"
+        Grid.ColumnSpan="4"
+        ColumnSpacing="12"
+        ColumnDefinitions="Auto, *, Auto, *">
+        <Label
+          Grid.Column="0"
+          Text="作成日:"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <Label
+          Grid.Column="1"
+          Text="{Binding CreatedAt, Source={x:Reference This}}"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <!-- 最終更新日 -->
+        <Label
+          Grid.Column="2"
+          Text="最終更新日:"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <Label
+          Grid.Column="3"
+          Text="{Binding UpdatedAt, Source={x:Reference This}}"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+      </Grid>
+      <Grid
+        Grid.Row="3"
+        Grid.Column="0"
+        Grid.ColumnSpan="4"
+        ColumnSpacing="12"
+        ColumnDefinitions="Auto, Auto, Auto, *">
+        <Label
+          Grid.Column="0"
+          Text="作成者:"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <Label
+          Grid.Column="1"
+          Text="{Binding CreatedBy, Source={x:Reference This}}"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <!-- 最終更新日 -->
+        <Label
+          Grid.Column="2"
+          Text="閲覧ユーザー:"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+        <Label
+          Grid.Column="3"
+          Text="本庄、三崎、サンタ"
+          FontSize="18"
+          TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+      </Grid>
+    </Grid>
   </Border>
 </ContentView>

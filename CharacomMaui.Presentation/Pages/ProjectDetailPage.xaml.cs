@@ -3,7 +3,10 @@ using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
+using CharacomMaui.Presentation.Dialogs;
+using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
+using UraniumUI.Dialogs.Mopups;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -13,21 +16,28 @@ public partial class ProjectDetailPage : ContentPage
   private AppStatus _appStatus;
   private GetProjectCharaItemsUseCase _useCase;
   private ProjectDetailViewModel _viewModel;
+  private CreateProjectViewModel _createViewModel;
   private IDialogService _dialogService;
-  public ProjectDetailPage(AppStatus appStatus, GetProjectCharaItemsUseCase useCase, ProjectDetailViewModel viewModel, IDialogService dialogService)
+  public ProjectDetailPage(AppStatus appStatus, GetProjectCharaItemsUseCase useCase, CreateProjectViewModel createProjectViewModel, ProjectDetailViewModel viewModel, IDialogService dialogService)
   {
     InitializeComponent();
     _appStatus = appStatus;
     _useCase = useCase;
     _dialogService = dialogService;
     _viewModel = viewModel;
+    _createViewModel = createProjectViewModel;
     BindingContext = _viewModel;
   }
 
-  protected override void OnAppearing()
+  protected override async void OnAppearing()
   {
     base.OnAppearing();
-    _ = GetCharaItemAsync();
+    await GetCharaItemAsync();
+    await _viewModel.SetProjectDatailsAsync(_appStatus.ProjectId);
+    LogEditor.Text += $"projectId = {_appStatus.ProjectId}\n";
+    LogEditor.Text += $"ProjectName = {_appStatus.ProjectName}\n";
+    LogEditor.Text += $"ProjectFolder = {_appStatus.ProjectFolderId}\n";
+    LogEditor.Text += $"CharaFolder = {_appStatus.CharaFolderId}\n";
   }
 
   private async Task GetCharaItemAsync()
@@ -86,5 +96,81 @@ public partial class ProjectDetailPage : ContentPage
       System.Diagnostics.Debug.WriteLine("Go!");
       await Shell.Current.GoToAsync("///CharaSelectPage");
     }
+  }
+  private Project makeProjectFromEventArgs(ProjectInfoEventArgs e)
+  {
+    return new Project
+    {
+      Id = e.ProjectId,
+      Name = e.ProjectName,
+      Description = e.ProjectDescription,
+      FolderId = e.ProjectFolderId,
+      CharaFolderId = e.CharaFolderId,
+    };
+  }
+  private async void OnUpdateRequested(object sender, ProjectInfoEventArgs e)
+  {
+    System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} folder{e.ProjectFolderId} chara{e.CharaFolderId})\n");
+    LogEditor.Text += $"編集: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} [ {e.ProjectFolderId} ][ {e.CharaFolderId} ]\n";
+    LogEditor.Text += "プロジェクトの更新！！\n";
+    // var accessToken = Preferences.Get("app_access_token", string.Empty);
+    var topFolderItems = await _createViewModel.GetFolderItemsAsync();
+    var project = makeProjectFromEventArgs(e);
+
+    var dialog = new CreateProjectDialog("プロジェクトの更新", topFolderItems, _dialogService, _createViewModel, project);
+    await this.ShowPopupAsync(dialog);
+
+    // ダイアログから返ってきてから。。。
+    if (dialog.SelectedTopFolder == null)
+    {
+      LogEditor.Text += "選択されていない";
+      return;
+    }
+
+    var projectName = dialog.ProjectName;
+    var projectDescription = dialog.ProjectDescription;
+    var selectedFolder = dialog.SelectedTopFolder;
+    var selectedCharaFolder = dialog.SelectedCharaFolder;
+
+    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
+    // 例えば編集画面を開く
+    // await Navigation.PushAsync(new EditProjectPage(e.ProjectId));
+  }
+
+  private async void OnDeleteRequested(object sender, ProjectInfoEventArgs e)
+  {
+    LogEditor.Text += $"削除: {e.ProjectName} (ID: {e.ProjectId})\n";
+    var project = makeProjectFromEventArgs(e);
+
+    var dialog = new ConfirmDeleteDialog("プロジェクトの削除確認", _dialogService, project);
+    await this.ShowPopupAsync(dialog);
+
+    if (dialog.IsConfirmed)
+    {
+      using (await _dialogService.DisplayProgressAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・\nしばらくお待ち下さい。"))
+      {
+        LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+        var result = await _createViewModel.DeleteProjectAsync(e.ProjectId);
+        LogEditor.Text += $"削除結果: {result.Success}\n";
+        if (!result.Success)
+        {
+          await _dialogService.DisplayTextPromptAsync("削除エラー", result.Message, "OK");
+          return;
+        }
+        // プロジェクトリストを再取得
+        var projects = await _createViewModel.GetProjectsAsync();
+
+        if (projects == null) return;
+        await Shell.Current.GoToAsync("///ProjectListPage");
+      }
+    }
+    else
+    {
+      LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
+    }
+  }
+  private async void OnInviteRequested(object sender, ProjectInfoEventArgs e)
+  {
+    LogEditor.Text += $"招待します.{e.ProjectName}\n";
   }
 }

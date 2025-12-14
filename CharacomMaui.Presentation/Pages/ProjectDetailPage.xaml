@@ -13,7 +13,19 @@
       VerticalOptions="Center"
       HorizontalOptions="Center"/>
 
-    <components:ProjectDetailCard/>
+    <components:ProjectDetailCard
+      ProjectName="{Binding ProjectName}"
+      ProjectId="{Binding ProjectId}"
+      ProjectDescription="{Binding ProjectDescription}"
+      CreatedAt="{Binding CreatedAt}"
+      UpdatedAt="{Binding UpdatedAt}"
+      CreatedBy="{Binding CreatedBy}"
+      ProjectFolderId="{Binding ProjectFolderId}"
+      CharaFolderId="{Binding CharaFolderId}"
+      UpdateRequested="OnUpdateRequested"
+      DeleteRequested="OnDeleteRequested"
+      InviteRequested="OnInviteRequested"/>
+
     <components:CharaDataProgressRowTitle/>
     <CollectionView
       x:Name="CharaDataCollection"

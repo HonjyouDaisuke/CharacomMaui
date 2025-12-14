@@ -187,4 +187,48 @@ public class ProjectRepository : IProjectRepository
       };
     }
   }
+  public async Task<ProjectDetails> GetProjectDetailsAsync(string accessToken, string projectId)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      project_id = projectId,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    var res = await _http.PostAsync("get_project_details.php", content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+
+    System.Diagnostics.Debug.WriteLine("----------GetProjectDetails server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+
+    var options = new JsonSerializerOptions
+    {
+      PropertyNameCaseInsensitive = true
+    };
+
+    var apiResponse =
+        JsonSerializer.Deserialize<ProjectDetailsResponse>(responseBody, options);
+
+    if (apiResponse == null || !apiResponse.Success || apiResponse.Data == null)
+      return null;
+
+    var d = apiResponse.Data;
+
+    // Domain / ViewModel 用 Project に変換
+    return new ProjectDetails
+    {
+      Id = d.Id,
+      Name = d.Name,
+      Description = d.Description,
+      ProjectFolderId = d.ProjectFolderId,
+      CharaFolderId = d.CharaFolderId,
+      CreatedAt = d.CreatedAt,
+      CreatedBy = d.CreatedBy,
+      UpdatedAt = d.UpdatedAt,
+      CharaCount = d.CharaCount,
+      Participants = d.Participants
+    };
+  }
 }

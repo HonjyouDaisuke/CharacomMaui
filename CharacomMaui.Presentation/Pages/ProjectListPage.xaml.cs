@@ -185,6 +185,9 @@ public partial class ProjectListPage : ContentPage
       clickedCard.IsSelected = true;
       _selectedCard = clickedCard;
       _notifier.ProjectName = _selectedCard.ProjectName;
+      _notifier.ProjectId = _selectedCard.ProjectId;
+      _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
+      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
 
@@ -204,6 +207,9 @@ public partial class ProjectListPage : ContentPage
 
       _notifier.ProjectName = _selectedCard.ProjectName;
       _notifier.ProjectId = _selectedCard.ProjectId;
+      _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
+      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
+
       LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
