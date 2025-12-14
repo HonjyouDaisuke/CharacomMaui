@@ -12,7 +12,7 @@ public class GetProjectDetailsUseCase
     _repository = repository;
   }
 
-  public async Task<ProjectDetails> ExecuteAsync(string accessToken, string projectId)
+  public async Task<ProjectDetails?> ExecuteAsync(string accessToken, string projectId)
   {
     return await _repository.GetProjectDetailsAsync(accessToken, projectId);
   }

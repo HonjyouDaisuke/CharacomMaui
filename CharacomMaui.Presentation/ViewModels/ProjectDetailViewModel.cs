@@ -147,14 +147,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       CreatedAt = projectDetails.CreatedAt.ToString("yyyy年MM月dd日");
       UpdatedAt = projectDetails.UpdatedAt.ToString("yyyy年MM月dd日");
       CreatedBy = projectDetails.CreatedBy;
-      string participants = "";
-      bool first = true;
-      foreach (var item in projectDetails.Participants)
-      {
-        participants += first ? item : ", " + item;
-        first = false;
-      }
-      ParticipantsText = participants;
+      ParticipantsText = string.Join(", ", projectDetails.Participants);
       System.Diagnostics.Debug.WriteLine($"2ProjectId = {projectId}");
       System.Diagnostics.Debug.WriteLine($"2ProjectName = {ProjectName} ?? ?? {projectDetails.Name}");
     }

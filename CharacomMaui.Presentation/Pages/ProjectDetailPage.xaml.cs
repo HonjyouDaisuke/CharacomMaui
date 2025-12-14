@@ -170,10 +170,7 @@ public partial class ProjectDetailPage : ContentPage
           await _dialogService.DisplayTextPromptAsync("削除エラー", result.Message, "OK");
           return;
         }
-        // プロジェクトリストを再取得
-        var projects = await _createViewModel.GetProjectsAsync();
 
-        if (projects == null) return;
         await Shell.Current.GoToAsync("///ProjectListPage");
       }
     }
