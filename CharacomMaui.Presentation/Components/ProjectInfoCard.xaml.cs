@@ -129,7 +129,6 @@ public partial class ProjectInfoCard : ContentView
     var surface = ThemeHelper.GetColor("Surface");
     var onSurface = ThemeHelper.GetColor("OnSurface");
 
-    var primaryColor = (Color)MauiApp.Current!.Resources["Primary"]; // App.xaml の Primary
     var onColor = isSelected ? onPrimary : onSurface;
 
     BackgroundBorder.BackgroundColor = isSelected

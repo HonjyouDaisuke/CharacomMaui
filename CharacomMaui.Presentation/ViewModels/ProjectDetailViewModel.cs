@@ -13,56 +13,62 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   private readonly AppStatus _appStatus;
   GetProjectCharaItemsUseCase _useCase;
   GetProjectDetailsUseCase _getProjectDetailsUseCase;
-  private string _projectId;
+  private string _projectId = string.Empty;
   public string ProjectId
   {
     get => _projectId;
     set => SetProperty(ref _projectId, value);
   }
-  private string _projectName;
+  private string _projectName = string.Empty;
   public string ProjectName
   {
     get => _projectName;
     set => SetProperty(ref _projectName, value);
   }
 
-  private string _projectDescription;
+  private string _projectDescription = string.Empty;
   public string ProjectDescription
   {
     get => _projectDescription;
     set => SetProperty(ref _projectDescription, value);
   }
-  private string _projectFolderId;
+  private string _projectFolderId = string.Empty;
   public string ProjectFolderId
   {
     get => _projectFolderId;
     set => SetProperty(ref _projectFolderId, value);
   }
-  private string _charaFolderId;
+  private string _charaFolderId = string.Empty;
   public string CharaFolderId
   {
     get => _charaFolderId;
     set => SetProperty(ref _charaFolderId, value);
   }
-  private string _createdAt;
+  private string _createdAt = string.Empty;
   public string CreatedAt
   {
     get => _createdAt;
     set => SetProperty(ref _createdAt, value);
   }
 
-  private string _updatedAt;
+  private string _updatedAt = string.Empty;
   public string UpdatedAt
   {
     get => _updatedAt;
     set => SetProperty(ref _updatedAt, value);
   }
 
-  private string _createdBy;
+  private string _createdBy = string.Empty;
   public string CreatedBy
   {
     get => _createdBy;
     set => SetProperty(ref _createdBy, value);
+  }
+  private string _participantsText = string.Empty;
+  public string ParticipantsText
+  {
+    get => _participantsText;
+    set => SetProperty(ref _participantsText, value);
   }
   public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus, GetProjectDetailsUseCase getProjectDetailsUseCase)
   {
@@ -123,24 +129,39 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     System.Diagnostics.Debug.WriteLine($"行数は；；；{_count} CharaDataSummariesCount = {CharaDataSummaries.Count}");
   }
 
-  public async Task SetProjectDatailsAsync(string projectId)
+  public async Task SetProjectDetailsAsync(string projectId)
   {
-    var accessToken = Preferences.Get("app_access_token", string.Empty);
-    var projectDetails = await _getProjectDetailsUseCase.ExecuteAsync(accessToken, projectId);
-    System.Diagnostics.Debug.WriteLine($"1ProjectId = {projectId}");
-    System.Diagnostics.Debug.WriteLine($"1ProjectName = {ProjectName}");
-    if (projectDetails == null) return;
+    try
+    {
+      var accessToken = Preferences.Get("app_access_token", string.Empty);
+      var projectDetails = await _getProjectDetailsUseCase.ExecuteAsync(accessToken, projectId);
+      System.Diagnostics.Debug.WriteLine($"1ProjectId = {projectId}");
+      System.Diagnostics.Debug.WriteLine($"1ProjectName = {ProjectName}");
+      if (projectDetails == null) return;
 
-    ProjectId = projectDetails.Id;
-    ProjectName = projectDetails.Name;
-    ProjectDescription = projectDetails.Description;
-    ProjectFolderId = projectDetails.ProjectFolderId;
-    CharaFolderId = projectDetails.CharaFolderId;
-    CreatedAt = projectDetails.CreatedAt.ToString("yyyy年MM月dd日");
-    UpdatedAt = projectDetails.UpdatedAt.ToString("yyyy年MM月dd日");
-    CreatedBy = projectDetails.CreatedBy;
-    System.Diagnostics.Debug.WriteLine($"2ProjectId = {projectId}");
-    System.Diagnostics.Debug.WriteLine($"2ProjectName = {ProjectName} ?? ?? {projectDetails.Name}");
-
+      ProjectId = projectDetails.Id;
+      ProjectName = projectDetails.Name;
+      ProjectDescription = projectDetails.Description;
+      ProjectFolderId = projectDetails.ProjectFolderId;
+      CharaFolderId = projectDetails.CharaFolderId;
+      CreatedAt = projectDetails.CreatedAt.ToString("yyyy年MM月dd日");
+      UpdatedAt = projectDetails.UpdatedAt.ToString("yyyy年MM月dd日");
+      CreatedBy = projectDetails.CreatedBy;
+      string participants = "";
+      bool first = true;
+      foreach (var item in projectDetails.Participants)
+      {
+        participants += first ? item : ", " + item;
+        first = false;
+      }
+      ParticipantsText = participants;
+      System.Diagnostics.Debug.WriteLine($"2ProjectId = {projectId}");
+      System.Diagnostics.Debug.WriteLine($"2ProjectName = {ProjectName} ?? ?? {projectDetails.Name}");
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"Error loading project details: {ex.Message}");
+      // TODO:ユーザー側へエラー通知する？
+    }
   }
 }

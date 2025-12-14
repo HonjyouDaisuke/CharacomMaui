@@ -21,7 +21,11 @@
       UpdatedAt="{Binding UpdatedAt}"
       CreatedBy="{Binding CreatedBy}"
       ProjectFolderId="{Binding ProjectFolderId}"
+      ParticipantsText="{Binding ParticipantsText}"
       CharaFolderId="{Binding CharaFolderId}"
+      IsUpdateVisible="True"
+      IsInviteVisible="True"
+      IsDeleteVisible="True"
       UpdateRequested="OnUpdateRequested"
       DeleteRequested="OnDeleteRequested"
       InviteRequested="OnInviteRequested"/>

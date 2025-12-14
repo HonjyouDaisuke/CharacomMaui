@@ -78,14 +78,23 @@ public partial class ProjectListPage : ContentPage
       return;
     }
 
-    var projectName = dialog.ProjectName;
-    var projectDescription = dialog.ProjectDescription;
-    var selectedFolder = dialog.SelectedTopFolder;
-    var selectedCharaFolder = dialog.SelectedCharaFolder;
+    project.Name = dialog.ProjectName;
+    project.Description = dialog.ProjectDescription;
+    project.FolderId = dialog.SelectedTopFolder.Id;
+    project.CharaFolderId = dialog.SelectedCharaFolder.Id;
+    LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
-    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
-    // 例えば編集画面を開く
-    // await Navigation.PushAsync(new EditProjectPage(e.ProjectId));
+    // プロジェクトを更新
+    using (await _dialogService.DisplayProgressAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。"))
+    {
+      var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
+      if (!updateResult.Success)
+      {
+        LogEditor.Text += $"プロジェクトの更新に失敗しました。{updateResult.Message}\n";
+        return;
+      }
+      LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
+    }
   }
 
   private async void OnDeleteRequested(object? sender, ProjectInfoEventArgs e)

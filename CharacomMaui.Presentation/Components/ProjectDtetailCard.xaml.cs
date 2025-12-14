@@ -16,6 +16,11 @@ public partial class ProjectDetailCard : ContentView
   public static readonly BindableProperty ProjectDescriptionProperty =
     BindableProperty.Create(nameof(ProjectDescription), typeof(string), typeof(ProjectDetailCard), string.Empty);
   public string ProjectDescription { get => (string)GetValue(ProjectDescriptionProperty); set => SetValue(ProjectDescriptionProperty, value); }
+
+  // ========== ParticipantsText ==========
+  public static readonly BindableProperty ParticipantsTextProperty =
+    BindableProperty.Create(nameof(ParticipantsText), typeof(string), typeof(ProjectDetailCard), string.Empty);
+  public string ParticipantsText { get => (string)GetValue(ParticipantsTextProperty); set => SetValue(ParticipantsTextProperty, value); }
   // ========== Created date ==========
   public static readonly BindableProperty CreatedAtProperty =
     BindableProperty.Create(nameof(CreatedAt), typeof(string), typeof(ProjectDetailCard), string.Empty);
@@ -82,7 +87,7 @@ public partial class ProjectDetailCard : ContentView
   private void OnInviteClicked(object sender, EventArgs e)
   {
     // 招待リクエスト
-    System.Diagnostics.Debug.WriteLine($"Project {ProjectName} 二招待します。 ID={ProjectId} ");
+    System.Diagnostics.Debug.WriteLine($"Project {ProjectName} に招待します。 ID={ProjectId} ");
 
     InviteRequested?.Invoke(this, new ProjectInfoEventArgs
     {
@@ -93,5 +98,42 @@ public partial class ProjectDetailCard : ContentView
       CharaFolderId = CharaFolderId,
     });
   }
+  public static readonly BindableProperty IsUpdateVisibleProperty =
+          BindableProperty.Create(
+              nameof(IsUpdateVisible),
+              typeof(bool),
+              typeof(ProjectDetailCard),
+              true);
 
+  public bool IsUpdateVisible
+  {
+    get => (bool)GetValue(IsUpdateVisibleProperty);
+    set => SetValue(IsUpdateVisibleProperty, value);
+  }
+
+  public static readonly BindableProperty IsDeleteVisibleProperty =
+      BindableProperty.Create(
+          nameof(IsDeleteVisible),
+          typeof(bool),
+          typeof(ProjectDetailCard),
+          true);
+
+  public bool IsDeleteVisible
+  {
+    get => (bool)GetValue(IsDeleteVisibleProperty);
+    set => SetValue(IsDeleteVisibleProperty, value);
+  }
+
+  public static readonly BindableProperty IsInviteVisibleProperty =
+      BindableProperty.Create(
+          nameof(IsInviteVisible),
+          typeof(bool),
+          typeof(ProjectDetailCard),
+          true);
+
+  public bool IsInviteVisible
+  {
+    get => (bool)GetValue(IsInviteVisibleProperty);
+    set => SetValue(IsInviteVisibleProperty, value);
+  }
 }

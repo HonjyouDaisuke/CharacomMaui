@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+namespace CharacomMaui.Domain.Entities;
+
 public class ProjectDetails
 {
   [JsonPropertyName("id")]

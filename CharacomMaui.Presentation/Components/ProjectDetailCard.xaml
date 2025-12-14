@@ -45,6 +45,7 @@
         <Button
           Grid.Column="0"
           x:Name="updateBtn"
+          IsVisible="{Binding IsUpdateVisible, Source={x:Reference This}}"
           TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
           BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
           Clicked="OnUpdateClicked"
@@ -52,6 +53,7 @@
         <Button
           Grid.Column="1"
           x:Name="InviteBtn"
+          IsVisible="{Binding IsInviteVisible, Source={x:Reference This}}"
           TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
           BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
           Clicked="OnInviteClicked"
@@ -60,6 +62,7 @@
       <Button
         Grid.Row="0"
         Grid.Column="3"
+        IsVisible="{Binding IsDeleteVisible, Source={x:Reference This}}"
         TextColor="{AppThemeBinding Light={DynamicResource OnError}, Dark={DynamicResource OnErrorDark}}"
         BackgroundColor="{AppThemeBinding Light={DynamicResource Error}, Dark={DynamicResource ErrorDark}}"
         Clicked="OnDeleteClicked"
@@ -142,7 +145,7 @@
 
         <Label
           Grid.Column="3"
-          Text="本庄、三崎、サンタ"
+          Text="{Binding ParticipantsText, Source={x:Reference This}}"
           FontSize="18"
           TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
       </Grid>

@@ -31,7 +31,7 @@ public class ProjectRepository : IProjectRepository
       project_folder_id = project.FolderId,
       chara_folder_id = project.CharaFolderId,
     });
-
+    System.Diagnostics.Debug.WriteLine($"更新するデータ：名前{project.Name} 説明{project.Description}");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync("create_or_update_project.php", content);
@@ -119,13 +119,13 @@ public class ProjectRepository : IProjectRepository
 
     List<Project> projects = [.. result.Projects.Select(x => new Project
     {
-        Id = x.Project_Id,
+        Id = x.ProjectId,
         Name = x.Name,
         Description = x.Description,
-        FolderId = x.Folder_Id,
-        CharaFolderId = x.Chara_Folder_Id,
-        CharaCount = x.Chara_Count,
-        UserCount = x.User_Count
+        FolderId = x.FolderId,
+        CharaFolderId = x.CharaFolderId,
+        CharaCount = x.CharaCount,
+        UserCount = x.UserCount
     })];
 
     return projects;
@@ -187,7 +187,7 @@ public class ProjectRepository : IProjectRepository
       };
     }
   }
-  public async Task<ProjectDetails> GetProjectDetailsAsync(string accessToken, string projectId)
+  public async Task<ProjectDetails?> GetProjectDetailsAsync(string accessToken, string projectId)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -198,6 +198,7 @@ public class ProjectRepository : IProjectRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync("get_project_details.php", content);
+    if (!res.IsSuccessStatusCode) return null;
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("----------GetProjectDetails server res--------------");
