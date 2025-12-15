@@ -50,7 +50,6 @@ public partial class App : Microsoft.Maui.Controls.Application
     var window = new Window(new LoadingPage(_userUseCase, _statusUseCase));
 
     window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
-
     return window;
   }
 }
