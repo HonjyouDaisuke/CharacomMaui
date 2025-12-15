@@ -5,32 +5,79 @@
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
+  xmlns:pages="clr-namespace:CharacomMaui.Presentation.Pages"
   Title="CharacomMaui"
-  Shell.NavBarIsVisible="True"
-  Shell.TitleColor="{AppThemeBinding Light={DynamicResource OnBackground}, Dark={DynamicResource OnBackgroundDark}}"
-  Shell.ForegroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-  Shell.BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
-  Shell.DisabledColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledText}}"
-  Shell.UnselectedColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurface}}">
+  Shell.ForegroundColor="{AppThemeBinding
+      Light={DynamicResource Primary},
+      Dark={DynamicResource PrimaryDark}}"
+  Shell.FlyoutBehavior="Flyout"
+  FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
+  <Shell.FlyoutHeader>
+    <VerticalStackLayout>
+      <Label Text="Characom Imager Pro Maui"
+             HorizontalOptions="Center"/>
+      <Image Source="characom_logo.png"
+             WidthRequest="100"
+             HeightRequest="100"
+             Aspect="AspectFit"/>
+      <Label Text="メニュー"
+             HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+  </Shell.FlyoutHeader>
 
-  <ShellContent
-    Title="ProjectList"
-    ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
-    Route="ProjectListPage"/>
-  <ShellContent
-    Title="ProjectDetail"
-    ContentTemplate="{DataTemplate local:Pages.ProjectDetailPage}"
-    Route="ProjectDetailPage"/>
-  <ShellContent
-    Title="CharaSelect"
-    ContentTemplate="{DataTemplate local:Pages.CharaSelectPage}"
-    Route="CharaSelectPage"/>
-  <ShellContent
-    Title="Chart"
-    ContentTemplate="{DataTemplate local:Pages.ChartPage}"
-    Route="ChartPage"/>
-  <ShellContent
-    Title="Homeホーム"
-    ContentTemplate="{DataTemplate local:Pages.HomePage}"
-    Route="HomePage"/>
+  <FlyoutItem Title="プロジェクト一覧"
+              Icon="{AppThemeBinding Light=project_icon_light.png, Dark=project_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ProjectListPage}"
+      Route="ProjectListPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="プロジェクト詳細"
+              Icon="{AppThemeBinding Light=detail_icon_light.png, Dark=detail_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ProjectDetailPage}"
+      Route="ProjectDetailPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="個別画像選択"
+              Icon="{AppThemeBinding Light=chara_icon_light.png, Dark=chara_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:CharaSelectPage}"
+      Route="CharaSelectPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="個別文字重ね合わせ"
+              Icon="{AppThemeBinding Light=overlay_icon_light.png, Dark=overlay_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ChartPage}"
+      Route="ChartPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="鑑定処理"
+              Icon="{AppThemeBinding Light=compare_icon_light.png, Dark=compare_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ChartPage}"
+      Route="ChartPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="ユーザー情報"
+              Icon="{AppThemeBinding Light=users_icon_light.png, Dark=users_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ChartPage}"
+      Route="ChartPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="グラフ"
+              Icon="{AppThemeBinding Light=chart_icon_light.png, Dark=chart_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:ChartPage}"
+      Route="ChartPage"/>
+  </FlyoutItem>
+  <FlyoutItem Title="ホーム"
+              Icon="{AppThemeBinding Light=home_icon_light.png, Dark=home_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:HomePage}"
+      Route="HomePage"/>
+  </FlyoutItem>
+
+  <Shell.FlyoutFooter>
+    <VerticalStackLayout>
+      <Label Text="Characom Maui"
+             HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+  </Shell.FlyoutFooter>
 </Shell>
