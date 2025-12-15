@@ -5,6 +5,7 @@
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
+  xmlns:pages="clr-namespace:CharacomMaui.Presentation.Pages"
   Title="CharacomMaui"
   Shell.ForegroundColor="{AppThemeBinding
       Light={DynamicResource Primary},
@@ -27,49 +28,49 @@
   <FlyoutItem Title="プロジェクト一覧"
               Icon="{AppThemeBinding Light=project_icon_light.png, Dark=project_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ProjectListPage}"
+      ContentTemplate="{DataTemplate pages:ProjectListPage}"
       Route="ProjectListPage"/>
   </FlyoutItem>
   <FlyoutItem Title="プロジェクト詳細"
               Icon="{AppThemeBinding Light=detail_icon_light.png, Dark=detail_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ProjectDetailPage}"
+      ContentTemplate="{DataTemplate pages:ProjectDetailPage}"
       Route="ProjectDetailPage"/>
   </FlyoutItem>
   <FlyoutItem Title="個別画像選択"
               Icon="{AppThemeBinding Light=chara_icon_light.png, Dark=chara_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.CharaSelectPage}"
+      ContentTemplate="{DataTemplate pages:CharaSelectPage}"
       Route="CharaSelectPage"/>
   </FlyoutItem>
   <FlyoutItem Title="個別文字重ね合わせ"
               Icon="{AppThemeBinding Light=overlay_icon_light.png, Dark=overlay_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ChartPage}"
+      ContentTemplate="{DataTemplate pages:ChartPage}"
       Route="ChartPage"/>
   </FlyoutItem>
   <FlyoutItem Title="鑑定処理"
               Icon="{AppThemeBinding Light=compare_icon_light.png, Dark=compare_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ChartPage}"
+      ContentTemplate="{DataTemplate pages:ChartPage}"
       Route="ChartPage"/>
   </FlyoutItem>
   <FlyoutItem Title="ユーザー情報"
               Icon="{AppThemeBinding Light=users_icon_light.png, Dark=users_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ChartPage}"
+      ContentTemplate="{DataTemplate pages:ChartPage}"
       Route="ChartPage"/>
   </FlyoutItem>
   <FlyoutItem Title="グラフ"
               Icon="{AppThemeBinding Light=chart_icon_light.png, Dark=chart_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.ChartPage}"
+      ContentTemplate="{DataTemplate pages:ChartPage}"
       Route="ChartPage"/>
   </FlyoutItem>
   <FlyoutItem Title="ホーム"
               Icon="{AppThemeBinding Light=home_icon_light.png, Dark=home_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate local:Pages.HomePage}"
+      ContentTemplate="{DataTemplate pages:HomePage}"
       Route="HomePage"/>
   </FlyoutItem>
 
