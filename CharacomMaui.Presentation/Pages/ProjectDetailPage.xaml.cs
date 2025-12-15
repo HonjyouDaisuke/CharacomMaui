@@ -34,6 +34,11 @@ public partial class ProjectDetailPage : ContentPage
     base.OnAppearing();
     try
     {
+      if (string.IsNullOrWhiteSpace(_appStatus.ProjectId))
+      {
+        await DisplayAlert("エラー", "ProjectIdが設定されていません", "OK");
+        return;
+      }
       await GetCharaItemAsync();
       await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
       LogEditor.Text += $"projectId = {_appStatus.ProjectId}\n";
@@ -157,6 +162,7 @@ public partial class ProjectDetailPage : ContentPage
           return;
         }
         LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
+        await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
       }
     }
     catch (Exception ex)
