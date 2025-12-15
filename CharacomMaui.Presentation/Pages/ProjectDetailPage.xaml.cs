@@ -185,7 +185,7 @@ public partial class ProjectDetailPage : ContentPage
           LogEditor.Text += $"削除結果: {result.Success}\n";
           if (!result.Success)
           {
-            await _dialogService.DisplayTextPromptAsync("削除エラー", result.Message, "OK");
+            await DisplayAlert("削除エラー", result.Message, "OK");
             return;
           }
 
