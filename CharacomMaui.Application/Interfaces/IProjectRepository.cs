@@ -8,4 +8,5 @@ public interface IProjectRepository
   Task<List<string>> GetProjectsAsync(string accessToken);
   Task<List<Project>> GetProjectsInfoAsync(string accessToken);
   Task<SimpleApiResult> DeleteProjectAsync(string accessToken, string projectId);
+  Task<ProjectDetails?> GetProjectDetailsAsync(string accessToken, string projectId);
 }

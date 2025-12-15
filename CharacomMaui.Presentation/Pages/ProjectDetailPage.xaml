@@ -13,7 +13,23 @@
       VerticalOptions="Center"
       HorizontalOptions="Center"/>
 
-    <components:ProjectDetailCard/>
+    <components:ProjectDetailCard
+      ProjectName="{Binding ProjectName}"
+      ProjectId="{Binding ProjectId}"
+      ProjectDescription="{Binding ProjectDescription}"
+      CreatedAt="{Binding CreatedAt}"
+      UpdatedAt="{Binding UpdatedAt}"
+      CreatedBy="{Binding CreatedBy}"
+      ProjectFolderId="{Binding ProjectFolderId}"
+      ParticipantsText="{Binding ParticipantsText}"
+      CharaFolderId="{Binding CharaFolderId}"
+      IsUpdateVisible="True"
+      IsInviteVisible="True"
+      IsDeleteVisible="True"
+      UpdateRequested="OnUpdateRequested"
+      DeleteRequested="OnDeleteRequested"
+      InviteRequested="OnInviteRequested"/>
+
     <components:CharaDataProgressRowTitle/>
     <CollectionView
       x:Name="CharaDataCollection"

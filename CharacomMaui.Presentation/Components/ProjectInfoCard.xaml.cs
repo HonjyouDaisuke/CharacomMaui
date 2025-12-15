@@ -122,16 +122,24 @@ public partial class ProjectInfoCard : ContentView
       card.UpdateBackground(isSelected);
     }
   }
-
   private void UpdateBackground(bool isSelected)
   {
-    var primaryColor = (Color)MauiApp.Current!.Resources["Primary"]; // App.xaml の Primary
-    var normalLight = Color.FromArgb("#FFFFFF");
-    var normalDark = Color.FromArgb("#1E1E1E");
+    var primary = ThemeHelper.GetColor("Primary");
+    var onPrimary = ThemeHelper.GetColor("OnPrimary");
+    var surface = ThemeHelper.GetColor("Surface");
+    var onSurface = ThemeHelper.GetColor("OnSurface");
+
+    var onColor = isSelected ? onPrimary : onSurface;
 
     BackgroundBorder.BackgroundColor = isSelected
-        ? primaryColor
-        : App.Current.RequestedTheme == AppTheme.Light ? normalLight : normalDark;
+        ? primary
+        : surface;
+    ProjectLabel.TextColor = onColor;
+    BorderLine.BackgroundColor = onColor;
+    ImagesLabel.TextColor = onColor;
+    ImagesCountLabel.TextColor = onColor;
+    UsersLabel.TextColor = onColor;
+    UsersCountLabel.TextColor = onColor;
   }
 
   private void OnEditProject(object sender, EventArgs e)

@@ -40,6 +40,30 @@ public class AppStatusNotifier : INotifyPropertyChanged
       }
     }
   }
+  public string ProjectFolderId
+  {
+    get => _status.ProjectFolderId;
+    set
+    {
+      if (_status.ProjectFolderId != value)
+      {
+        _status.ProjectFolderId = value;
+        OnPropertyChanged();
+      }
+    }
+  }
+  public string CharaFolderId
+  {
+    get => _status.CharaFolderId;
+    set
+    {
+      if (_status.CharaFolderId != value)
+      {
+        _status.CharaFolderId = value;
+        OnPropertyChanged();
+      }
+    }
+  }
 
   public event PropertyChangedEventHandler? PropertyChanged;
 

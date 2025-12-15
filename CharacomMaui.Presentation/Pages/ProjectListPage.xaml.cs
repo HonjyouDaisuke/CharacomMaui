@@ -77,15 +77,28 @@ public partial class ProjectListPage : ContentPage
       LogEditor.Text += "選択されていない";
       return;
     }
+    if (dialog.SelectedCharaFolder == null)
+    {
+      LogEditor.Text += "個別文字フォルダが選択されていない";
+      return;
+    }
+    project.Name = dialog.ProjectName;
+    project.Description = dialog.ProjectDescription;
+    project.FolderId = dialog.SelectedTopFolder.Id;
+    project.CharaFolderId = dialog.SelectedCharaFolder.Id;
+    LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
-    var projectName = dialog.ProjectName;
-    var projectDescription = dialog.ProjectDescription;
-    var selectedFolder = dialog.SelectedTopFolder;
-    var selectedCharaFolder = dialog.SelectedCharaFolder;
-
-    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
-    // 例えば編集画面を開く
-    // await Navigation.PushAsync(new EditProjectPage(e.ProjectId));
+    // プロジェクトを更新
+    using (await _dialogService.DisplayProgressAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。"))
+    {
+      var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
+      if (!updateResult.Success)
+      {
+        LogEditor.Text += $"プロジェクトの更新に失敗しました。{updateResult.Message}\n";
+        return;
+      }
+      LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
+    }
   }
 
   private async void OnDeleteRequested(object? sender, ProjectInfoEventArgs e)
@@ -185,6 +198,9 @@ public partial class ProjectListPage : ContentPage
       clickedCard.IsSelected = true;
       _selectedCard = clickedCard;
       _notifier.ProjectName = _selectedCard.ProjectName;
+      _notifier.ProjectId = _selectedCard.ProjectId;
+      _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
+      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
 
@@ -204,6 +220,9 @@ public partial class ProjectListPage : ContentPage
 
       _notifier.ProjectName = _selectedCard.ProjectName;
       _notifier.ProjectId = _selectedCard.ProjectId;
+      _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
+      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
+
       LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
