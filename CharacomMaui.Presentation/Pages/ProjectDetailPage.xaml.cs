@@ -155,12 +155,6 @@ public partial class ProjectDetailPage : ContentPage
       // プロジェクトを更新
       using (await _dialogService.DisplayProgressAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。"))
       {
-        var updateResult = await _createViewModel.CreateOrUpdateProjectAsync(project);
-        if (!updateResult.Success)
-        {
-          LogEditor.Text += $"プロジェクトの更新に失敗しました。{updateResult.Message}\n";
-          return;
-        }
         LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
         await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
       }
