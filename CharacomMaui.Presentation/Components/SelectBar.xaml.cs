@@ -114,9 +114,15 @@ public partial class SelectBar : ContentView
   {
     ((SelectBar)bindable).ApplyInitialSelection();
   }
-
+  private readonly Dictionary<SelectBarContents, PropertyChangedEventHandler> _itemHandlers = [];
   private void BuildItems()
   {
+    // 既存のハンドラを解除
+    foreach (var kvp in _itemHandlers)
+    {
+      kvp.Key.PropertyChanged -= kvp.Value;
+    }
+    _itemHandlers.Clear();
     ItemContainer.Children.Clear();
 
     if (Items == null || !Items.Any())
@@ -142,12 +148,17 @@ public partial class SelectBar : ContentView
 
       PropertyChangedEventHandler handler = (_, e) =>
       {
-        if (e.PropertyName == nameof(item.IsSelected))
+        if (e.PropertyName == nameof(item.IsSelected) ||
+        e.PropertyName == nameof(item.IsDisabled))
+        {
+          border.IsEnabled = !item.IsDisabled;
           UpdateVisualState(border, label, item);
+        }
+
       };
 
       item.PropertyChanged += handler;
-      border.Unloaded += (_, _) => item.PropertyChanged -= handler;
+      _itemHandlers[item] = handler;
 
       UpdateVisualState(border, label, item);
       ItemContainer.Children.Add(border);
