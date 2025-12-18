@@ -216,6 +216,19 @@ public partial class SelectBar : ContentView
       SelectedName = data.Name
     });
   }
+  protected override void OnHandlerChanging(HandlerChangingEventArgs args)
+  {
+    base.OnHandlerChanging(args);
+    if (args.NewHandler == null)
+    {
+      // コントロールが破棄される際のクリーンアップ
+      foreach (var kvp in _itemHandlers)
+      {
+        kvp.Key.PropertyChanged -= kvp.Value;
+      }
+      _itemHandlers.Clear();
+    }
+  }
 }
 public class SelectBarEventArgs : EventArgs
 {
