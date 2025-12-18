@@ -151,6 +151,10 @@ public partial class CharaThumbnailCard : ContentView
     }
   }
 
+  /// <summary>
+  /// Updates the visual state of the card elements to either "Selected" or "Normal".
+  /// </summary>
+  /// <param name="isSelected">If true, applies the "Selected" visual state; otherwise applies the "Normal" visual state.</param>
   private void UpdateBackground(bool isSelected)
   {
     var state = isSelected ? "Selected" : "Normal";
