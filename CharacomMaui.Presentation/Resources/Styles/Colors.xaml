@@ -4,6 +4,7 @@
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+
   <Color x:Key="Primary">#52D681</Color>
   <Color x:Key="OnPrimary">#FFFFFF</Color>
   <Color x:Key="PrimaryContainer">#baefcd</Color>
@@ -36,7 +37,7 @@
 
   <Color x:Key="Outline">#202020</Color>
   <Color x:Key="OutlineVariant">#C4C7C5</Color>
-  <Color x:Key="Shadow">#000000</Color>
+  <Color x:Key="Shadow">#49454F</Color>
 
   <Color x:Key="InverseSurface">#313033</Color>
   <Color x:Key="InverseOnSurface">#F4EFF4</Color>
@@ -139,5 +140,4 @@
   <Color x:Key="Blue100Accent">#3E8EED</Color>
   <Color x:Key="Blue200Accent">#72ACF1</Color>
   <Color x:Key="Blue300Accent">#A7CBF6</Color>
-
 </ResourceDictionary>
