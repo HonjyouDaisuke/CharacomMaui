@@ -4,20 +4,130 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   x:Name="Root">
 
+  <ContentView.Resources>
+    <ResourceDictionary>
+
+      <!-- Border スタイル -->
+      <Style x:Key="SelectBarItemStyle"
+             TargetType="Border">
+        <Setter Property="StrokeThickness"
+                Value="1"/>
+        <Setter Property="Padding"
+                Value="16,10"/>
+        <Setter Property="Margin"
+                Value="6"/>
+        <Setter Property="BackgroundColor"
+                Value="Transparent"/>
+        <Setter Property="StrokeShape">
+          <Setter.Value>
+            <RoundRectangle CornerRadius="8"/>
+          </Setter.Value>
+        </Setter>
+
+        <Setter Property="VisualStateManager.VisualStateGroups">
+          <VisualStateGroupList>
+
+            <VisualStateGroup x:Name="SelectionStates">
+
+              <VisualState x:Name="Normal">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="Transparent"/>
+                  <Setter Property="Stroke"
+                          Value="{AppThemeBinding Light={StaticResource Outline},
+                                                      Dark={StaticResource OutlineDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <VisualState x:Name="Selected">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="{AppThemeBinding Light={StaticResource Primary},
+                                                      Dark={StaticResource PrimaryDark}}"/>
+                  <Setter Property="StrokeThickness"
+                          Value="0"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <VisualState x:Name="Disabled">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="{AppThemeBinding Light={StaticResource DisabledBackground},
+                                                      Dark={StaticResource DisabledBackgroundDark}}"/>
+                  <Setter Property="StrokeThickness"
+                          Value="0"/>
+                </VisualState.Setters>
+              </VisualState>
+
+            </VisualStateGroup>
+
+          </VisualStateGroupList>
+        </Setter>
+      </Style>
+
+      <!-- Label スタイル -->
+      <Style x:Key="SelectBarLabelStyle"
+             TargetType="Label">
+        <Setter Property="HorizontalOptions"
+                Value="Center"/>
+        <Setter Property="VerticalOptions"
+                Value="Center"/>
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding
+                    Light={StaticResource Outline},
+                    Dark={StaticResource OutlineDark}}"/>
+
+        <Setter Property="VisualStateManager.VisualStateGroups">
+          <VisualStateGroupList>
+            <VisualStateGroup x:Name="SelectionStates">
+
+              <VisualState x:Name="Normal">
+                <VisualState.Setters>
+                  <Setter Property="TextColor"
+                          Value="{AppThemeBinding
+                              Light={StaticResource Outline},
+                              Dark={StaticResource OutlineDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <VisualState x:Name="Selected">
+                <VisualState.Setters>
+                  <Setter Property="TextColor"
+                          Value="{AppThemeBinding
+                              Light={StaticResource OnPrimary},
+                              Dark={StaticResource OnPrimaryDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <VisualState x:Name="Disabled">
+                <VisualState.Setters>
+                  <Setter Property="TextColor"
+                          Value="{AppThemeBinding
+                              Light={StaticResource DisabledText},
+                              Dark={StaticResource DisabledTextDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+            </VisualStateGroup>
+          </VisualStateGroupList>
+        </Setter>
+      </Style>
+
+    </ResourceDictionary>
+  </ContentView.Resources>
+
   <Grid>
     <BoxView
       x:Name="BackgroundBox"
       InputTransparent="True"/>
     <!-- メイン内容 -->
     <ScrollView Orientation="Vertical">
-      <FlexLayout x:Name="ButtonContainer"
+      <FlexLayout x:Name="ItemContainer"
                   Direction="Row"
                   Wrap="Wrap"
                   AlignItems="Start"
                   AlignContent="Start"
-                  JustifyContent="Start"
-                  Margin="0"
-                  Padding="0"/>
+                  JustifyContent="Start"/>
     </ScrollView>
   </Grid>
 </ContentView>

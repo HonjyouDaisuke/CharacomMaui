@@ -81,7 +81,7 @@ public partial class CharaThumbnailCard : ContentView
       BindableProperty.Create(
           nameof(Bitmap),
           typeof(SKBitmap),
-          typeof(CharaImageCard),
+          typeof(CharaThumbnailCard),
           null,
           propertyChanged: OnBitmapChanged);
 
@@ -133,7 +133,7 @@ public partial class CharaThumbnailCard : ContentView
       BindableProperty.Create(
           nameof(IsSelected),
           typeof(bool),
-          typeof(CharaDataProgressRow),
+          typeof(CharaThumbnailCard),
           false,
           propertyChanged: OnIsSelectedChanged);
 
@@ -153,27 +153,10 @@ public partial class CharaThumbnailCard : ContentView
 
   private void UpdateBackground(bool isSelected)
   {
-    //TODO: リソースから色を取ってくるようにする
-    var primary = App.Current!.RequestedTheme == AppTheme.Light ? (Color)MauiApp.Current!.Resources["Primary"] : (Color)MauiApp.Current!.Resources["PrimaryDark"];
-    var primaryText = App.Current!.RequestedTheme == AppTheme.Light ? (Color)MauiApp.Current!.Resources["OnPrimary"] : (Color)MauiApp.Current!.Resources["OnPrimaryDark"];
-    var surface = App.Current!.RequestedTheme == AppTheme.Light ? (Color)MauiApp.Current!.Resources["Surface"] : (Color)MauiApp.Current!.Resources["SurfaceDark"];
-    var surfaceText = App.Current!.RequestedTheme == AppTheme.Light ? (Color)MauiApp.Current!.Resources["OnSurface"] : (Color)MauiApp.Current!.Resources["OnSurfaceDark"];
-
-    if (isSelected)
-    {
-      CardBorder.BackgroundColor = primary;
-      CharaIdLabel.TextColor = primaryText;
-      TitleLabel.TextColor = primaryText;
-      return;
-    }
-
-    else
-    {
-      CardBorder.BackgroundColor = surface;
-      CharaIdLabel.TextColor = surfaceText;
-      TitleLabel.TextColor = surfaceText;
-    }
-    return;
+    var state = isSelected ? "Selected" : "Normal";
+    VisualStateManager.GoToState(CardBorder, state);
+    VisualStateManager.GoToState(TitleLabel, state);
+    VisualStateManager.GoToState(CharaIdLabel, state);
   }
 
   // カードがタップされたとき

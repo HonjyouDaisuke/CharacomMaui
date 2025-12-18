@@ -6,29 +6,103 @@
   xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
   x:Name="Root">
 
+  <!-- ===== タップ ===== -->
   <ContentView.GestureRecognizers>
     <TapGestureRecognizer Tapped="OnCardTapped"/>
   </ContentView.GestureRecognizers>
 
+  <!-- ===== Resources ===== -->
+  <ContentView.Resources>
+    <ResourceDictionary>
+
+      <!-- Label : Normal 状態 -->
+      <Style x:Key="ThumbnailLabelStyle"
+             TargetType="Label">
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource OnSurface},
+                                          Dark={StaticResource OnSurfaceDark}}"/>
+      </Style>
+
+      <!-- Border : Normal 状態 -->
+      <Style x:Key="ThumbnailCardBorderStyle"
+             TargetType="Border">
+        <Setter Property="StrokeShape"
+                Value="RoundRectangle 8"/>
+        <Setter Property="StrokeThickness"
+                Value="0"/>
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource Surface},
+                                          Dark={StaticResource SurfaceDark}}"/>
+      </Style>
+
+    </ResourceDictionary>
+  </ContentView.Resources>
+
   <Border
     x:Name="CardBorder"
+    Style="{StaticResource ThumbnailCardBorderStyle}"
     StrokeShape="RoundRectangle 8"
-    StrokeThickness="0"
-    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface},
-                                        Dark={DynamicResource SurfaceDark}}">
+    StrokeThickness="0">
+    <!-- ===== Shadow ===== -->
+    <Border.Shadow>
+      <Shadow
+        Brush="{AppThemeBinding Light={StaticResource Shadow},
+                                Dark={StaticResource ShadowDark}}"
+        Offset="2,2"
+        Radius="10"
+        Opacity="1"/>
+    </Border.Shadow>
+
+    <!-- ===== VisualStates ===== -->
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="SelectionStates">
+
+        <!-- Normal : Style に任せる -->
+        <VisualState x:Name="Normal"/>
+
+        <!-- Selected : 差分のみ -->
+        <VisualState x:Name="Selected">
+          <VisualState.Setters>
+
+            <!-- Border -->
+            <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}"/>
+
+            <!-- Labels -->
+            <Setter TargetName="TitleLabel"
+                    Property="Label.TextColor"
+                    Value="{AppThemeBinding Light={StaticResource OnPrimary},
+                                            Dark={StaticResource OnPrimaryDark}}"/>
+
+            <Setter TargetName="CharaIdLabel"
+                    Property="Label.TextColor"
+                    Value="{AppThemeBinding Light={StaticResource OnPrimary},
+                                            Dark={StaticResource OnPrimaryDark}}"/>
+
+          </VisualState.Setters>
+        </VisualState>
+
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+
+    <!-- ===== Layout ===== -->
     <Grid
       Padding="10"
       RowDefinitions="Auto, Auto, Auto"
       RowSpacing="5">
+      <!-- Title -->
       <Label
         x:Name="TitleLabel"
+        Style="{StaticResource ThumbnailLabelStyle}"
         FontSize="16"
         FontAttributes="Bold"
         VerticalOptions="Center"
         HorizontalOptions="Center"
         Text="{Binding Source={x:Reference Root}, Path=Title}"
-        Grid.Row="0"/>
-
+        Grid.Row="0">
+      </Label>
+      <!-- Image -->
       <skia:SKCanvasView
         x:Name="CharaImage"
         WidthRequest="{Binding Source={x:Reference Root}, Path=CanvasWidth}"
@@ -37,12 +111,14 @@
         Grid.Row="1"/>
       <Label
         x:Name="CharaIdLabel"
+        Style="{StaticResource ThumbnailLabelStyle}"
         FontSize="16"
         FontAttributes="Bold"
         VerticalOptions="Center"
         HorizontalOptions="Center"
         Text="{Binding Source={x:Reference Root}, Path=CharaId}"
-        Grid.Row="2"/>
+        Grid.Row="2">
+      </Label>
 
     </Grid>
   </Border>

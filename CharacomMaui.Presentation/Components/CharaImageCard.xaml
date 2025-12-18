@@ -8,8 +8,19 @@
   <Border
     StrokeShape="RoundRectangle 8"
     StrokeThickness="0"
+    Shadow="30"
     BackgroundColor="{AppThemeBinding Light={DynamicResource Surface},
                                         Dark={DynamicResource SurfaceDark}}">
+    <!-- ===== Shadow ===== -->
+    <Border.Shadow>
+      <Shadow
+        Brush="{AppThemeBinding Light={StaticResource Shadow},
+                                Dark={StaticResource ShadowDark}}"
+        Offset="5,5"
+        Radius="20"
+        Opacity="1"/>
+    </Border.Shadow>
+
     <Grid
       Padding="10"
       RowDefinitions="Auto, Auto"

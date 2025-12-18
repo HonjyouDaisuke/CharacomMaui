@@ -1,5 +1,5 @@
 using System.Collections.Specialized;
-using CharacomMaui.Presentation.Helpers;
+using System.ComponentModel;
 using CharacomMaui.Presentation.Models;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
@@ -12,7 +12,6 @@ public partial class SelectBar : ContentView
     InitializeComponent();
   }
 
-  private Button? _selectedButton;
   private INotifyCollectionChanged? _observableItems;
 
   // ========= ラベルリスト =========
@@ -33,7 +32,6 @@ public partial class SelectBar : ContentView
   // ========= テーマ =========
   public static readonly BindableProperty ThemeKeyProperty =
     BindableProperty.Create(
-
         nameof(ThemeKey),
         typeof(string),
         typeof(SelectBar),
@@ -80,7 +78,7 @@ public partial class SelectBar : ContentView
       observable.CollectionChanged += control.OnItemsCollectionChanged;
     }
 
-    control.BuildButtons();
+    control.BuildItems();
   }
   private static void OnThemeKeyChanged(BindableObject bindable, object oldVal, object newVal)
   {
@@ -109,46 +107,50 @@ public partial class SelectBar : ContentView
 
   private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
-    BuildButtons();
+    BuildItems();
   }
 
   private static void OnInitialSelectedLabelChanged(BindableObject bindable, object oldValue, object newValue)
   {
-    var control = (SelectBar)bindable;
-    control.ApplyInitialSelection();
+    ((SelectBar)bindable).ApplyInitialSelection();
   }
 
-  private void BuildButtons()
+  private void BuildItems()
   {
-    ButtonContainer.Children.Clear();
+    ItemContainer.Children.Clear();
 
     if (Items == null || !Items.Any())
       return;
 
-    var outline = ThemeHelper.GetColor("Outline");
-    var disableBackground = ThemeHelper.GetColor("DisabledBackground");
-    var disableText = ThemeHelper.GetColor("DisabledText");
     foreach (var item in Items)
     {
-      //item.Title = string.IsNullOrEmpty(item.Title) ? $"{item.Name}({item.Count})" : item.Title;
-      //item.IsDisabled = item.Count <= 0;
-      System.Diagnostics.Debug.WriteLine($"SelectBar Button: {item.Title} Disabled:{item.IsDisabled}");
-      var btn = new Button
+      var label = new Label
       {
         Text = item.Title,
-        BackgroundColor = Colors.Transparent, // 非選択色
-        TextColor = item.IsDisabled ? disableText : outline,
-        BorderColor = item.IsDisabled ? disableBackground : outline,
-        IsEnabled = !item.IsDisabled,
-        BorderWidth = 1,
-        WidthRequest = 100,
-        CornerRadius = 8,
-        Padding = new Thickness(16, 10),
-        Margin = new Thickness(6),
-        BindingContext = item,
+        Style = (Style)Resources["SelectBarLabelStyle"],
       };
-      btn.Clicked += OnButtonClicked;
-      ButtonContainer.Children.Add(btn);
+      var border = new Border
+      {
+        Style = (Style)Resources["SelectBarItemStyle"],
+        Content = label,
+        BindingContext = item,
+        IsEnabled = !item.IsDisabled,
+      };
+      var tap = new TapGestureRecognizer();
+      tap.Tapped += (_, _) => SelectItem(border);
+      border.GestureRecognizers.Add(tap);
+
+      PropertyChangedEventHandler handler = (_, e) =>
+      {
+        if (e.PropertyName == nameof(item.IsSelected))
+          UpdateVisualState(border, label, item);
+      };
+
+      item.PropertyChanged += handler;
+      border.Unloaded += (_, _) => item.PropertyChanged -= handler;
+
+      UpdateVisualState(border, label, item);
+      ItemContainer.Children.Add(border);
     }
 
     ApplyInitialSelection();
@@ -158,50 +160,50 @@ public partial class SelectBar : ContentView
   {
     if (string.IsNullOrEmpty(InitialSelectedLabel)) return;
 
-    var btn = ButtonContainer.Children
-        .OfType<Button>()
+    var border = ItemContainer.Children
+        .OfType<Border>()
         .FirstOrDefault(b =>
             b.BindingContext is SelectBarContents data &&
             data.Name == InitialSelectedLabel && !data.IsDisabled);
 
-    if (btn != null)
-      SelectButton(btn);
+    if (border != null)
+      SelectItem(border);
   }
 
-  private void OnButtonClicked(object? sender, EventArgs e)
+  private void UpdateVisualState(Border border, Label label, SelectBarContents item)
   {
-    if (sender is not Button clickedButton) return;
-    SelectButton(clickedButton);
-  }
-
-  private void SelectButton(Button clickedButton)
-  {
-    // 非選択色に戻す
-    if (_selectedButton != null)
+    if (item.IsDisabled)
     {
-      var outline = ThemeHelper.GetColor("Outline");
-      _selectedButton.BackgroundColor = Colors.Transparent;
-      _selectedButton.TextColor = outline;
-      _selectedButton.BorderColor = outline;
-      _selectedButton.BorderWidth = 1;
+      VisualStateManager.GoToState(border, "Disabled");
+      VisualStateManager.GoToState(label, "Disabled");
+    }
+    else if (item.IsSelected)
+    {
+      VisualStateManager.GoToState(border, "Selected");
+      VisualStateManager.GoToState(label, "Selected");
+    }
+    else
+    {
+      VisualStateManager.GoToState(border, "Normal");
+      VisualStateManager.GoToState(label, "Normal");
+    }
+  }
+  private void SelectItem(Border selectedBorder)
+  {
+    if (selectedBorder.BindingContext is not SelectBarContents data)
+      return;
+
+    if (Items == null || Items.Count() == 0) return;
+    foreach (var item in Items)
+    {
+      if (item.IsDisabled) continue;
+      item.IsSelected = item.Name == data.Name;
     }
 
-    // 選択色
-    clickedButton.BackgroundColor = ThemeHelper.GetColor("Primary");
-    clickedButton.TextColor = ThemeHelper.GetColor("OnPrimary");
-    clickedButton.BorderWidth = 0;
-
-    _selectedButton = clickedButton;
-    // Bindingされているデータを取得
-    var data = clickedButton.BindingContext as SelectBarContents;
-    if (data == null) return;
-    // イベント発火
-    System.Diagnostics.Debug.WriteLine($"Selected: {data.Name} title = {clickedButton.Text}");
     ItemSelected?.Invoke(this, new SelectBarEventArgs
     {
-      SelectedName = data.Name,
+      SelectedName = data.Name
     });
-
   }
 }
 public class SelectBarEventArgs : EventArgs
