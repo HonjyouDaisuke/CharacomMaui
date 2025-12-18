@@ -1,5 +1,11 @@
 # .coderabbit.yaml (リポジトリのルートに置く)
 language: "ja-JP"
+
+instructions: |
+  When adding or updating docstrings, always write them in Japanese.
+  Use concise and technical Japanese.
+  Do not translate code identifiers or symbol names.
+
 reviews:
   profile: "chill"
   auto_review:
