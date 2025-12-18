@@ -40,9 +40,7 @@
 
   <Border
     x:Name="CardBorder"
-    Style="{StaticResource ThumbnailCardBorderStyle}"
-    StrokeShape="RoundRectangle 8"
-    StrokeThickness="0">
+    Style="{StaticResource ThumbnailCardBorderStyle}">
     <!-- ===== Shadow ===== -->
     <Border.Shadow>
       <Shadow

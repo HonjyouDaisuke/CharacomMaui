@@ -8,7 +8,6 @@
   <Border
     StrokeShape="RoundRectangle 8"
     StrokeThickness="0"
-    Shadow="30"
     BackgroundColor="{AppThemeBinding Light={DynamicResource Surface},
                                         Dark={DynamicResource SurfaceDark}}">
     <!-- ===== Shadow ===== -->

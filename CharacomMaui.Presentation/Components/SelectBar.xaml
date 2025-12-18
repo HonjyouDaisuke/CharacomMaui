@@ -81,14 +81,7 @@
           <VisualStateGroupList>
             <VisualStateGroup x:Name="SelectionStates">
 
-              <VisualState x:Name="Normal">
-                <VisualState.Setters>
-                  <Setter Property="TextColor"
-                          Value="{AppThemeBinding
-                              Light={StaticResource Outline},
-                              Dark={StaticResource OutlineDark}}"/>
-                </VisualState.Setters>
-              </VisualState>
+              <VisualState x:Name="Normal"/>
 
               <VisualState x:Name="Selected">
                 <VisualState.Setters>

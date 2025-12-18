@@ -193,7 +193,7 @@ public partial class SelectBar : ContentView
     if (selectedBorder.BindingContext is not SelectBarContents data)
       return;
 
-    if (Items == null || Items.Count() == 0) return;
+    if (Items == null) return;
     foreach (var item in Items)
     {
       if (item.IsDisabled) continue;
