@@ -195,8 +195,6 @@ public partial class CharaDataProgressRow : ContentView
         view.SelectedBar,
         new Rect(0, 0, ratio, 1)
     );
-    string hex = view.SelectedBar.Color.ToArgbHex();
-
   }
 }
 public class CharaDataProgressRowEventArgs : EventArgs

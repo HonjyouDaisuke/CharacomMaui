@@ -51,14 +51,8 @@ public partial class ProjectDetailPage : ContentPage
       System.Diagnostics.Debug.WriteLine($"OnAppearing error: {ex.Message}");
       await DisplayAlert("エラー", "ページの初期化中にエラーが発生しました。", "OK");
     }
-    RefreshPage();
   }
-  void RefreshPage()
-  {
-    var old = Content;
-    Content = null;
-    Content = old;
-  }
+
   private async Task GetCharaItemAsync()
   {
     using (await _dialogService.DisplayProgressAsync("プロジェクト詳細ページ準備中", "プロジェクト画面を準備しています。少々お待ちください。"))
