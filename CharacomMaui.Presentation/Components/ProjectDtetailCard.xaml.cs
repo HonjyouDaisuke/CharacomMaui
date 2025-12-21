@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace CharacomMaui.Presentation.Components;
 
 public partial class ProjectDetailCard : ContentView
@@ -46,94 +48,104 @@ public partial class ProjectDetailCard : ContentView
     BindableProperty.Create(nameof(CharaFolderId), typeof(string), typeof(ProjectDetailCard), string.Empty);
   public string CharaFolderId { get => (string)GetValue(CharaFolderIdProperty); set => SetValue(CharaFolderIdProperty, value); }
 
+  // ========== IsUpdateVisible ==========
+  public static readonly BindableProperty IsUpdateVisibleProperty =
+    BindableProperty.Create(nameof(IsUpdateVisible), typeof(bool), typeof(ProjectDetailCard), true);
+  public bool IsUpdateVisible { get => (bool)GetValue(IsUpdateVisibleProperty); set => SetValue(IsUpdateVisibleProperty, value); }
 
+  // ========== IsDeleteVisible ==========
+  public static readonly BindableProperty IsDeleteVisibleProperty =
+    BindableProperty.Create(nameof(IsDeleteVisible), typeof(bool), typeof(ProjectDetailCard), true);
+  public bool IsDeleteVisible { get => (bool)GetValue(IsDeleteVisibleProperty); set => SetValue(IsDeleteVisibleProperty, value); }
+
+  // ========== IsInviteVisble ===========
+  public static readonly BindableProperty IsInviteVisibleProperty =
+    BindableProperty.Create(nameof(IsInviteVisible), typeof(bool), typeof(ProjectDetailCard), true);
+  public bool IsInviteVisible { get => (bool)GetValue(IsInviteVisibleProperty); set => SetValue(IsInviteVisibleProperty, value); }
   // イベントを追加
-  public event EventHandler<ProjectInfoEventArgs>? UpdateRequested;
-  public event EventHandler<ProjectInfoEventArgs>? DeleteRequested;
-  public event EventHandler<ProjectInfoEventArgs>? InviteRequested;
+  public event Func<ProjectInfoEventArgs, Task>? UpdateRequested;
+  public event Func<ProjectInfoEventArgs, Task>? DeleteRequested;
+  public event Func<ProjectInfoEventArgs, Task>? InviteRequested;
+
+  private bool _isActionProcessing = false;
 
   public ProjectDetailCard()
   {
     InitializeComponent();
   }
-  private void OnUpdateClicked(object sender, EventArgs e)
-  {
-    // アップデートリクエスト
-    System.Diagnostics.Debug.WriteLine($"Project {ProjectName} をアップデートします。 ID={ProjectId} folder={ProjectFolderId} charafolder={CharaFolderId}");
 
-    UpdateRequested?.Invoke(this, new ProjectInfoEventArgs
+  private ProjectInfoEventArgs CreateArgs() => new()
+  {
+    ProjectId = ProjectId,
+    ProjectName = ProjectName,
+    ProjectDescription = ProjectDescription,
+    ProjectFolderId = ProjectFolderId,
+    CharaFolderId = CharaFolderId,
+  };
+
+  private async void OnUpdateClicked(object sender, EventArgs e)
+  {
+    await RunOnceAsync(updateBtn, async () =>
     {
-      ProjectId = ProjectId,
-      ProjectName = ProjectName,
-      ProjectDescription = ProjectDescription,
-      ProjectFolderId = ProjectFolderId,
-      CharaFolderId = CharaFolderId,
+      var handler = UpdateRequested;
+      if (handler != null)
+      {
+        await handler(CreateArgs());
+      }
     });
   }
-  private void OnDeleteClicked(object sender, EventArgs e)
+  private async void OnDeleteClicked(object sender, EventArgs e)
   {
-    // 削除リクエスト
-    System.Diagnostics.Debug.WriteLine($"Project {ProjectName} を削除します。 ID={ProjectId} ");
-
-    DeleteRequested?.Invoke(this, new ProjectInfoEventArgs
+    await RunOnceAsync(deleteBtn, async () =>
     {
-      ProjectId = ProjectId,
-      ProjectName = ProjectName,
-      ProjectDescription = ProjectDescription,
-      ProjectFolderId = ProjectFolderId,
-      CharaFolderId = CharaFolderId,
+      var handler = DeleteRequested;
+      if (handler != null)
+      {
+        await handler(CreateArgs());
+      }
     });
   }
-  private void OnInviteClicked(object sender, EventArgs e)
+  private async void OnInviteClicked(object sender, EventArgs e)
   {
-    // 招待リクエスト
-    System.Diagnostics.Debug.WriteLine($"Project {ProjectName} に招待します。 ID={ProjectId} ");
-
-    InviteRequested?.Invoke(this, new ProjectInfoEventArgs
+    await RunOnceAsync(InviteBtn, async () =>
     {
-      ProjectId = ProjectId,
-      ProjectName = ProjectName,
-      ProjectDescription = ProjectDescription,
-      ProjectFolderId = ProjectFolderId,
-      CharaFolderId = CharaFolderId,
+      var handler = InviteRequested;
+      if (handler != null)
+      {
+        await handler(CreateArgs());
+      }
     });
   }
-  public static readonly BindableProperty IsUpdateVisibleProperty =
-          BindableProperty.Create(
-              nameof(IsUpdateVisible),
-              typeof(bool),
-              typeof(ProjectDetailCard),
-              true);
 
-  public bool IsUpdateVisible
+  private async Task RunOnceAsync(
+    Button button,
+    Func<Task> action)
   {
-    get => (bool)GetValue(IsUpdateVisibleProperty);
-    set => SetValue(IsUpdateVisibleProperty, value);
+    if (_isActionProcessing)
+      return; // ← ここが重要
+
+    _isActionProcessing = true;
+
+    try
+    {
+      // 全ボタンをロック
+      updateBtn.IsEnabled = false;
+      deleteBtn.IsEnabled = false;
+      InviteBtn.IsEnabled = false;
+
+      button.IsEnabled = false;
+
+      await action();
+    }
+    finally
+    {
+      updateBtn.IsEnabled = true;
+      deleteBtn.IsEnabled = true;
+      InviteBtn.IsEnabled = true;
+
+      _isActionProcessing = false;
+    }
   }
 
-  public static readonly BindableProperty IsDeleteVisibleProperty =
-      BindableProperty.Create(
-          nameof(IsDeleteVisible),
-          typeof(bool),
-          typeof(ProjectDetailCard),
-          true);
-
-  public bool IsDeleteVisible
-  {
-    get => (bool)GetValue(IsDeleteVisibleProperty);
-    set => SetValue(IsDeleteVisibleProperty, value);
-  }
-
-  public static readonly BindableProperty IsInviteVisibleProperty =
-      BindableProperty.Create(
-          nameof(IsInviteVisible),
-          typeof(bool),
-          typeof(ProjectDetailCard),
-          true);
-
-  public bool IsInviteVisible
-  {
-    get => (bool)GetValue(IsInviteVisibleProperty);
-    set => SetValue(IsInviteVisibleProperty, value);
-  }
 }
+

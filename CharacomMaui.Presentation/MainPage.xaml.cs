@@ -11,6 +11,7 @@ public partial class MainPage : ContentPage
   private readonly CreateAppUserViewModel _createAppUserViewModel;
   private readonly GetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
+  private bool _isLoginProcessing = false;
 
   public MainPage(GetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase)
   {
@@ -34,50 +35,63 @@ public partial class MainPage : ContentPage
 
   private async void OnLoginClicked(object sender, EventArgs e)
   {
-    LogEditor.Text += "ログイン処理を開始...\n";
-    var res = await _boxLoginViewModel.LoginAsync();
-    if (res == null)
+    if (_isLoginProcessing) return;
+
+    _isLoginProcessing = true;
+    try
     {
-      LogEditor.Text += "ログインに失敗しました。。。\nå";
-      return;
+      if (sender is VisualElement ve) ve.IsEnabled = false; //UIをロック
+
+
+      LogEditor.Text += "ログイン処理を開始...\n";
+      var res = await _boxLoginViewModel.LoginAsync();
+      if (res == null)
+      {
+        LogEditor.Text += "ログインに失敗しました。。。\nå";
+        return;
+      }
+      var user = await _boxLoginViewModel.GetUserInfoAsync(res.AccessToken);
+      LogEditor.Text += $"AccessToken = {res.AccessToken}\n";
+      LogEditor.Text += $"RefreshToken = {res.RefreshToken}\n";
+      LogEditor.Text += $"id = {user.id}\n";
+      LogEditor.Text += $"name = {user.name}\n";
+      LogEditor.Text += $"login = {user.login}\n";
+      LogEditor.Text += $"picture = {user.avatar_url}\n";
+      LogEditor.Text += $"status = {user.status}\n";
+
+      var appUser = new AppUser
+      {
+        Id = user.id,
+        Name = user.name,
+        Email = user.login,
+        PictureUrl = user.avatar_url,
+        BoxAccessToken = res.AccessToken,
+        BoxRefreshToken = res.RefreshToken,
+      };
+      // ユーザーをアプリに登録
+      var success = await _createAppUserViewModel.CreateUserAsync(appUser);
+      if (success)
+      {
+        LogEditor.Text += "ユーザー情報を保存しました...\n";
+        var accessToken = Preferences.Get("app_access_token", string.Empty);
+        LogEditor.Text += $"app AccessToken = {accessToken}\n";
+        var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
+        _statusUseCase.SetUserInfo(userInfo);
+      }
+      else
+      {
+        LogEditor.Text += "ユーザー情報保存に失敗\n";
+      }
+
+      LogEditor.Text += "終了しました...\n";
+
+      MauiApp.Current!.Windows[0].Page = new AppShell();
     }
-    var user = await _boxLoginViewModel.GetUserInfoAsync(res.AccessToken);
-    LogEditor.Text += $"AccessToken = {res.AccessToken}\n";
-    LogEditor.Text += $"RefreshToken = {res.RefreshToken}\n";
-    LogEditor.Text += $"id = {user.id}\n";
-    LogEditor.Text += $"name = {user.name}\n";
-    LogEditor.Text += $"login = {user.login}\n";
-    LogEditor.Text += $"picture = {user.avatar_url}\n";
-    LogEditor.Text += $"status = {user.status}\n";
-
-    var appUser = new AppUser
+    finally
     {
-      Id = user.id,
-      Name = user.name,
-      Email = user.login,
-      PictureUrl = user.avatar_url,
-      BoxAccessToken = res.AccessToken,
-      BoxRefreshToken = res.RefreshToken,
-    };
-    // ユーザーをアプリに登録
-    var success = await _createAppUserViewModel.CreateUserAsync(appUser);
-    if (success)
-    {
-      LogEditor.Text += "ユーザー情報を保存しました...\n";
-      var accessToken = Preferences.Get("app_access_token", string.Empty);
-      LogEditor.Text += $"app AccessToken = {accessToken}\n";
-      var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
-      _statusUseCase.SetUserInfo(userInfo);
+      _isLoginProcessing = false;
+      if (sender is VisualElement ve) ve.IsEnabled = true;
     }
-    else
-    {
-      LogEditor.Text += "ユーザー情報保存に失敗\n";
-    }
-
-    LogEditor.Text += "終了しました...\n";
-
-    MauiApp.Current!.Windows[0].Page = new AppShell();
-
   }
 
   private async void OnNewPageButtonClick(object sender, EventArgs e)
