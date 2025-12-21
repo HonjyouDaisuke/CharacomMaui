@@ -44,7 +44,7 @@
         ColumnDefinitions="Auto, Auto">
         <Button
           Grid.Column="0"
-          x:Name="updateBtn"
+          x:Name="UpdateBtn"
           IsVisible="{Binding IsUpdateVisible, Source={x:Reference This}}"
           TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"
           BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -66,7 +66,7 @@
         TextColor="{AppThemeBinding Light={DynamicResource OnError}, Dark={DynamicResource OnErrorDark}}"
         BackgroundColor="{AppThemeBinding Light={DynamicResource Error}, Dark={DynamicResource ErrorDark}}"
         Clicked="OnDeleteClicked"
-        x:Name="deleteBtn"
+        x:Name="DeleteBtn"
         FontFamily="{x:Static models:Icons.FontFamily}"
         Text="&#xE872; 削除"/>
       <!-- 説明 -->

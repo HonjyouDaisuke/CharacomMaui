@@ -85,7 +85,7 @@ public partial class ProjectDetailCard : ContentView
 
   private async void OnUpdateClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(updateBtn, async () =>
+    await RunOnceAsync(UpdateBtn, async () =>
     {
       var handler = UpdateRequested;
       if (handler != null)
@@ -96,7 +96,7 @@ public partial class ProjectDetailCard : ContentView
   }
   private async void OnDeleteClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(deleteBtn, async () =>
+    await RunOnceAsync(DeleteBtn, async () =>
     {
       var handler = DeleteRequested;
       if (handler != null)
@@ -129,8 +129,8 @@ public partial class ProjectDetailCard : ContentView
     try
     {
       // 全ボタンをロック
-      updateBtn.IsEnabled = false;
-      deleteBtn.IsEnabled = false;
+      UpdateBtn.IsEnabled = false;
+      DeleteBtn.IsEnabled = false;
       InviteBtn.IsEnabled = false;
 
       button.IsEnabled = false;
@@ -139,8 +139,8 @@ public partial class ProjectDetailCard : ContentView
     }
     finally
     {
-      updateBtn.IsEnabled = true;
-      deleteBtn.IsEnabled = true;
+      UpdateBtn.IsEnabled = true;
+      DeleteBtn.IsEnabled = true;
       InviteBtn.IsEnabled = true;
 
       _isActionProcessing = false;
