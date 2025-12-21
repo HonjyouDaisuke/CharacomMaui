@@ -133,15 +133,13 @@ public partial class ProjectDetailCard : ContentView
       DeleteBtn.IsEnabled = false;
       InviteBtn.IsEnabled = false;
 
-      button.IsEnabled = false;
-
       await action();
     }
     finally
     {
-      UpdateBtn.IsEnabled = true;
-      DeleteBtn.IsEnabled = true;
-      InviteBtn.IsEnabled = true;
+      UpdateBtn.IsEnabled = IsUpdateVisible;
+      DeleteBtn.IsEnabled = IsDeleteVisible;
+      InviteBtn.IsEnabled = IsInviteVisible;
 
       _isActionProcessing = false;
     }

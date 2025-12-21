@@ -32,7 +32,13 @@ public partial class ProjectDetailPage : ContentPage
     ProjectDetailCard.DeleteRequested += OnDeleteRequestedAsync;
     ProjectDetailCard.InviteRequested += OnInviteRequestedAsync;
   }
-
+  protected override void OnDisappearing()
+  {
+    base.OnDisappearing();
+    ProjectDetailCard.UpdateRequested -= OnUpdateRequestedAsync;
+    ProjectDetailCard.DeleteRequested -= OnDeleteRequestedAsync;
+    ProjectDetailCard.InviteRequested -= OnInviteRequestedAsync;
+  }
   protected override async void OnAppearing()
   {
     base.OnAppearing();

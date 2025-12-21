@@ -47,7 +47,7 @@ public partial class MainPage : ContentPage
       var res = await _boxLoginViewModel.LoginAsync();
       if (res == null)
       {
-        LogEditor.Text += "ログインに失敗しました。。。\nå";
+        LogEditor.Text += "ログインに失敗しました。。。\n";
         return;
       }
       var user = await _boxLoginViewModel.GetUserInfoAsync(res.AccessToken);
