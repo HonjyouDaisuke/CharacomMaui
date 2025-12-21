@@ -46,6 +46,7 @@
             SelectedCount="{Binding SelectedCount}"
             IsSelected="{Binding IsSelected}"
             RowClicked="OnRowClicked"
+            IsOdd="{Binding IsOdd}"
             RowDoubleClicked="OnRowDoubleClicked"/>
         </DataTemplate>
       </CollectionView.ItemTemplate>

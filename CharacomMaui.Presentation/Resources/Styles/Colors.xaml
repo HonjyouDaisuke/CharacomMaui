@@ -27,6 +27,9 @@
   <Color x:Key="SurfaceVariant">#E7E0EC</Color>
   <Color x:Key="OnSurfaceVariant">#49454E</Color>
 
+  <Color x:Key="SurfaceAlt">#F0F0F0</Color>
+  <Color x:Key="SurfaceAltDark">#474747</Color>
+
   <Color x:Key="Background">#FFFBFE</Color>
   <Color x:Key="OnBackground">#1A1A1A</Color>
 

@@ -14,6 +14,8 @@ public partial class CharaDataProgressRow : ContentView
   public CharaDataProgressRow()
   {
     InitializeComponent();
+    // 初期状態を明示
+    // VisualStateManager.GoToState(BackgroundBorder, "Normal");
   }
 
   public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
@@ -52,10 +54,37 @@ public partial class CharaDataProgressRow : ContentView
     set => SetValue(IsSelectedProperty, value);
   }
 
+  public static readonly BindableProperty IsOddProperty =
+    BindableProperty.Create(
+      nameof(IsOdd),
+      typeof(bool),
+      typeof(CharaDataProgressRow),
+      false,
+      propertyChanged: OnIsOddChanged);
+
+
+  public bool IsOdd
+  {
+    get => (bool)GetValue(IsOddProperty);
+    set => SetValue(IsOddProperty, value);
+  }
+
   // イベント
   public event EventHandler<CharaDataProgressRowEventArgs>? RowClicked;
   public event EventHandler<CharaDataProgressRowEventArgs>? RowDoubleClicked;
+  protected override void OnPropertyChanged(string? propertyName = null)
+  {
+    base.OnPropertyChanged(propertyName);
 
+    if (propertyName == IsEnabledProperty.PropertyName)
+    {
+      if (IsEnabled)
+      {
+        // 🔥 Disabled から必ず引き戻す
+        UpdateVisualState();
+      }
+    }
+  }
   // クリック時の処理
   private void OnCardTapped(object? sender, EventArgs e)
   {
@@ -108,86 +137,66 @@ public partial class CharaDataProgressRow : ContentView
   //背景色の切り替え
   private static void OnIsSelectedChanged(BindableObject bindable, object oldValue, object newValue)
   {
-    if (bindable is CharaDataProgressRow row && newValue is bool isSelected)
-    {
-      System.Diagnostics.Debug.WriteLine($"OnIsSelectedChange -> charaName={row.CharaName} MaterialName={row.MaterialName} isSelect={row.IsSelected} newValue={isSelected}");
-      row.UpdateSelectionState(isSelected);
-      row.UpdateBackground(isSelected);
-    }
+    if (bindable is CharaDataProgressRow row)
+      row.UpdateVisualState();
+  }
+  private static void OnIsOddChanged(BindableObject bindable, object oldValue, object newValue)
+  {
+    if (bindable is CharaDataProgressRow row)
+      row.UpdateVisualState();
+  }
+
+  private void OnBackgroundLoaded(object? sender, EventArgs e)
+  {
+    UpdateVisualState();
   }
 
   protected override void OnBindingContextChanged()
   {
     base.OnBindingContextChanged();
-
-    if (BindingContext is CharaDataSummary data)
-    {
-      UpdateSelectionState(data.IsSelected);
-      UpdateBackground(data.IsSelected);
-    }
-    else
-    {
-      // バインド解除された瞬間にも一応リセット
-      UpdateSelectionState(false);
-      UpdateBackground(false);
-    }
+    UpdateVisualState();
   }
 
-  private void UpdateSelectionState(bool isSelected)
+  private void OnProgressGridLoaded(object? sender, EventArgs e)
   {
-    if (isSelected)
-    {
-      BackgroundBorder.BackgroundColor = ThemeHelper.GetColor("Secondary");
-      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
-      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
-      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
-      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSecondary");
-    }
-    else
-    {
-      CharaNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
-      MaterialNameLabel.TextColor = ThemeHelper.GetColor("OnSurface");
-      CharaCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
-      SelectedCountLabel.TextColor = ThemeHelper.GetColor("OnSurface");
-    }
+    UpdateBarWidths(this);
   }
-  private void UpdateBackground(bool isSelected)
-  {
-    // 選択中の場合はUpadateSelectionStateで制御する
-    if (isSelected) return;
-    // BindingContext から Number を取り出す
-    int number = 0;
-    if (BindingContext is CharaDataSummary data)
-    {
-      number = data.Number;
-    }
-
-    bool isOdd = number % 2 == 1;
-    System.Diagnostics.Debug.WriteLine($"選択されていないので、背景決めます {CharaName} : {MaterialName} ->{IsSelected}");
-    BackgroundBorder.BackgroundColor = isOdd ? ThemeHelper.GetColor("DisabledBackground") : ThemeHelper.GetColor("Surface");
-
-  }
-
 
   private static void OnDataChanged(BindableObject bindable, object oldValue, object newValue)
   {
     var view = (CharaDataProgressRow)bindable;
+    UpdateBarWidths(view);
+  }
 
+  private void UpdateVisualState()
+  {
+    if (IsSelected)
+    {
+      VisualStateManager.GoToState(BackgroundBorder, "Selected");
+      System.Diagnostics.Debug.WriteLine($"CharaName = {CharaName} Selected = {SelectedCount}  ★☆Selected!");
+    }
+    else
+    {
+      VisualStateManager.GoToState(
+        BackgroundBorder,
+        IsOdd ? "NormalOdd" : "NormalEven");
+      System.Diagnostics.Debug.WriteLine($"CharaName = {CharaName} Selected = {SelectedCount}  ★☆Normal{IsOdd}");
+    }
+
+  }
+  private static void UpdateBarWidths(CharaDataProgressRow view)
+  {
     int total = view.CharaCount;
     int selected = view.SelectedCount;
 
-    if (total <= 0)
-    {
-      view.SelectedRatio = new GridLength(0, GridUnitType.Star);
-      view.UnselectedRatio = new GridLength(1, GridUnitType.Star);
-      return;
-    }
+    double ratio = total == 0 ? 0 : (double)selected / total;
 
-    int unselected = Math.Max(total - selected, 0);
+    AbsoluteLayout.SetLayoutBounds(
+        view.SelectedBar,
+        new Rect(0, 0, ratio, 1)
+    );
+    string hex = view.SelectedBar.Color.ToArgbHex();
 
-    view.SelectedRatio = new GridLength(selected, GridUnitType.Star);
-    view.UnselectedRatio = new GridLength(unselected, GridUnitType.Star);
-    System.Diagnostics.Debug.WriteLine($"selected:{selected} - unselected:{unselected}");
   }
 }
 public class CharaDataProgressRowEventArgs : EventArgs
