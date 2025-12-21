@@ -10,7 +10,7 @@ public class CharaDataSummary : INotifyPropertyChanged
   public string MaterialName { get; set; } = string.Empty;
   public int CharaCount { get; set; } = 0;
   public int SelectedCount { get; set; } = 0;
-  public bool _isOdd;
+  private bool _isOdd;
   public bool IsOdd
   {
     get => _isOdd;
