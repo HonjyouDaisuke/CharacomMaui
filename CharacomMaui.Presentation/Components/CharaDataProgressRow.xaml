@@ -7,21 +7,70 @@
   xmlns:conv="clr-namespace:CharacomMaui.Presentation.Converters"
   x:Name="This">
 
+
+  <!-- ✅ Resources -->
   <ContentView.Resources>
-    <conv:OddConverter x:Key="OddConverter"/>
+    <ResourceDictionary>
+
+      <conv:OddConverter x:Key="OddConverter"/>
+
+      <Style x:Key="ProgressRowBackgroundStyle"
+             TargetType="Grid">
+
+        <Setter Property="VisualStateManager.VisualStateGroups">
+          <VisualStateGroupList>
+
+            <VisualStateGroup x:Name="RowStates">
+
+              <!-- 偶数行（非選択） -->
+              <VisualState x:Name="NormalEven">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <!-- 奇数行（非選択） -->
+              <VisualState x:Name="NormalOdd">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="{AppThemeBinding Light={StaticResource SurfaceAlt}, Dark={StaticResource SurfaceAltDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+              <!-- 選択 -->
+              <VisualState x:Name="Selected">
+                <VisualState.Setters>
+                  <Setter Property="BackgroundColor"
+                          Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource SecondaryDark}}"/>
+                </VisualState.Setters>
+              </VisualState>
+
+            </VisualStateGroup>
+
+          </VisualStateGroupList>
+        </Setter>
+      </Style>
+
+
+    </ResourceDictionary>
   </ContentView.Resources>
+
+  <!-- ✅ GestureRecognizers はこれだけ -->
   <ContentView.GestureRecognizers>
     <TapGestureRecognizer Tapped="OnCardTapped"/>
   </ContentView.GestureRecognizers>
 
-  <Grid RowDefinitions="*, Auto">
+  <Grid RowDefinitions="*, Auto"
+        IsEnabled="True">
 
-    <Grid Margin="20,5,20,5"
+    <Grid x:Name="BackgroundBorder"
+          Style="{StaticResource ProgressRowBackgroundStyle}"
+          Margin="20,5,20,5"
           Padding="5"
           Grid.Row="0"
-          ColumnSpacing="10"
-          x:Name="BackgroundBorder"
-          BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
+          IsEnabled="True"
+          ColumnSpacing="10">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="1*"/>
         <ColumnDefinition Width="1*"/>
@@ -50,32 +99,33 @@
              x:Name="SelectedCountLabel"
              Text="{Binding SelectedCount, Source={x:Reference This}}"/>
 
-      <Grid x:Name="ProgressGrid"
-            Grid.Column="4"
-            VerticalOptions="Center"
-            HorizontalOptions="Fill"
-            HeightRequest="30">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="{Binding SelectedRatio, Source={x:Reference This}}"/>
-          <ColumnDefinition Width="{Binding UnselectedRatio, Source={x:Reference This}}"/>
-        </Grid.ColumnDefinitions>
-        <BoxView Grid.Column="0"
-                 x:Name="SelectedBar"
-                 BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                 CornerRadius="4,0,4,0"/>
+      <AbsoluteLayout x:Name="ProgressRoot"
+                      Grid.Column="4"
+                      IsEnabled="True"
+                      HeightRequest="30">
+        <!-- 背景 -->
+        <BoxView
+          Color="{AppThemeBinding Light={StaticResource DisabledBackground}, Dark={StaticResource DisabledBackgroundDark}}"
+          AbsoluteLayout.LayoutBounds="0,0,1,1"
+          AbsoluteLayout.LayoutFlags="All"
+          CornerRadius="4"/>
 
-        <BoxView Grid.Column="1"
-                 x:Name="UnSelectedBar"
-                 BackgroundColor="{AppThemeBinding Light={DynamicResource DisabledBackground}, Dark={DynamicResource DisabledBackground}}"
-                 CornerRadius="0,4,0,4"/>
-      </Grid>
+        <!-- 進捗 -->
+        <BoxView x:Name="SelectedBar"
+                 IsEnabled="True"
+                 InputTransparent="True"
+                 Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                 AbsoluteLayout.LayoutBounds="0,0,0,1"
+                 AbsoluteLayout.LayoutFlags="All"
+                 CornerRadius="4"/>
+      </AbsoluteLayout>
     </Grid>
 
     <!-- 下線 -->
     <BoxView Grid.Row="1"
              Margin="20,0,20,0"
              HeightRequest="1"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}"
              HorizontalOptions="Fill"/>
   </Grid>
 

@@ -121,6 +121,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       }
       System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個 IsSelected = {isSelected}");
       item.Number = _count;
+      item.IsOdd = _count % 2 == 1;
       item.IsSelected = isSelected;
       CharaDataSummaries.Add(item);
       _count++;
