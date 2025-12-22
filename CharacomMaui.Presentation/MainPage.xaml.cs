@@ -87,6 +87,11 @@ public partial class MainPage : ContentPage
 
       MauiApp.Current!.Windows[0].Page = new AppShell();
     }
+    catch (Exception ex)
+    {
+      LogEditor.Text += $"エラーが発生しました：{ex.Message}\n";
+      System.Diagnostics.Debug.WriteLine($"[Login Error] {ex.Message}");
+    }
     finally
     {
       _isLoginProcessing = false;

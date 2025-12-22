@@ -135,6 +135,10 @@ public partial class ProjectDetailCard : ContentView
 
       await action();
     }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[Error] {ex.Message}");
+    }
     finally
     {
       UpdateBtn.IsEnabled = IsUpdateVisible;

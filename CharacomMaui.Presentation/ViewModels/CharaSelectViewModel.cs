@@ -71,6 +71,10 @@ public partial class CharaSelectViewModel : ObservableObject
       IsLoading = true;
       await LoadCharaItemsCoreAsync();
     }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[GetCharaItem Error] {ex.Message}");
+    }
     finally
     {
       IsLoading = false;
@@ -193,15 +197,7 @@ public partial class CharaSelectViewModel : ObservableObject
       {
         System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
         var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
-        // TODO:後ほど削除
-        /**
-        var image = await LoadThumbnailAsync(accessToken, currentItem.FileId, 32, 32) ?? [];
-        if (image.Length == 0)
-        {
-          System.Diagnostics.Debug.WriteLine($"サムネイル取得エラー FileId: {currentItem.FileId}");
-          image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
-        }
-        **/
+
         if (image.Length == 0)
         {
           System.Diagnostics.Debug.WriteLine($"画像取得エラー FileId: {currentItem.FileId}");
