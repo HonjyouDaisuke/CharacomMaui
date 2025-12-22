@@ -14,6 +14,7 @@
       HorizontalOptions="Center"/>
 
     <components:ProjectDetailCard
+      x:Name="ProjectDetailCard"
       ProjectName="{Binding ProjectName}"
       ProjectId="{Binding ProjectId}"
       ProjectDescription="{Binding ProjectDescription}"
@@ -25,10 +26,7 @@
       CharaFolderId="{Binding CharaFolderId}"
       IsUpdateVisible="True"
       IsInviteVisible="True"
-      IsDeleteVisible="True"
-      UpdateRequested="OnUpdateRequested"
-      DeleteRequested="OnDeleteRequested"
-      InviteRequested="OnInviteRequested"/>
+      IsDeleteVisible="True"/>
 
     <components:CharaDataProgressRowTitle/>
     <CollectionView

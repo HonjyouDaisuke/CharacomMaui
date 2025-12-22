@@ -27,8 +27,18 @@ public partial class ProjectDetailPage : ContentPage
     _viewModel = viewModel;
     _createViewModel = createProjectViewModel;
     BindingContext = _viewModel;
-  }
 
+    ProjectDetailCard.UpdateRequested += OnUpdateRequestedAsync;
+    ProjectDetailCard.DeleteRequested += OnDeleteRequestedAsync;
+    ProjectDetailCard.InviteRequested += OnInviteRequestedAsync;
+  }
+  protected override void OnDisappearing()
+  {
+    base.OnDisappearing();
+    ProjectDetailCard.UpdateRequested -= OnUpdateRequestedAsync;
+    ProjectDetailCard.DeleteRequested -= OnDeleteRequestedAsync;
+    ProjectDetailCard.InviteRequested -= OnInviteRequestedAsync;
+  }
   protected override async void OnAppearing()
   {
     base.OnAppearing();
@@ -121,7 +131,7 @@ public partial class ProjectDetailPage : ContentPage
       CharaFolderId = e.CharaFolderId,
     };
   }
-  private async void OnUpdateRequested(object sender, ProjectInfoEventArgs e)
+  private async Task OnUpdateRequestedAsync(ProjectInfoEventArgs e)
   {
     try
     {
@@ -166,7 +176,7 @@ public partial class ProjectDetailPage : ContentPage
     }
   }
 
-  private async void OnDeleteRequested(object sender, ProjectInfoEventArgs e)
+  private async Task OnDeleteRequestedAsync(ProjectInfoEventArgs e)
   {
     try
     {
@@ -203,7 +213,7 @@ public partial class ProjectDetailPage : ContentPage
       await DisplayAlert("エラー", $"プロジェクトの削除中にエラーが発生しました: {ex.Message}", "OK");
     }
   }
-  private async void OnInviteRequested(object sender, ProjectInfoEventArgs e)
+  private async Task OnInviteRequestedAsync(ProjectInfoEventArgs e)
   {
     LogEditor.Text += $"招待します.{e.ProjectName}\n";
   }
