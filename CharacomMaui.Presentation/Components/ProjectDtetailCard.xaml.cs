@@ -58,7 +58,7 @@ public partial class ProjectDetailCard : ContentView
     BindableProperty.Create(nameof(IsDeleteVisible), typeof(bool), typeof(ProjectDetailCard), true);
   public bool IsDeleteVisible { get => (bool)GetValue(IsDeleteVisibleProperty); set => SetValue(IsDeleteVisibleProperty, value); }
 
-  // ========== IsInviteVisble ===========
+  // ========== IsInviteVisible ===========
   public static readonly BindableProperty IsInviteVisibleProperty =
     BindableProperty.Create(nameof(IsInviteVisible), typeof(bool), typeof(ProjectDetailCard), true);
   public bool IsInviteVisible { get => (bool)GetValue(IsInviteVisibleProperty); set => SetValue(IsInviteVisibleProperty, value); }
@@ -85,7 +85,7 @@ public partial class ProjectDetailCard : ContentView
 
   private async void OnUpdateClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(UpdateBtn, async () =>
+    await RunOnceAsync(async () =>
     {
       var handler = UpdateRequested;
       if (handler != null)
@@ -96,7 +96,7 @@ public partial class ProjectDetailCard : ContentView
   }
   private async void OnDeleteClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(DeleteBtn, async () =>
+    await RunOnceAsync(async () =>
     {
       var handler = DeleteRequested;
       if (handler != null)
@@ -107,7 +107,7 @@ public partial class ProjectDetailCard : ContentView
   }
   private async void OnInviteClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(InviteBtn, async () =>
+    await RunOnceAsync(async () =>
     {
       var handler = InviteRequested;
       if (handler != null)
@@ -118,7 +118,6 @@ public partial class ProjectDetailCard : ContentView
   }
 
   private async Task RunOnceAsync(
-    Button button,
     Func<Task> action)
   {
     if (_isActionProcessing)

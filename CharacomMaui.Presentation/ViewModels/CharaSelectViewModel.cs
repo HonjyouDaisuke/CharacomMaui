@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SkiaSharp;
 using UraniumUI.Dialogs;
+using MauiControls = Microsoft.Maui.Controls;
 
 namespace CharacomMaui.Presentation.ViewModels;
 

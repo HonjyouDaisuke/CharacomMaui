@@ -40,7 +40,7 @@ public partial class MainPage : ContentPage
     _isLoginProcessing = true;
     try
     {
-      if (sender is VisualElement ve) ve.IsEnabled = false; //UIをロック
+      if (sender is VisualElement button) button.IsEnabled = false; //UIをロック
 
 
       LogEditor.Text += "ログイン処理を開始...\n";
@@ -70,18 +70,19 @@ public partial class MainPage : ContentPage
       };
       // ユーザーをアプリに登録
       var success = await _createAppUserViewModel.CreateUserAsync(appUser);
-      if (success)
-      {
-        LogEditor.Text += "ユーザー情報を保存しました...\n";
-        var accessToken = Preferences.Get("app_access_token", string.Empty);
-        LogEditor.Text += $"app AccessToken = {accessToken}\n";
-        var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
-        _statusUseCase.SetUserInfo(userInfo);
-      }
-      else
+
+      // 失敗終了（早期リターン）
+      if (!success)
       {
         LogEditor.Text += "ユーザー情報保存に失敗\n";
+        return;
       }
+
+      LogEditor.Text += "ユーザー情報を保存しました...\n";
+      var accessToken = Preferences.Get("app_access_token", string.Empty);
+      LogEditor.Text += $"app AccessToken = {accessToken}\n";
+      var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
+      _statusUseCase.SetUserInfo(userInfo);
 
       LogEditor.Text += "終了しました...\n";
 
@@ -95,7 +96,7 @@ public partial class MainPage : ContentPage
     finally
     {
       _isLoginProcessing = false;
-      if (sender is VisualElement ve) ve.IsEnabled = true;
+      if (sender is VisualElement button) button.IsEnabled = true;
     }
   }
 
