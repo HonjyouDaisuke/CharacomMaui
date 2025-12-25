@@ -20,13 +20,13 @@ public class AppStatusRepository : IAppStatusRepository
 {
   private AppStatus _appStatus = new AppStatus();
 
-  public void SetUserInfo(string userId, string userName, string userRole, string avaterUrl, string avatarImgString)
+  public void SetUserInfo(string userId, string userName, string userRole, string avaterUrl, string userEmail)
   {
     _appStatus.UserId = userId;
     _appStatus.UserName = userName;
     _appStatus.UserRole = userRole;
+    _appStatus.UserEmail = userEmail;
     _appStatus.AvatarUrl = avaterUrl;
-    _appStatus.AvatarImgString = avatarImgString;
     System.Diagnostics.Debug.WriteLine($"ユーザをセットしました.{_appStatus.UserName}");
   }
 

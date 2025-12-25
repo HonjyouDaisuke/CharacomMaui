@@ -187,7 +187,7 @@ public class ProjectRepository : IProjectRepository
       };
     }
   }
-  public async Task<ProjectDetails?> GetProjectDetailsAsync(string accessToken, string projectId)
+  public async Task<ProjectDetails> GetProjectDetailsAsync(string accessToken, string projectId)
   {
     var json = JsonSerializer.Serialize(new
     {

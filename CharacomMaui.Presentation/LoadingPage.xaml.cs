@@ -60,10 +60,10 @@ public partial class LoadingPage : ContentPage
     System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
     if (isValid)
     {
-      var avaterImg = await _userUseCase.GetAvatarImgStringAsync(accessToken);
-      System.Diagnostics.Debug.WriteLine($"avaterImg = {avaterImg}");
-      user!.AvatarImgString = avaterImg;
-      _statusUseCase.SetUserInfo(user);
+      // var avaterImg = await _userUseCase.GetAvatarImgStringAsync(accessToken);
+      // System.Diagnostics.Debug.WriteLine($"avaterImg = {avaterImg}");
+      // user!.AvatarImgString = avaterImg;
+      if (user != null) _statusUseCase.SetUserInfo(user);
 
       MauiApp.Current!.Windows[0].Page = new AppShell();
     }

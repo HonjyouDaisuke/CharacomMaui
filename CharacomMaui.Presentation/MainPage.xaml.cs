@@ -64,7 +64,6 @@ public partial class MainPage : ContentPage
         Id = user.id,
         Name = user.name,
         Email = user.login,
-        PictureUrl = user.avatar_url,
         BoxAccessToken = res.AccessToken,
         BoxRefreshToken = res.RefreshToken,
       };

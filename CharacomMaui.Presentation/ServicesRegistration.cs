@@ -35,6 +35,8 @@ public static class ServicesRegistration
     services.AddTransient<UpdateCharaSelectedUseCase>();
     services.AddTransient<DeleteProjectUseCase>();
     services.AddTransient<GetProjectDetailsUseCase>();
+    services.AddTransient<GetAvatarsUrlUseCase>();
+    services.AddTransient<UpdateUserInfoUseCase>();
 
     // Repository
     services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();
@@ -42,6 +44,7 @@ public static class ServicesRegistration
     services.AddTransient<IUserRepository, ApiUserRepository>();
     services.AddTransient<IProjectRepository, ProjectRepository>();
     services.AddTransient<ICharaDataRepository, CharaDataRepository>();
+    services.AddTransient<IAvatarRepository, AvatarRepository>();
 
     // API Client
     services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();

@@ -75,7 +75,6 @@ public class BoxLoginViewModel
       var window = MauiApp.Current!.Windows.FirstOrDefault();
       var pageToPush = window?.Page;
       await page!.Navigation.PushModalAsync(pageToPush);
-      //await MauiApp.Current!.MainPage.Navigation.PushModalAsync(page); ↑３行
       tokens = await tcs.Task; // ここがTask<BoxAuthResult>になる
     }
     else

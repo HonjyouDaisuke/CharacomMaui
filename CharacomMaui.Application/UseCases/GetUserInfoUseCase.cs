@@ -16,9 +16,4 @@ public class GetUserInfoUseCase
   {
     return await _repository.GetUserInfoAsync(accessToken);
   }
-
-  public async Task<string> GetAvatarImgStringAsync(string accessToken)
-  {
-    return await _repository.GetAvatarImgStringAsync(accessToken);
-  }
 }
