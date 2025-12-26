@@ -104,8 +104,11 @@ public class TitleBarViewModel : INotifyPropertyChanged
   {
     System.Diagnostics.Debug.WriteLine($"UserId{_appStatus.UserId}");
 
+    if (string.IsNullOrEmpty(_appStatus.UserId) || _appStatus.UserId.Length < 2)
+    {
+      return _appStatus.UserId ?? string.Empty;
+    }
     return _appStatus.UserId.Substring(0, 2);
-
   }
 
   private string MakeAvatarUrl()
