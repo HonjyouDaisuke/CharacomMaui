@@ -143,17 +143,24 @@ public partial class UserProfileDialog : Popup
     AvatarsLoad();
   }
 
-  private async void AvatarsLoad()
+  private async Task AvatarsLoad()
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    var avatars = await _avatarsUrlUseCase.ExecuteAsync(access_token);
-    Avatars.Clear();
-    foreach (var avatar in avatars)
+    try
     {
-      System.Diagnostics.Debug.WriteLine($"avatarURL = {avatar}");
-      Avatars.Add(avatar);
+      var access_token = Preferences.Get("app_access_token", string.Empty);
+      var avatars = await _avatarsUrlUseCase.ExecuteAsync(access_token);
+      Avatars.Clear();
+      foreach (var avatar in avatars)
+      {
+        System.Diagnostics.Debug.WriteLine($"avatarURL = {avatar}");
+        Avatars.Add(avatar);
+      }
     }
-
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"アバター読み込みエラー: {ex.Message}");
+      // TODO: ユーザーにエラーを通知
+    }
   }
 
   private async void OnOkClicked(object sender, EventArgs e)
