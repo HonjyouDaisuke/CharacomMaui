@@ -11,6 +11,7 @@ using CharacomMaui.Presentation.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Interfaces;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -22,6 +23,7 @@ public partial class UserProfileDialog : Popup
   private readonly AppStatus _appStatus;
   private readonly GetAvatarsUrlUseCase _avatarsUrlUseCase;
   private readonly UpdateUserInfoUseCase _userInfoUseCase;
+  private readonly IAppTokenStorageService _tokenStorage;
 
   public ObservableCollection<string> Avatars { get; } = new();
   // ========== Title ==========
@@ -122,7 +124,13 @@ public partial class UserProfileDialog : Popup
     set => SetValue(IsAvatarSelectModeProperty, value);
   }
 
-  public UserProfileDialog(string title, IDialogService dialogService, AppStatusNotifier notifier, AppStatus appStatus, GetAvatarsUrlUseCase avatarsUrlUseCase, UpdateUserInfoUseCase userInfoUseCase)
+  public UserProfileDialog(string title,
+                           IDialogService dialogService,
+                           AppStatusNotifier notifier,
+                           AppStatus appStatus,
+                           GetAvatarsUrlUseCase avatarsUrlUseCase,
+                           UpdateUserInfoUseCase userInfoUseCase,
+                           IAppTokenStorageService tokenStorage)
   {
     InitializeComponent();
 
@@ -133,6 +141,7 @@ public partial class UserProfileDialog : Popup
     _appStatus = appStatus;
     _avatarsUrlUseCase = avatarsUrlUseCase;
     _userInfoUseCase = userInfoUseCase;
+    _tokenStorage = tokenStorage;
     AvatarUrl = _notifier.AvatarUrl ?? string.Empty;
     AppUserName = _notifier.UserName ?? string.Empty;
     AppEmailAddress = _notifier.UserEmail ?? string.Empty;
@@ -147,8 +156,9 @@ public partial class UserProfileDialog : Popup
   {
     try
     {
-      var access_token = Preferences.Get("app_access_token", string.Empty);
-      var avatars = await _avatarsUrlUseCase.ExecuteAsync(access_token);
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      var avatars = await _avatarsUrlUseCase.ExecuteAsync(accessToken);
       Avatars.Clear();
       foreach (var avatar in avatars)
       {
@@ -169,8 +179,15 @@ public partial class UserProfileDialog : Popup
     _notifier.UserName = AppUserName;
     _notifier.UserEmail = AppEmailAddress;
     _notifier.AvatarUrl = AvatarUrl;
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    var res = await _userInfoUseCase.ExecuteAsync(access_token, _appStatus.UserId, AppUserName, AppEmailAddress, AvatarUrl);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+    {
+      System.Diagnostics.Debug.WriteLine($"エラーが発生しました。AccessTokenが取得できませんでした。");
+      await CloseAsync();
+      return;
+    }
+    var res = await _userInfoUseCase.ExecuteAsync(accessToken, _appStatus.UserId, AppUserName, AppEmailAddress, AvatarUrl);
     if (!res.Success)
     {
       System.Diagnostics.Debug.WriteLine($"エラーが発生しました。{res.Message}");

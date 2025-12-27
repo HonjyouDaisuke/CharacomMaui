@@ -3,7 +3,7 @@ using CharacomMaui.Domain.Entities;
 
 namespace CharacomMaui.Application.UseCases;
 
-public class GetUserInfoUseCase
+public class GetUserInfoUseCase : IGetUserInfoUseCase
 {
   private readonly IUserRepository _repository;
 

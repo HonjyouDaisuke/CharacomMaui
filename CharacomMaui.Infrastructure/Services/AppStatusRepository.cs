@@ -5,17 +5,6 @@ using System.Threading.Tasks;
 
 namespace CharacomMaui.Infrastructure.Services;
 
-/**
-  public string UserId { get; set; } = string.Empty;
-  public string UserName { get; set; } = string.Empty;
-  public string UserRole { get; set; } = string.Empty;
-  public string ProjectId { get; set; } = string.Empty;
-  public string ProjectFolderId { get; set; } = string.Empty;
-  public string ProjectName
-  public string CharaFolderId { get; set; } = string.Empty;
-  public string ProjectRole { get; set; } = string.Empty;
-  public string AvaterUrl { get; set; } = string.Empty;
-**/
 public class AppStatusRepository : IAppStatusRepository
 {
   private AppStatus _appStatus = new AppStatus();

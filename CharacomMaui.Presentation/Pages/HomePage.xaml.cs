@@ -1,4 +1,5 @@
-﻿using CharacomMaui.Application.UseCases;
+﻿using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.ViewModels;
 using CommunityToolkit.Maui.Extensions;
@@ -14,6 +15,7 @@ public partial class HomePage : ContentPage
   private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
   private readonly BoxFolderViewModel _boxFolderViewModel;
   private readonly BoxLoginViewModel _boxLoginViewModel;
+  private readonly IAppTokenStorageService _tokenStorage;
 
   private const string RootFolderId = "303046914186";
   private const string TEST_FOLDER_ID = "303046914186";
@@ -22,7 +24,8 @@ public partial class HomePage : ContentPage
 
   public HomePage(GetBoxConfigUseCase getBoxConfigUseCase,
                   BoxFolderViewModel boxFolderViewModel,
-                  BoxLoginViewModel boxLoginViewModel)
+                  BoxLoginViewModel boxLoginViewModel,
+                  IAppTokenStorageService tokenStorage)
   {
     try
     {
@@ -32,6 +35,7 @@ public partial class HomePage : ContentPage
       _boxFolderViewModel = boxFolderViewModel;
       _boxLoginViewModel = boxLoginViewModel;
       BindingContext = _boxFolderViewModel;
+      _tokenStorage = tokenStorage;
     }
     catch (Exception ex)
     {
@@ -75,7 +79,8 @@ public partial class HomePage : ContentPage
 
     StatusLabel.Text = "ログイン処理を開始...";
     await _boxLoginViewModel.LoginAsync();
-    var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
     System.Diagnostics.Debug.WriteLine("ユーザ情報取得開始");
     await _boxLoginViewModel.GetUserInfoAsync(accessToken);
     StatusLabel.Text = "ログイン成功！";
@@ -87,7 +92,8 @@ public partial class HomePage : ContentPage
     {
       StatusLabel.Text = "取得中...";
 
-      var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
       StatusLabel.Text = $"AccessToken = {accessToken}";
       if (string.IsNullOrEmpty(accessToken))
       {
@@ -124,7 +130,8 @@ public partial class HomePage : ContentPage
 
     try
     {
-      var accessToken = Preferences.Get(BOX_ACCESS_TOKEN, string.Empty);
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
 
       // 1. ダウンロードとViewModelへのアイテム追加（画像セットは含まない）
       await _boxFolderViewModel.LoadImageItemsAsync(accessToken, TEST_FOLDER_ID, progressHandler, cts.Token);

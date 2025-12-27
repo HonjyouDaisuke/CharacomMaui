@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 using Org.BouncyCastle.Asn1.Misc;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 
@@ -19,7 +20,8 @@ public class ApiUserRepository : IUserRepository
   public ApiUserRepository(HttpClient http)
   {
     _http = http;
-    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    if (_http.BaseAddress == null)
+      throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<AppTokenResult> CreateUserAsync(AppUser user)
@@ -37,7 +39,7 @@ public class ApiUserRepository : IUserRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("create_user.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.CreateUser, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("---------- Create User server res--------------");
     System.Diagnostics.Debug.WriteLine($"PictureUrl = {user.PictureUrl}");
@@ -86,7 +88,7 @@ public class ApiUserRepository : IUserRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("get_user_info.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetUserInfo, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Info server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
@@ -118,7 +120,7 @@ public class ApiUserRepository : IUserRepository
       avatar_url = avatarUrl,
     });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("update_user_info.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.UpdateUserInfo, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------Update User Info server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);

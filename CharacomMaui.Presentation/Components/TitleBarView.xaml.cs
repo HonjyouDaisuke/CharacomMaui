@@ -10,6 +10,7 @@ using CommunityToolkit.Maui.Extensions;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Interfaces;
 
 public partial class TitleBarView : ContentView
 {
@@ -18,6 +19,7 @@ public partial class TitleBarView : ContentView
   private AppStatus? _appStatus;
   private GetAvatarsUrlUseCase? _getAvatarsUrlUseCase;
   private UpdateUserInfoUseCase? _userInfoUseCase;
+  private IAppTokenStorageService? _tokenStorage;
   public TitleBarView()
   {
     InitializeComponent();
@@ -38,6 +40,7 @@ public partial class TitleBarView : ContentView
     _appStatus = services.GetService<AppStatus>();
     _getAvatarsUrlUseCase = services.GetService<GetAvatarsUrlUseCase>();
     _userInfoUseCase = services.GetService<UpdateUserInfoUseCase>();
+    _tokenStorage = services.GetService<IAppTokenStorageService>();
     var vm = services.GetService<TitleBarViewModel>();
 
     if (vm == null)
@@ -50,10 +53,10 @@ public partial class TitleBarView : ContentView
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)
   {
-    if (_dialogService == null || _notifier == null || _appStatus == null || _getAvatarsUrlUseCase == null || _userInfoUseCase == null)
+    if (_dialogService == null || _notifier == null || _appStatus == null || _getAvatarsUrlUseCase == null || _userInfoUseCase == null || _tokenStorage == null)
       return;
 
-    var dialog = new UserProfileDialog("ユーザー情報の更新", _dialogService, _notifier, _appStatus, _getAvatarsUrlUseCase, _userInfoUseCase);
+    var dialog = new UserProfileDialog("ユーザー情報の更新", _dialogService, _notifier, _appStatus, _getAvatarsUrlUseCase, _userInfoUseCase, _tokenStorage);
 
     await Shell.Current.ShowPopupAsync(dialog);
   }

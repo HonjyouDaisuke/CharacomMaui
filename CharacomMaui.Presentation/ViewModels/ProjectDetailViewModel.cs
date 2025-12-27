@@ -5,6 +5,7 @@ using CharacomMaui.Presentation.Models;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Application.Interfaces;
 namespace CharacomMaui.Presentation.ViewModels;
 
 public class ProjectDetailViewModel : INotifyPropertyChanged
@@ -13,6 +14,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   private readonly AppStatus _appStatus;
   GetProjectCharaItemsUseCase _useCase;
   GetProjectDetailsUseCase _getProjectDetailsUseCase;
+  private readonly IAppTokenStorageService _tokenStorage;
   private string _projectId = string.Empty;
   public string ProjectId
   {
@@ -70,11 +72,12 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     get => _participantsText;
     set => SetProperty(ref _participantsText, value);
   }
-  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus, GetProjectDetailsUseCase getProjectDetailsUseCase)
+  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus, GetProjectDetailsUseCase getProjectDetailsUseCase, IAppTokenStorageService tokenStorage)
   {
     _useCase = useCase;
     _appStatus = appStatus;
     _getProjectDetailsUseCase = getProjectDetailsUseCase;
+    _tokenStorage = tokenStorage;
   }
   public event PropertyChangedEventHandler? PropertyChanged;
   protected bool SetProperty<T>(
@@ -97,7 +100,9 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
 
   public async Task FetchCharaDataAsync(string ProjectId)
   {
-    var accessToken = Preferences.Get("app_access_token", string.Empty);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
     var charaItems = await _useCase.ExecuteAsync(accessToken, ProjectId);
     System.Diagnostics.Debug.WriteLine($"Count = {charaItems.Count}");
 
@@ -134,7 +139,10 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   {
     try
     {
-      var accessToken = Preferences.Get("app_access_token", string.Empty);
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return;
+
       var projectDetails = await _getProjectDetailsUseCase.ExecuteAsync(accessToken, projectId);
       System.Diagnostics.Debug.WriteLine($"1ProjectId = {projectId}");
       System.Diagnostics.Debug.WriteLine($"1ProjectName = {ProjectName}");
