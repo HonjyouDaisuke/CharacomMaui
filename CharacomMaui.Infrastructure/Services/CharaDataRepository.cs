@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -18,7 +19,8 @@ public class CharaDataRepository : ICharaDataRepository
   public CharaDataRepository(HttpClient http)
   {
     _http = http;
-    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    if (_http.BaseAddress == null)
+      throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<List<CharaData>> GetCharaDataAsync(string accessToken, string projectId)
@@ -30,7 +32,7 @@ public class CharaDataRepository : ICharaDataRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("get_project_chara_items.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetProjectCharaItems, content);
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("---------- GetProjectCharaItems server res--------------");
@@ -59,7 +61,7 @@ public class CharaDataRepository : ICharaDataRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("update_chara_selected.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.UpdateCharaSelected, content);
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("---------- Update CharaSelected server res--------------");

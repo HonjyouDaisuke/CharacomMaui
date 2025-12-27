@@ -21,6 +21,7 @@ public class CreateAppUserViewModel
     System.Diagnostics.Debug.WriteLine($"-----------------res-----------");
     System.Diagnostics.Debug.WriteLine($"res = {res.ToString()}");
     if (!res.Success) return false;
+    System.Diagnostics.Debug.WriteLine($"ここで保存します。");
     await _storage.SaveTokensAsync(res);
     return true;
   }

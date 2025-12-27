@@ -3,7 +3,7 @@ using CharacomMaui.Domain.Entities;
 
 namespace CharacomMaui.Application.UseCases;
 
-public class GetUserInfoUseCase
+public class GetUserInfoUseCase : IGetUserInfoUseCase
 {
   private readonly IUserRepository _repository;
 
@@ -15,10 +15,5 @@ public class GetUserInfoUseCase
   public async Task<AppUser> GetUserInfoAsync(string accessToken)
   {
     return await _repository.GetUserInfoAsync(accessToken);
-  }
-
-  public async Task<string> GetAvatarImgStringAsync(string accessToken)
-  {
-    return await _repository.GetAvatarImgStringAsync(accessToken);
   }
 }

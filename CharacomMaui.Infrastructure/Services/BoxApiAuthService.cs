@@ -46,7 +46,6 @@ public class BoxApiAuthService : IBoxApiAuthService
       name = root.GetProperty("name").GetString(),
       login = root.GetProperty("login").GetString(),
       status = root.GetProperty("status").GetString(),
-      avatar_url = root.GetProperty("avatar_url").GetString(),
     };
 
     return user;

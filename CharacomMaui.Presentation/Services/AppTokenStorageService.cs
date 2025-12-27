@@ -1,6 +1,6 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
-
+using Microsoft.Maui.Storage;
 
 namespace CharacomMaui.Presentation.Services;
 
@@ -11,11 +11,10 @@ public class AppTokenStorageService : IAppTokenStorageService
   private const string AppExpireAtKey = "app_expire_at";
 
   // --- 個別操作 ---
-
   public Task SaveAccessTokenAsync(string? accessToken)
   {
     if (accessToken is not null)
-      Preferences.Set(AppAccessTokenKey, accessToken);
+      Preferences.Set(AppAccessTokenKey, SimpleCrypto.Encrypt(accessToken));
     else
       Preferences.Remove(AppAccessTokenKey);
 
@@ -24,14 +23,23 @@ public class AppTokenStorageService : IAppTokenStorageService
 
   public Task<string?> GetAccessTokenAsync()
   {
-    var token = Preferences.Get(AppAccessTokenKey, null);
-    return Task.FromResult<string?>(token);
+    var encrypted = Preferences.Get(AppAccessTokenKey, null);
+    if (encrypted is null) return Task.FromResult<string?>(null);
+
+    try
+    {
+      return Task.FromResult(SimpleCrypto.Decrypt(encrypted));
+    }
+    catch
+    {
+      return Task.FromResult<string?>(null);
+    }
   }
 
   public Task SaveRefreshTokenAsync(string? refreshToken)
   {
     if (refreshToken is not null)
-      Preferences.Set(AppRefreshTokenKey, refreshToken);
+      Preferences.Set(AppRefreshTokenKey, SimpleCrypto.Encrypt(refreshToken));
     else
       Preferences.Remove(AppRefreshTokenKey);
 
@@ -40,21 +48,37 @@ public class AppTokenStorageService : IAppTokenStorageService
 
   public Task<string?> GetRefreshTokenAsync()
   {
-    var token = Preferences.Get(AppRefreshTokenKey, null);
-    return Task.FromResult<string?>(token);
+    var encrypted = Preferences.Get(AppRefreshTokenKey, null);
+    if (encrypted is null) return Task.FromResult<string?>(null);
+
+    try
+    {
+      return Task.FromResult(SimpleCrypto.Decrypt(encrypted));
+    }
+    catch
+    {
+      return Task.FromResult<string?>(null);
+    }
   }
 
   public Task SaveExpireAtAsync(DateTime expireAt)
   {
-    Preferences.Set(AppExpireAtKey, expireAt.ToString("O")); // ISO8601形式
+    Preferences.Set(AppExpireAtKey, SimpleCrypto.Encrypt(expireAt.ToString("O")));
     return Task.CompletedTask;
   }
 
   public Task<DateTime?> GetExpireAtAsync()
   {
-    var expireAtStr = Preferences.Get(AppExpireAtKey, null);
-    if (DateTime.TryParse(expireAtStr, out var expireAt))
-      return Task.FromResult<DateTime?>(expireAt);
+    var encrypted = Preferences.Get(AppExpireAtKey, null);
+    if (encrypted is null) return Task.FromResult<DateTime?>(null);
+
+    try
+    {
+      var decrypted = SimpleCrypto.Decrypt(encrypted);
+      if (DateTime.TryParse(decrypted, out var expireAt))
+        return Task.FromResult<DateTime?>(expireAt);
+    }
+    catch { }
 
     return Task.FromResult<DateTime?>(null);
   }
@@ -73,15 +97,19 @@ public class AppTokenStorageService : IAppTokenStorageService
     var refreshToken = await GetRefreshTokenAsync();
     var expireAt = await GetExpireAtAsync();
 
-    if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken) || expireAt == null)
+    if (string.IsNullOrEmpty(accessToken) ||
+        string.IsNullOrEmpty(refreshToken) ||
+        expireAt == null)
       return null;
 
     var expiresInSeconds = (int)(expireAt.Value - DateTime.UtcNow).TotalSeconds;
-    AppTokenResult result = new AppTokenResult();
-    result.AccessToken = accessToken;
-    result.RefreshToken = refreshToken;
-    result.ExpiresAt = expiresInSeconds;
-    return result;
+
+    return new AppTokenResult
+    {
+      AccessToken = accessToken,
+      RefreshToken = refreshToken,
+      ExpiresAt = expiresInSeconds
+    };
   }
 
   public Task ClearTokensAsync()

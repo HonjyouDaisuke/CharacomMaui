@@ -6,5 +6,5 @@ public interface IUserRepository
 {
   Task<AppTokenResult> CreateUserAsync(AppUser user);
   Task<AppUser> GetUserInfoAsync(string accessToken);
-  Task<string> GetAvatarImgStringAsync(string accessToken);
+  Task<SimpleApiResult> UpdateUserInfoAsync(string accessToken, string userId, string userName, string userEmail, string avatarUrl);
 }

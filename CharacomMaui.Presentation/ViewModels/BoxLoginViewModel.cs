@@ -1,6 +1,7 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.Models;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Infrastructure.Api;
 using CommunityToolkit.Maui.Extensions;
 using System.Text.Json;
 using MauiApp = Microsoft.Maui.Controls.Application;
@@ -11,13 +12,13 @@ public class BoxLoginViewModel
 {
   private readonly LoginToBoxUseCase _loginUseCase;
   private readonly GetBoxConfigUseCase _getBoxConfigUseCase;
-  private readonly ITokenStorageService _tokenStorage;
+  private readonly IAppTokenStorageService _tokenStorage;
 
 
   public BoxLoginViewModel(
       LoginToBoxUseCase loginUseCase,
       GetBoxConfigUseCase getBoxConfigUseCase,
-      ITokenStorageService tokenStorage)
+      IAppTokenStorageService tokenStorage)
   {
     _loginUseCase = loginUseCase;
     _getBoxConfigUseCase = getBoxConfigUseCase;
@@ -75,7 +76,6 @@ public class BoxLoginViewModel
       var window = MauiApp.Current!.Windows.FirstOrDefault();
       var pageToPush = window?.Page;
       await page!.Navigation.PushModalAsync(pageToPush);
-      //await MauiApp.Current!.MainPage.Navigation.PushModalAsync(page); ↑３行
       tokens = await tcs.Task; // ここがTask<BoxAuthResult>になる
     }
     else
@@ -89,7 +89,7 @@ public class BoxLoginViewModel
 
     }
     // TODO: BoxTokenの保存は削除する
-    await _tokenStorage.SaveTokensAsync(tokens);
+    //await _tokenStorage.SaveTokensAsync(tokens);
     return tokens;
 
   }
@@ -117,7 +117,7 @@ public class BoxLoginViewModel
     };
 
     var content = new FormUrlEncodedContent(pairs);
-    var response = await client.PostAsync("https://api.box.com/oauth2/token", content);
+    var response = await client.PostAsync(ApiEndpoints.BoxOAuth2, content);
     response.EnsureSuccessStatusCode();
 
     var json = await response.Content.ReadAsStringAsync();

@@ -1,4 +1,5 @@
-﻿using CharacomMaui.Application.UseCases;
+﻿using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.ViewModels;
 using MauiApp = Microsoft.Maui.Controls.Application;
@@ -9,11 +10,13 @@ public partial class MainPage : ContentPage
 {
   private readonly BoxLoginViewModel _boxLoginViewModel;
   private readonly CreateAppUserViewModel _createAppUserViewModel;
-  private readonly GetUserInfoUseCase _userUseCase;
+  private readonly IGetUserInfoUseCase _userUseCase;
+  private readonly IAppTokenStorageService _tokenStorage;
   private readonly AppStatusUseCase _statusUseCase;
+
   private bool _isLoginProcessing = false;
 
-  public MainPage(GetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase)
+  public MainPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
   {
     try
     {
@@ -25,6 +28,7 @@ public partial class MainPage : ContentPage
       BindingContext = _boxLoginViewModel;
       _userUseCase = userUseCase;
       _statusUseCase = statusUseCase;
+      _tokenStorage = tokenStorage;
     }
     catch (Exception ex)
     {
@@ -64,7 +68,6 @@ public partial class MainPage : ContentPage
         Id = user.id,
         Name = user.name,
         Email = user.login,
-        PictureUrl = user.avatar_url,
         BoxAccessToken = res.AccessToken,
         BoxRefreshToken = res.RefreshToken,
       };
@@ -79,7 +82,8 @@ public partial class MainPage : ContentPage
       }
 
       LogEditor.Text += "ユーザー情報を保存しました...\n";
-      var accessToken = Preferences.Get("app_access_token", string.Empty);
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
       LogEditor.Text += $"app AccessToken = {accessToken}\n";
       var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
       _statusUseCase.SetUserInfo(userInfo);
@@ -102,11 +106,9 @@ public partial class MainPage : ContentPage
 
   private async void OnNewPageButtonClick(object sender, EventArgs e)
   {
-    var window = MauiApp.Current?.Windows.FirstOrDefault();
-    if (window != null)
-    {
-      window.Page = new AppShell();
-    }
+    await SecureStorage.SetAsync("test", "hello");
+    var v = await SecureStorage.GetAsync("test");
+    LogEditor.Text += v; // "hello" が出れば SecureStorage OK
   }
 
 }

@@ -138,7 +138,7 @@ public partial class ProjectDetailPage : ContentPage
       System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} folder{e.ProjectFolderId} chara{e.CharaFolderId})\n");
       LogEditor.Text += $"編集: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} [ {e.ProjectFolderId} ][ {e.CharaFolderId} ]\n";
       LogEditor.Text += "プロジェクトの更新！！\n";
-      // var accessToken = Preferences.Get("app_access_token", string.Empty);
+
       var topFolderItems = await _createViewModel.GetFolderItemsAsync();
       var project = MakeProjectFromEventArgs(e);
 
