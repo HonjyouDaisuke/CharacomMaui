@@ -1,9 +1,11 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Box.Sdk.Gen.Managers;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Api;
@@ -46,7 +48,7 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
 
         // folderItems を List<BoxItem> に変換
         var folderItems = JsonSerializer.Deserialize<List<BoxItem>>(folderItemsElement.GetRawText());
-
+        if (folderItems == null) return [];
         foreach (var item in folderItems)
         {
           Console.WriteLine($"{item.Id}: {item.Name} ({item.Type})");
@@ -57,11 +59,12 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
 
       var message = root.GetProperty("message").GetString();
       System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
-      return null;
+      return [];
     }
-    catch
+    catch (Exception ex)
     {
-      return null;
+      System.Diagnostics.Debug.WriteLine($"GetFolderItemsAsync エラー: {ex.Message}");
+      return [];
     }
   }
 }
