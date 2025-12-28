@@ -3,6 +3,8 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Application.Interfaces;
+using CommunityToolkit.Maui.Converters;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -14,6 +16,7 @@ public partial class CreateProjectViewModel : ObservableObject
   private readonly UpdateStrokeMasterUseCase _updateStrokeMasterUseCase;
   private readonly UpdateStandardMasterUseCase _updateStandardMasterUseCase;
   private readonly DeleteProjectUseCase _deleteProjectUseCase;
+  private readonly IAppTokenStorageService _tokenStorage;
   private BoxItem _selectedFolder = new();
 
   public AppStatus _appStatus = new();
@@ -38,7 +41,8 @@ public partial class CreateProjectViewModel : ObservableObject
                                 GetUserProjectsUseCase getUserProjectsUseCase,
                                 UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
                                 UpdateStandardMasterUseCase updateStandardMasterUseCase,
-                                DeleteProjectUseCase deleteProjectUseCase)
+                                DeleteProjectUseCase deleteProjectUseCase,
+                                IAppTokenStorageService tokenStorage)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
     _createOrUpdateProjectUsecase = createOrUpdateProjectUseCase;
@@ -46,25 +50,48 @@ public partial class CreateProjectViewModel : ObservableObject
     _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
     _updateStandardMasterUseCase = updateStandardMasterUseCase;
     _deleteProjectUseCase = deleteProjectUseCase;
+    _tokenStorage = tokenStorage;
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string? folderId = null)
   {
-    var accessToken = Preferences.Get("app_access_token", string.Empty);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
     Debug.WriteLine($"AppAccessToken : {accessToken}");
+    if (accessToken == null)
+    {
+      System.Diagnostics.Debug.WriteLine("AccessTokenの取得に失敗しました。");
+      return [];
+    }
     return await _getFolderItemsUsecase.ExecuteAsync(accessToken, folderId);
   }
 
   public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(Project project)
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _createOrUpdateProjectUsecase.ExecuteAsync(access_token, project);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+    {
+      System.Diagnostics.Debug.WriteLine("AccessTokenの取得に失敗しました。");
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = "AccessTokenの取得に失敗しました。"
+      };
+    }
+    return await _createOrUpdateProjectUsecase.ExecuteAsync(accessToken, project);
   }
 
   public async Task<List<Project>?> GetProjectsAsync()
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _getUserProjectsUseCase.GetProjectsInfoAsync(access_token);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+    {
+      System.Diagnostics.Debug.WriteLine("AccessTokenの取得に失敗しました。");
+      return null;
+    }
+    return await _getUserProjectsUseCase.GetProjectsInfoAsync(accessToken);
   }
 
   public AppStatus AppStatus
@@ -87,20 +114,41 @@ public partial class CreateProjectViewModel : ObservableObject
 
   public async Task<SimpleApiResult> UpdateStrokeAsync()
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _updateStrokeMasterUseCase.ExecuteAsync(access_token);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = "AccessTokenの取得に失敗しました。"
+      };
+    return await _updateStrokeMasterUseCase.ExecuteAsync(accessToken);
   }
 
   public async Task<SimpleApiResult> UpdateStandardAsync()
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _updateStandardMasterUseCase.ExecuteAsync(access_token);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = "AccessTokenの取得に失敗しました。"
+      };
+    return await _updateStandardMasterUseCase.ExecuteAsync(accessToken);
   }
 
   public async Task<SimpleApiResult> DeleteProjectAsync(string projectId)
   {
-    var access_token = Preferences.Get("app_access_token", string.Empty);
-    return await _deleteProjectUseCase.ExecuteAsync(access_token, projectId);
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null)
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = "AccessTokenの取得に失敗しました。"
+      };
+    return await _deleteProjectUseCase.ExecuteAsync(accessToken, projectId);
   }
 }
 

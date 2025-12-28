@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -17,7 +18,8 @@ public class ProjectRepository : IProjectRepository
   public ProjectRepository(HttpClient http)
   {
     _http = http;
-    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    if (_http.BaseAddress == null)
+      throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(string accessToken, Project project)
@@ -34,7 +36,7 @@ public class ProjectRepository : IProjectRepository
     System.Diagnostics.Debug.WriteLine($"更新するデータ：名前{project.Name} 説明{project.Description}");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("create_or_update_project.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.CreateOrUpdateProject, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------create Project server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
@@ -79,7 +81,7 @@ public class ProjectRepository : IProjectRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("get_user_projects.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetUserProjects, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
@@ -101,7 +103,7 @@ public class ProjectRepository : IProjectRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync("get_user_projects.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetUserProjects, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
@@ -141,7 +143,7 @@ public class ProjectRepository : IProjectRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("project_delete.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.ProjectDelete, content);
     if (!res.IsSuccessStatusCode)
     {
       return new SimpleApiResult
@@ -187,7 +189,7 @@ public class ProjectRepository : IProjectRepository
       };
     }
   }
-  public async Task<ProjectDetails?> GetProjectDetailsAsync(string accessToken, string projectId)
+  public async Task<ProjectDetails> GetProjectDetailsAsync(string accessToken, string projectId)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -197,7 +199,7 @@ public class ProjectRepository : IProjectRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("get_project_details.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetProjectDetails, content);
     if (!res.IsSuccessStatusCode) return null;
     var responseBody = await res.Content.ReadAsStringAsync();
 

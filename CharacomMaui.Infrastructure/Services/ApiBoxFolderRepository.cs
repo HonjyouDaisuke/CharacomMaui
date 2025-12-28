@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -16,7 +17,8 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
   public ApiBoxFolderRepository(HttpClient http)
   {
     _http = http;
-    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    if (_http.BaseAddress == null)
+      throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string? folderId = null)
@@ -28,7 +30,8 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
     });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("get_folder_items.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetFolderItems, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("----------server res--------------");

@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -16,7 +17,8 @@ public class StrokeMasterRepository : IStrokeMasterRepository
   public StrokeMasterRepository(HttpClient http)
   {
     _http = http;
-    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    if (_http.BaseAddress == null)
+      throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<SimpleApiResult> UpdateStrokeMasterAsync(string accessToken)
@@ -28,7 +30,7 @@ public class StrokeMasterRepository : IStrokeMasterRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("create_stroke_master.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.CreateStrokeMaster, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------stroke master server res--------------");
     System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
@@ -75,7 +77,8 @@ public class StrokeMasterRepository : IStrokeMasterRepository
     });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync("get_stroke_file_id.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.GetStrokeFileId, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------stroke master get file id server res--------------");
     System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");

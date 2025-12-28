@@ -23,7 +23,7 @@ public class AppStatusUseCase
     _status.UserName = userInfo.Name;
     _status.UserRole = userInfo.RoleId;
     _status.AvatarUrl = userInfo.PictureUrl;
-    _status.AvatarImgString = userInfo.AvatarImgString;
+    _status.UserEmail = userInfo.Email;
   }
 
   // プロジェクト情報をセット

@@ -7,17 +7,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
 public class ApiTokenValidationService : ITokenValidationService
 {
-  private readonly HttpClient _httpClient;
+  private readonly HttpClient _http;
 
-  public ApiTokenValidationService(HttpClient httpClient)
+  public ApiTokenValidationService(HttpClient http)
   {
-    _httpClient = httpClient;
-    _httpClient.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
+    _http = http;
+    if (_http.BaseAddress == null)
+      throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<TokenValidationResult> ValidateAsync(string accessToken)
@@ -29,7 +31,7 @@ public class ApiTokenValidationService : ITokenValidationService
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _httpClient.PostAsync("check_access_token.php", content);
+    var res = await _http.PostAsync(ApiEndpoints.CheckAccessToken, content);
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("----------server res check accessToken--------------");
