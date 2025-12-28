@@ -8,24 +8,22 @@ namespace CharacomMaui.Presentation;
 
 public partial class LoadingPage : ContentPage
 {
-  private readonly IGetUserInfoUseCase _userUseCase;
+  private readonly GetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
-  private readonly IAppTokenStorageService _tokenStorage;
-  public LoadingPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
+  public LoadingPage(GetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase)
   {
     InitializeComponent();
 
     _userUseCase = userUseCase;
     _statusUseCase = statusUseCase;
-    _tokenStorage = tokenStorage;
   }
 
   protected override async void OnAppearing()
   {
     base.OnAppearing();
     System.Diagnostics.Debug.WriteLine($"スタート----");
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
+
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
     var tokenService = ServiceHelper.GetService<ITokenValidationService>();
     bool isValid = false;
     System.Diagnostics.Debug.WriteLine($"チェック開始 : {accessToken}");
@@ -42,7 +40,7 @@ public partial class LoadingPage : ContentPage
       {
         isValid = false;
         System.Diagnostics.Debug.WriteLine($"Error --tokenRes isValid = {isValid}");
-        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase);
         return;
       }
     }
@@ -50,7 +48,7 @@ public partial class LoadingPage : ContentPage
     if (!isValid)
     {
       System.Diagnostics.Debug.WriteLine($"TokenError = {isValid}");
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase);
       return;
     }
     var user = await _userUseCase.GetUserInfoAsync(accessToken);
@@ -62,16 +60,16 @@ public partial class LoadingPage : ContentPage
     System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
     if (isValid)
     {
-      if (isValid)
-      {
-        if (user != null) _statusUseCase.SetUserInfo(user);
-      }
+      var avaterImg = await _userUseCase.GetAvatarImgStringAsync(accessToken);
+      System.Diagnostics.Debug.WriteLine($"avaterImg = {avaterImg}");
+      user!.AvatarImgString = avaterImg;
+      _statusUseCase.SetUserInfo(user);
 
       MauiApp.Current!.Windows[0].Page = new AppShell();
     }
     else
     {
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase);
     }
   }
 }

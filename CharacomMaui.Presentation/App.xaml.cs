@@ -1,20 +1,17 @@
 ﻿using System.Web;
-using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 
 namespace CharacomMaui.Presentation;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {
-  private readonly IGetUserInfoUseCase _userUseCase;
+  private readonly GetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
-  private readonly IAppTokenStorageService _tokenStorage;
-  public App(IGetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
+  public App(GetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase)
   {
     InitializeComponent();
     _userUseCase = userUserCase;
     _statusUseCase = statusUseCase;
-    _tokenStorage = tokenStorage;
   }
 
 
@@ -50,7 +47,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
   protected override Window CreateWindow(IActivationState? activationState)
   {
-    var window = new Window(new LoadingPage(_userUseCase, _statusUseCase, _tokenStorage));
+    var window = new Window(new LoadingPage(_userUseCase, _statusUseCase));
 
     window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
     return window;

@@ -8,9 +8,8 @@ using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace CharacomMaui.Presentation.DependencyInjection;
+namespace CharacomMaui.Presentation;
 
 public static class ServicesRegistration
 {
@@ -21,7 +20,7 @@ public static class ServicesRegistration
     services.AddTransient<GetBoxConfigUseCase>();
     services.AddTransient<CreateOrUpdateProjectUseCase>();
     services.AddTransient<GetUserProjectsUseCase>();
-    services.AddTransient<IGetUserInfoUseCase, GetUserInfoUseCase>();
+    services.AddTransient<GetUserInfoUseCase>();
     services.AddTransient<GetProjectCharaItemsUseCase>();
     services.AddSingleton<AppStatusUseCase>();
     services.AddTransient<LoginToBoxUseCase>();
@@ -36,15 +35,21 @@ public static class ServicesRegistration
     services.AddTransient<UpdateCharaSelectedUseCase>();
     services.AddTransient<DeleteProjectUseCase>();
     services.AddTransient<GetProjectDetailsUseCase>();
-    services.AddTransient<GetAvatarsUrlUseCase>();
-    services.AddTransient<UpdateUserInfoUseCase>();
 
     // Repository
+    services.AddTransient<IBoxFolderRepository, ApiBoxFolderRepository>();
     services.AddSingleton<IAppStatusRepository, AppStatusRepository>();
+    services.AddTransient<IUserRepository, ApiUserRepository>();
+    services.AddTransient<IProjectRepository, ProjectRepository>();
+    services.AddTransient<ICharaDataRepository, CharaDataRepository>();
 
     // API Client
     services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();
+    services.AddHttpClient<ITokenValidationService, ApiTokenValidationService>();
     services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
+    services.AddHttpClient<IStrokeMasterRepository, StrokeMasterRepository>();
+    services.AddHttpClient<IStandardMasterRepository, StandardMasterRepository>();
+    services.AddHttpClient<IFetchBoxItemContentService, FetchBoxItemContentService>();
 
     // ViewModel
     services.AddSingleton<BoxLoginViewModel>();
@@ -63,6 +68,7 @@ public static class ServicesRegistration
 
     // Infrastructure Service
     services.AddSingleton<IBoxApiAuthService, BoxApiAuthService>();
+    services.AddSingleton<ITokenStorageService, TokenStorageService>();
     services.AddSingleton<IAppTokenStorageService, AppTokenStorageService>();
 
     // PageのDI

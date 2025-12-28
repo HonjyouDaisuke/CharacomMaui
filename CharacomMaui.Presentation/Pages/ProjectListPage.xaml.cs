@@ -64,7 +64,7 @@ public partial class ProjectListPage : ContentPage
     System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription})\n");
     LogEditor.Text += $"編集: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} {e.ProjectFolderId} {e.CharaFolderId}\n";
     LogEditor.Text += "プロジェクトの更新！！\n";
-
+    // var accessToken = Preferences.Get("app_access_token", string.Empty);
     var topFolderItems = await _viewModel.GetFolderItemsAsync();
     var project = makeProjectFromEventArgs(e);
 
@@ -145,7 +145,7 @@ public partial class ProjectListPage : ContentPage
   private async void OnCreateProjectBtn(object? sender, EventArgs e)
   {
     LogEditor.Text += "プロジェクトの新規作成\n";
-
+    // var accessToken = Preferences.Get("app_access_token", string.Empty);
     var topFolderItems = await _viewModel.GetFolderItemsAsync();
 
     var dialog = new CreateProjectDialog("プロジェクトの新規作成", topFolderItems, _dialogService, _viewModel);

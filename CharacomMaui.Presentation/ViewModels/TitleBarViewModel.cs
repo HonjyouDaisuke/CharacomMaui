@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
 
 namespace CharacomMaui.Presentation.ViewModels;
@@ -8,7 +7,6 @@ namespace CharacomMaui.Presentation.ViewModels;
 public class TitleBarViewModel : INotifyPropertyChanged
 {
   private readonly AppStatusNotifier _notifier;
-  private readonly AppStatus _appStatus;
 
   // バインディング用プロパティ
   private string titleString = string.Empty;
@@ -20,35 +18,6 @@ public class TitleBarViewModel : INotifyPropertyChanged
       if (titleString != value)
       {
         titleString = value;
-        OnPropertyChanged();
-      }
-    }
-  }
-
-  // avaterText
-  private string avatarString = string.Empty;
-  public string AvatarString
-  {
-    get => avatarString;
-    set
-    {
-      if (avatarString != value)
-      {
-        avatarString = value;
-        OnPropertyChanged();
-      }
-    }
-  }
-
-  private string avatarUrl = string.Empty;
-  public string AvatarUrl
-  {
-    get => avatarUrl;
-    set
-    {
-      if (avatarUrl != value)
-      {
-        avatarUrl = value;
         OnPropertyChanged();
       }
     }
@@ -70,50 +39,19 @@ public class TitleBarViewModel : INotifyPropertyChanged
 
   public string ProjectName => _notifier.ProjectName;
 
-  public TitleBarViewModel(AppStatusNotifier notifier, AppStatus appStatus)
+  public TitleBarViewModel(AppStatusNotifier notifier)
   {
-    System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
     _notifier = notifier;
-    _appStatus = appStatus;
 
     // AppStatusNotifier の変更を購読
-    _notifier.PropertyChanged += (_, e) =>
+    _notifier.PropertyChanged += (_, __) =>
     {
-      System.Diagnostics.Debug.WriteLine($"[VM] PropertyChanged name = '{e.PropertyName}'");
-      if (e.PropertyName == nameof(AppStatusNotifier.ProjectName))
-      {
-        TitleString = MakeTitleString();
-      }
-
-      if (e.PropertyName == nameof(AppStatusNotifier.AvatarUrl))
-      {
-        System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
-
-        System.Diagnostics.Debug.WriteLine($"[viewmodel] avatar changed = {_notifier.AvatarUrl}");
-        AvatarUrl = _notifier.AvatarUrl;
-      }
+      OnPropertyChanged(nameof(ProjectName));
+      System.Diagnostics.Debug.WriteLine($"Notifier!!{_notifier.ProjectName}");
+      TitleString = MakeTitleString();
     };
 
-
     TitleString = MakeTitleString();
-    AvatarString = MakeAvatarString();
-    AvatarUrl = MakeAvatarUrl();
-  }
-
-  private string MakeAvatarString()
-  {
-    System.Diagnostics.Debug.WriteLine($"UserId{_appStatus.UserId}");
-
-    if (string.IsNullOrEmpty(_appStatus.UserId) || _appStatus.UserId.Length < 2)
-    {
-      return _appStatus.UserId ?? string.Empty;
-    }
-    return _appStatus.UserId.Substring(0, 2);
-  }
-
-  private string MakeAvatarUrl()
-  {
-    return _notifier.AvatarUrl;
   }
 
   private string MakeTitleString()

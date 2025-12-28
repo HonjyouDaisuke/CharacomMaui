@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Api;
 using Org.BouncyCastle.Asn1.Misc;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 
@@ -20,8 +19,7 @@ public class ApiUserRepository : IUserRepository
   public ApiUserRepository(HttpClient http)
   {
     _http = http;
-    if (_http.BaseAddress == null)
-      throw new Exception("HttpClient.BaseAddress is NULL");
+    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
   public async Task<AppTokenResult> CreateUserAsync(AppUser user)
@@ -39,10 +37,9 @@ public class ApiUserRepository : IUserRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    var res = await _http.PostAsync(ApiEndpoints.CreateUser, content);
+    var res = await _http.PostAsync("create_user.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("---------- Create User server res--------------");
-    System.Diagnostics.Debug.WriteLine($"PictureUrl = {user.PictureUrl}");
+    System.Diagnostics.Debug.WriteLine("----------server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
     try
     {
@@ -88,9 +85,10 @@ public class ApiUserRepository : IUserRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync(ApiEndpoints.GetUserInfo, content);
+    var res = await _http.PostAsync("get_user_info.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------User Info server res--------------");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
     System.Diagnostics.Debug.WriteLine(responseBody);
 
     var response = JsonDocument.Parse(responseBody).RootElement;
@@ -110,51 +108,28 @@ public class ApiUserRepository : IUserRepository
       RoleId = response.GetProperty("role_id").GetString(),
     };
   }
-  public async Task<SimpleApiResult> UpdateUserInfoAsync(string accessToken, string userId, string userName, string userEmail, string avatarUrl)
+
+  public async Task<string> GetAvatarImgStringAsync(string accessToken)
   {
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
-      user_name = userName,
-      user_email = userEmail,
-      avatar_url = avatarUrl,
     });
+
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync(ApiEndpoints.UpdateUserInfo, content);
+    var res = await _http.PostAsync("get_user_avatar.php", content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------Update User Info server res--------------");
+    var response = JsonDocument.Parse(responseBody).RootElement;
+    System.Diagnostics.Debug.WriteLine("----------User Avatar server res--------------");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
     System.Diagnostics.Debug.WriteLine(responseBody);
+    var success = response.GetProperty("success").GetBoolean();
 
-    try
+    if (!success)
     {
-      var root = JsonDocument.Parse(responseBody).RootElement;
-
-      if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
-      {
-        System.Diagnostics.Debug.WriteLine("こっち");
-        return new SimpleApiResult
-        {
-          Success = true,
-          Message = "Success Update User Info...",
-        };
-      }
-
-
-      var message = root.GetProperty("message").GetString();
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
-      return new SimpleApiResult
-      {
-        Success = false,
-        Message = $"サーバーエラー: {message}",
-      };
+      return null;
     }
-    catch (Exception ex)
-    {
-      return new SimpleApiResult
-      {
-        Success = false,
-        Message = $"想定外のエラーが発生しました。。。{ex.Message}",
-      };
-    }
+
+    return response.GetProperty("avatar_base64").GetString();
   }
 }

@@ -1,58 +1,58 @@
 using CharacomMaui.Application.Interfaces;
-using CharacomMaui.Domain.Entities;
+using CharacomMaui.Application.Models;
 
 
 namespace CharacomMaui.Presentation.Services;
 
-public class AppTokenStorageService : IAppTokenStorageService
+public class TokenStorageService : ITokenStorageService
 {
-  private const string AppAccessTokenKey = "app_access_token";
-  private const string AppRefreshTokenKey = "app_refresh_token";
-  private const string AppExpireAtKey = "app_expire_at";
+  private const string AccessTokenKey = "box_access_token";
+  private const string RefreshTokenKey = "box_refresh_token";
+  private const string ExpireAtKey = "box_expire_at";
 
   // --- 個別操作 ---
 
   public Task SaveAccessTokenAsync(string? accessToken)
   {
     if (accessToken is not null)
-      Preferences.Set(AppAccessTokenKey, accessToken);
+      Preferences.Set(AccessTokenKey, accessToken);
     else
-      Preferences.Remove(AppAccessTokenKey);
+      Preferences.Remove(AccessTokenKey);
 
     return Task.CompletedTask;
   }
 
   public Task<string?> GetAccessTokenAsync()
   {
-    var token = Preferences.Get(AppAccessTokenKey, null);
+    var token = Preferences.Get(AccessTokenKey, null);
     return Task.FromResult<string?>(token);
   }
 
   public Task SaveRefreshTokenAsync(string? refreshToken)
   {
     if (refreshToken is not null)
-      Preferences.Set(AppRefreshTokenKey, refreshToken);
+      Preferences.Set(RefreshTokenKey, refreshToken);
     else
-      Preferences.Remove(AppRefreshTokenKey);
+      Preferences.Remove(RefreshTokenKey);
 
     return Task.CompletedTask;
   }
 
   public Task<string?> GetRefreshTokenAsync()
   {
-    var token = Preferences.Get(AppRefreshTokenKey, null);
+    var token = Preferences.Get(RefreshTokenKey, null);
     return Task.FromResult<string?>(token);
   }
 
   public Task SaveExpireAtAsync(DateTime expireAt)
   {
-    Preferences.Set(AppExpireAtKey, expireAt.ToString("O")); // ISO8601形式
+    Preferences.Set(ExpireAtKey, expireAt.ToString("O")); // ISO8601形式
     return Task.CompletedTask;
   }
 
   public Task<DateTime?> GetExpireAtAsync()
   {
-    var expireAtStr = Preferences.Get(AppExpireAtKey, null);
+    var expireAtStr = Preferences.Get(ExpireAtKey, null);
     if (DateTime.TryParse(expireAtStr, out var expireAt))
       return Task.FromResult<DateTime?>(expireAt);
 
@@ -60,14 +60,14 @@ public class AppTokenStorageService : IAppTokenStorageService
   }
 
   // --- 一括保存 ---
-  public async Task SaveTokensAsync(AppTokenResult tokens)
+  public async Task SaveTokensAsync(BoxAuthResult tokens)
   {
     await SaveAccessTokenAsync(tokens.AccessToken);
     await SaveRefreshTokenAsync(tokens.RefreshToken);
     await SaveExpireAtAsync(DateTime.UtcNow.AddSeconds(tokens.ExpiresAt));
   }
 
-  public async Task<AppTokenResult?> GetTokensAsync()
+  public async Task<BoxAuthResult?> GetTokensAsync()
   {
     var accessToken = await GetAccessTokenAsync();
     var refreshToken = await GetRefreshTokenAsync();
@@ -77,7 +77,7 @@ public class AppTokenStorageService : IAppTokenStorageService
       return null;
 
     var expiresInSeconds = (int)(expireAt.Value - DateTime.UtcNow).TotalSeconds;
-    AppTokenResult result = new AppTokenResult();
+    BoxAuthResult result = new BoxAuthResult();
     result.AccessToken = accessToken;
     result.RefreshToken = refreshToken;
     result.ExpiresAt = expiresInSeconds;
@@ -86,9 +86,9 @@ public class AppTokenStorageService : IAppTokenStorageService
 
   public Task ClearTokensAsync()
   {
-    Preferences.Remove(AppAccessTokenKey);
-    Preferences.Remove(AppRefreshTokenKey);
-    Preferences.Remove(AppExpireAtKey);
+    Preferences.Remove(AccessTokenKey);
+    Preferences.Remove(RefreshTokenKey);
+    Preferences.Remove(ExpireAtKey);
     return Task.CompletedTask;
   }
 }

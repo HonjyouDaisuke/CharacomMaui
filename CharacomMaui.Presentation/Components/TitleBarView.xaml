@@ -2,7 +2,6 @@
 <ContentView
   x:Class="CharacomMaui.Presentation.Components.TitleBarView"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-  xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
   <Grid Padding="0,0,10,0">
@@ -17,18 +16,21 @@
            FontSize="24"/>
 
     <!-- ▼ Avatar -->
-    <toolkit:AvatarView
-      Text="{Binding AvatarString}"
-      WidthRequest="40"
-      HeightRequest="40"
-      BorderWidth="0"
-      Padding="0"
-      HorizontalOptions="End"
-      ImageSource="{Binding AvatarUrl}">
-      <toolkit:AvatarView.GestureRecognizers>
-        <TapGestureRecognizer Tapped="OnAvatarViewTapped"
-                              NumberOfTapsRequired="1"/>
-      </toolkit:AvatarView.GestureRecognizers>
-    </toolkit:AvatarView>
+    <Border Grid.Column="1"
+            Stroke="LightGray"
+            StrokeThickness="1"
+            WidthRequest="36"
+            HeightRequest="36"
+            VerticalOptions="Center"
+            HorizontalOptions="End">
+      <Image Source="{Binding AvatarImageSource}"
+             Aspect="AspectFill">
+        <Image.Clip>
+          <EllipseGeometry Center="18,18"
+                           RadiusX="18"
+                           RadiusY="18"/>
+        </Image.Clip>
+      </Image>
+    </Border>
   </Grid>
 </ContentView>

@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
-using CharacomMaui.Infrastructure.Api;
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -18,8 +17,7 @@ public class FetchBoxItemContentService : IFetchBoxItemContentService
   public FetchBoxItemContentService(HttpClient http)
   {
     _http = http;
-    if (_http.BaseAddress == null)
-      throw new Exception("HttpClient.BaseAddress is NULL");
+    _http.BaseAddress = new Uri("http://localhost:8888/CharacomMauiHP/api/");
   }
 
   public async Task<FetchImageResult> FetchImageData(string accessToken, string fileId)
@@ -31,7 +29,7 @@ public class FetchBoxItemContentService : IFetchBoxItemContentService
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync(ApiEndpoints.FetchBoxItem, content);
+    var res = await _http.PostAsync("fetch_box_item.php", content);
     // Content-Type を取得
     var contentType = res.Content.Headers.ContentType?.MediaType;
 
@@ -69,7 +67,7 @@ public class FetchBoxItemContentService : IFetchBoxItemContentService
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync(ApiEndpoints.FetchBoxThumbnail, content);
+    var res = await _http.PostAsync("fetch_box_thumbnail.php", content);
     // Content-Type を取得
     var contentType = res.Content.Headers.ContentType?.MediaType;
 

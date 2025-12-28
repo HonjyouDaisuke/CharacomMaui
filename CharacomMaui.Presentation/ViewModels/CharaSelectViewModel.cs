@@ -1,7 +1,6 @@
 
 using System.Collections.ObjectModel;
 using CharacomMaui.Application.ImageProcessing;
-using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
@@ -34,7 +33,6 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly GetStrokeFileIdUseCase _getStrokeFileIdUseCase;
   readonly FetchBoxItemUseCase _fetchBoxItemUseCase;
   readonly UpdateCharaSelectedUseCase _updateCharaSelectUseCase;
-  readonly IAppTokenStorageService _tokenStorage;
   AppStatus _appStatus;
 
   private List<CharaData> allCharaData = new();
@@ -54,8 +52,7 @@ public partial class CharaSelectViewModel : ObservableObject
                               GetStandardFileIdUseCase getStandardFileIdUseCase,
                               GetStrokeFileIdUseCase getStrokeFileIdUseCase,
                               UpdateCharaSelectedUseCase updateCharaSelectedUseCase,
-                              IDialogService dialogService,
-                              IAppTokenStorageService tokenStorage)
+                              IDialogService dialogService)
   {
     _useCase = useCase;
     _appStatus = appStatus;
@@ -64,7 +61,6 @@ public partial class CharaSelectViewModel : ObservableObject
     _getStrokeFileIdUseCase = getStrokeFileIdUseCase;
     _updateCharaSelectUseCase = updateCharaSelectedUseCase;
     _dialogService = dialogService;
-    _tokenStorage = tokenStorage;
     // CharaButtonCommand = new AsyncRelayCommand<string>(OnCharaTapped);
   }
 
@@ -88,9 +84,8 @@ public partial class CharaSelectViewModel : ObservableObject
 
   private async Task LoadCharaItemsCoreAsync()
   {
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return;
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
+
     // Projectデータ読み込み
     await LoadProjectItems(accessToken);
 
@@ -287,9 +282,7 @@ public partial class CharaSelectViewModel : ObservableObject
     using (await _dialogService.DisplayProgressAsync("文字選択画面準備中", "画面を準備しています。しばらくお待ち下さい。"))
     {
       System.Diagnostics.Debug.WriteLine($"OnChangeSelect: Chara={charaName}, Material={materialName} -- 前回 Chara={_appStatus.CharaName}, Material={_appStatus.MaterialName}  ");
-      var tokens = await _tokenStorage.GetTokensAsync();
-      var accessToken = tokens?.AccessToken;
-      if (accessToken == null) return;
+      var accessToken = Preferences.Get("app_access_token", string.Empty);
       _appStatus.CharaName = charaName;
       _appStatus.MaterialName = materialName;
       if (previousCharaName != charaName)
@@ -332,9 +325,7 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public async Task<bool> UpdateCharaSelected(string charaId, bool isSelected)
   {
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return false;
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
     var result = await _updateCharaSelectUseCase.ExecuteAsync(accessToken, charaId, isSelected);
 
     foreach (var item in CurrentCharaItems)
@@ -348,9 +339,7 @@ public partial class CharaSelectViewModel : ObservableObject
 
   public async Task<byte[]?> GetImageFromFileIdAsync(string fileId)
   {
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return [];
+    var accessToken = Preferences.Get("app_access_token", string.Empty);
     return await LoadImageAsync(accessToken, fileId);
   }
 
