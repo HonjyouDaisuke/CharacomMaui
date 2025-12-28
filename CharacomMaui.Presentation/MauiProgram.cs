@@ -39,8 +39,10 @@ public static class MauiProgram
         });
 
 
-    using var stream =
-     FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
+    using var stream = typeof(MauiProgram).Assembly
+      .GetManifestResourceStream("CharacomMaui.Presentation.Resources.Raw.appsettings.json");
+    if (stream == null)
+      throw new FileNotFoundException("appsettings.json not found");
     builder.Configuration.AddJsonStream(stream);
 
     builder.Services.Configure<ApiSettings>(
