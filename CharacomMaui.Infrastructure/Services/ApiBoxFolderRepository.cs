@@ -18,7 +18,7 @@ public class ApiBoxFolderRepository : IBoxFolderRepository
   {
     _http = http;
     if (_http.BaseAddress == null)
-      throw new Exception("HttpClient.BaseAddress is NULL");
+      throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<List<BoxItem>> GetFolderItemsAsync(string accessToken, string? folderId = null)
