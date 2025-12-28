@@ -18,7 +18,7 @@ public class StandardMasterRepository : IStandardMasterRepository
   {
     _http = http;
     if (_http.BaseAddress == null)
-      throw new Exception("HttpClient.BaseAddress is NULL");
+      throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
   public async Task<SimpleApiResult> UpdateStandardMasterAsync(string accessToken)
