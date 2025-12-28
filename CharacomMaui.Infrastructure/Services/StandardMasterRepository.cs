@@ -31,6 +31,7 @@ public class StandardMasterRepository : IStandardMasterRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.CreateStandardMaster, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------stroke master server res--------------");
     System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
