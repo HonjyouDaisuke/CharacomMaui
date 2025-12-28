@@ -79,6 +79,7 @@ public class StandardMasterRepository : IStandardMasterRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.GetStandardFileId, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------standard master get file id server res--------------");
     System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}  ");
