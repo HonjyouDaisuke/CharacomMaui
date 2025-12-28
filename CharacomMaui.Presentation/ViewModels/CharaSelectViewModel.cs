@@ -79,7 +79,7 @@ public partial class CharaSelectViewModel : ObservableObject
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"[GetCharaItem Error] {ex.Message}");
-      await Shell.Current.DisplayAlert("エラー", $"個別画像の取得でエラーが発生しました。{ex.Message}", "OK");
+      await Shell.Current.DisplayAlert("エラー", $"個別画像の取得でエラーが発生しました。", "OK");
     }
     finally
     {
