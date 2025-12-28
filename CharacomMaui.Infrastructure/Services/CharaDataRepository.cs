@@ -33,6 +33,7 @@ public class CharaDataRepository : ICharaDataRepository
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.GetProjectCharaItems, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("---------- GetProjectCharaItems server res--------------");
