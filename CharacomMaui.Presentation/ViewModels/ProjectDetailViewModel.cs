@@ -163,7 +163,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error loading project details: {ex.Message}");
-      await SnackBarService.Error($"プロジェクト詳細の読み込みに失敗しました。");
+      await SnackBarService.Error("プロジェクト詳細の読み込みに失敗しました。");
     }
   }
 }

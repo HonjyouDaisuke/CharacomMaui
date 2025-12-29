@@ -46,7 +46,7 @@
               Text="Box ClientId取得"/>
       <Button
         x:Name="PlatformBtn"
-        Clicked="OnPlatformClicked"
+        Clicked="OnPlatfromClicked"
         HorizontalOptions="Fill"
         SemanticProperties.Hint="デバイスのプラットフォームを取得します"
         Text="Platforms取得"/>

@@ -4,11 +4,8 @@ using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Helpers;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Extensions;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using Font = Microsoft.Maui.Font;
 namespace CharacomMaui.Presentation.Pages;
 
@@ -74,7 +71,7 @@ public partial class HomePage : ContentPage
       await DisplayAlert("エラー", ex.Message, "OK");
     }
   }
-  private async void OnPlatformClicked(object sender, EventArgs e)
+  private async void OnPlatfromClicked(object sender, EventArgs e)
   {
     System.Diagnostics.Debug.WriteLine("OnStart Clicked");
     Console.WriteLine("Console.Debug");

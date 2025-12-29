@@ -35,8 +35,5 @@
         <!-- The Setter for BackgroundColor with hardcoded Red has been removed -->
       </Style>
     </ResourceDictionary>
-
-
-
   </Application.Resources>
 </Application>
