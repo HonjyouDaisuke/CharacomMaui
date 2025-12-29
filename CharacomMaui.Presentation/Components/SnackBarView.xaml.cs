@@ -32,7 +32,6 @@ public partial class SnackBarView : ContentView
     this.IsVisible = true;
     this.Opacity = 0; // 一旦 0 にしてからフェードイン
 
-    System.Diagnostics.Debug.WriteLine($"★★★ SnackBar表示: {message}");
 
     // 3. アニメーション
     await this.FadeTo(1, 200);
