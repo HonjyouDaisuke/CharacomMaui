@@ -11,7 +11,6 @@ public partial class App : Microsoft.Maui.Controls.Application
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
-  private Grid? _overlayGrid;
   public App(IGetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
   {
     InitializeComponent();
