@@ -1,3 +1,5 @@
+namespace CharacomMaui.Presentation.Models;
+
 public enum SnackBarType
 {
   Error,
