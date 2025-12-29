@@ -62,12 +62,17 @@ public partial class LoadingPage : ContentPage
     System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
     if (isValid)
     {
-      if (isValid)
+      if (user != null) _statusUseCase.SetUserInfo(user);
+      MainThread.BeginInvokeOnMainThread(() =>
       {
-        if (user != null) _statusUseCase.SetUserInfo(user);
-      }
-
-      MauiApp.Current!.Windows[0].Page = new AppShell();
+        // App クラスのインスタンスをキャストしてメソッドを呼ぶ
+        if (MauiApp.Current is App myApp)
+        {
+          myApp.MainPage = new AppShell();
+        }
+      });
+      //MauiApp.Current!.Windows[0].Page = new AppShell();
+      //MauiApp.Current!.Windows[0].Page = new AppShell();
     }
     else
     {

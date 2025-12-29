@@ -1,0 +1,22 @@
+<ContentPage
+  x:Class="CharacomMaui.Presentation.ShellWithOverlayPage"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:local="clr-namespace:CharacomMaui.Presentation"
+  xmlns:component="clr-namespace:CharacomMaui.Presentation.Components">
+
+  <Grid x:Name="RootGrid"
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill">
+    <!-- AppShell を Grid に配置 -->
+
+    <local:AppShell x:Name="AppShellRoot"/>
+
+
+    <!-- SnackBar を重ねる -->
+    <component:SnackBarView x:Name="SnackBar"
+                            VerticalOptions="End"
+                            HorizontalOptions="Fill"
+                            Margin="16"/>
+  </Grid>
+</ContentPage>

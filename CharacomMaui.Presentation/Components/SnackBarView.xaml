@@ -1,0 +1,28 @@
+<ContentView
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Class="CharacomMaui.Presentation.Components.SnackBarView"
+  IsVisible="False"
+  Opacity="0"
+  VerticalOptions="End"
+  HorizontalOptions="Fill"
+  Margin="16">
+
+  <Border
+    x:Name="Root"
+    StrokeShape="RoundRectangle 12"
+    Padding="14">
+
+    <HorizontalStackLayout Spacing="12">
+      <Label
+        x:Name="Icon"
+        FontFamily="FontAwesome"
+        FontSize="18"/>
+
+      <Label
+        x:Name="Message"
+        FontSize="14"
+        LineBreakMode="WordWrap"/>
+    </HorizontalStackLayout>
+  </Border>
+</ContentView>

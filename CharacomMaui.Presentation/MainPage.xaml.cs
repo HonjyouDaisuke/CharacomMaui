@@ -89,8 +89,15 @@ public partial class MainPage : ContentPage
       _statusUseCase.SetUserInfo(userInfo);
 
       LogEditor.Text += "終了しました...\n";
-
-      MauiApp.Current!.Windows[0].Page = new AppShell();
+      MainThread.BeginInvokeOnMainThread(() =>
+      {
+        // App クラスのインスタンスをキャストしてメソッドを呼ぶ
+        if (MauiApp.Current is App myApp)
+        {
+          myApp.MainPage = new AppShell();
+        }
+      });
+      //MauiApp.Current!.Windows[0].Page = new AppShell();
     }
     catch (Exception ex)
     {

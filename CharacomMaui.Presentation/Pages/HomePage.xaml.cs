@@ -1,9 +1,15 @@
 ﻿using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Presentation.Helpers;
+using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.ViewModels;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Extensions;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using Font = Microsoft.Maui.Font;
 namespace CharacomMaui.Presentation.Pages;
 
 public partial class HomePage : ContentPage
@@ -82,6 +88,11 @@ public partial class HomePage : ContentPage
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     System.Diagnostics.Debug.WriteLine("ユーザ情報取得開始");
+    if (accessToken == null)
+    {
+      await Shell.Current.DisplayAlert("エラー", "アクセストークンの取得に失敗しました。", "OK");
+      return;
+    }
     await _boxLoginViewModel.GetUserInfoAsync(accessToken);
     StatusLabel.Text = "ログイン成功！";
   }
@@ -112,7 +123,10 @@ public partial class HomePage : ContentPage
     }
 
   }
-
+  private async void OnToastClicked(object sender, EventArgs e)
+  {
+    await SnackBarHost.ShowAsync("データを保存しました", SnackBarType.Success);
+  }
   private async void OnStartDownloadClicked(object sender, EventArgs e)
   {
     var cts = new CancellationTokenSource();
@@ -132,7 +146,11 @@ public partial class HomePage : ContentPage
     {
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
-
+      if (accessToken == null)
+      {
+        await Shell.Current.DisplayAlert("エラー", "アクセストークンの取得に失敗しました。", "OK");
+        return;
+      }
       // 1. ダウンロードとViewModelへのアイテム追加（画像セットは含まない）
       await _boxFolderViewModel.LoadImageItemsAsync(accessToken, TEST_FOLDER_ID, progressHandler, cts.Token);
 
@@ -163,32 +181,7 @@ public partial class HomePage : ContentPage
     }
   }
 
-  /**
-  private async Task addFiles()
-  {
-      var tempList = _boxFolderViewModel.Files2.Take(10)
-              .Select(entry => new BoxImageItemViewModel(new BoxImageItem
-              {
-                  Id = entry.Id ?? "",
-                  Name = entry.Name ?? "",
-                  Type = entry.Type ?? "",
-                  Image = entry.Image
-              }))
-              .ToList();
-
-      MainThread.BeginInvokeOnMainThread(() =>
-      {
-          var backup = Files2;
-          Files2 = null; // 一旦解除
-          OnPropertyChanged(nameof(Files2));
-
-          Files2 = new ObservableCollection<BoxImageItemViewModel>(tempList);
-          OnPropertyChanged(nameof(Files2));
-      });
-      await DisplayAlert("Message", $"ファイル一覧を更新しました。{Files2.Count}", "OK");
-  }
-  **/
-  private string GetPlatfrom()
+  private static string GetPlatfrom()
   {
     var platform = DeviceInfo.Platform;
     if (platform == DevicePlatform.WinUI)

@@ -38,6 +38,10 @@ public static class MauiProgram
           fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
         });
 
+    builder.ConfigureFonts(fonts =>
+    {
+      fonts.AddFont("fa-solid-900.ttf", "FontAwesome");
+    });
 
     using var stream =
       FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;

@@ -1,6 +1,8 @@
 ﻿using System.Web;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Presentation.Components;
+using CharacomMaui.Presentation.Services;
 
 namespace CharacomMaui.Presentation;
 
@@ -9,6 +11,7 @@ public partial class App : Microsoft.Maui.Controls.Application
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
+  private Grid? _overlayGrid;
   public App(IGetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
   {
     InitializeComponent();
@@ -54,5 +57,10 @@ public partial class App : Microsoft.Maui.Controls.Application
 
     window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
     return window;
+  }
+  public void SwitchToShell()
+  {
+    // MainPage を AppShell に入れ替える（Windows[0].Page ではなく MainPage を使う）
+    MainPage = new AppShell();
   }
 }

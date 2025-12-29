@@ -80,6 +80,10 @@
         x:Name="ListFilesBtn"
         Clicked="OnListFilesClicked"
         Text="ルートフォルダ一覧を取得"/>
+      <Button
+        x:Name="ToastBtn"
+        Clicked="OnToastClicked"
+        Text="トースト通知を表示"/>
 
       <CollectionView
         x:Name="FilesCollection"
