@@ -1,3 +1,4 @@
+using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Resources.Styles;
 using CharacomMaui.Presentation.Services;
 

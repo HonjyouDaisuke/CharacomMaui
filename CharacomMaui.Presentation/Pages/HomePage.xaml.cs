@@ -125,19 +125,19 @@ public partial class HomePage : ContentPage
   }
   private async void OnSuccessToastClicked(object sender, EventArgs e)
   {
-    await SnackBarService.Success("データを保存しました");
+    await SnackBarService.Success("[成功]成功SnackBarのサンプルです。");
   }
   private async void OnErrorToastClicked(object sender, EventArgs e)
   {
-    await SnackBarService.Error("データを保存しました");
+    await SnackBarService.Error("[エラー]エラーSnackBarのサンプルです。");
   }
   private async void OnWarningToastClicked(object sender, EventArgs e)
   {
-    await SnackBarService.Warning("データを保存しました");
+    await SnackBarService.Warning("[警告]警告SnackBarのサンプルです。");
   }
   private async void OnInfoToastClicked(object sender, EventArgs e)
   {
-    await SnackBarService.Info("データを保存しました");
+    await SnackBarService.Info("[情報]情報SnackBarのサンプルです。");
   }
   private async void OnStartDownloadClicked(object sender, EventArgs e)
   {

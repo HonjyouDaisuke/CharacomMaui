@@ -1,4 +1,5 @@
 using CharacomMaui.Presentation.Helpers;
+using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Resources.Icons;
 
 namespace CharacomMaui.Presentation.Resources.Styles;

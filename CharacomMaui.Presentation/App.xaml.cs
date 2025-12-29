@@ -57,9 +57,4 @@ public partial class App : Microsoft.Maui.Controls.Application
     window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
     return window;
   }
-  public void SwitchToShell()
-  {
-    // MainPage を AppShell に入れ替える（Windows[0].Page ではなく MainPage を使う）
-    MainPage = new AppShell();
-  }
 }

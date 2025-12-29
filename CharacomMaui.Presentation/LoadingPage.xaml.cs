@@ -55,12 +55,8 @@ public partial class LoadingPage : ContentPage
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
       return;
     }
-    if (accessToken == null)
-    {
-      await SnackBarService.Error("AccessTokenが取得できませんでした");
-      return;
-    }
-    var user = await _userUseCase.GetUserInfoAsync(accessToken);
+
+    var user = await _userUseCase.GetUserInfoAsync(accessToken!);
 
     if (user == null || user.Id == null)
     {

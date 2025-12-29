@@ -81,7 +81,7 @@
           Clicked="OnErrorToastClicked"
           Text="[エラー]トースト通知を表示"/>
         <Button
-          x:Name="WarningTostBtn"
+          x:Name="WarningToastBtn"
           Clicked="OnWarningToastClicked"
           Text="[警告]トースト通知を表示"/>
         <Button
