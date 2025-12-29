@@ -8,38 +8,37 @@ public partial class SnackBarView : ContentView
   public SnackBarView()
   {
     InitializeComponent();
-    this.Loaded += (s, e) =>
-    {
-      System.Diagnostics.Debug.WriteLine("★★★ SnackBarView Loaded!");
-      SnackBarHost.Initialize(this);
-    };
-
-    this.Unloaded += (s, e) =>
-    {
-      System.Diagnostics.Debug.WriteLine("★★★ SnackBarView Unloaded!");
-    };
+    // 画面に現れたら、その時点の「有効なSnackBar」としてHostに自分を渡す
+    this.Loaded += (s, e) => SnackBarHost.Initialize(this);
   }
 
-  public async Task ShowAsync(
-      string message,
-      SnackBarType type,
-      int durationMs = 3000)
+  public async Task ShowAsync(string message, SnackBarType type, int durationMs = 3000)
   {
     var style = SnackBarStyles.Get(type);
 
-    Root.BackgroundColor = style.Background;
-    Message.TextColor = style.TextColor;
-    Icon.TextColor = style.TextColor;
+    MainThread.BeginInvokeOnMainThread(() =>
+    {
+      Root.BackgroundColor = style.Background;
+      Message.TextColor = style.TextColor;
 
-    Icon.Text = style.Icon;
-    Message.Text = message;
+      Icon.Text = style.Icon;
+      Icon.TextColor = style.TextColor;
 
-    IsVisible = true;
-    System.Diagnostics.Debug.WriteLine(message);
+      Message.Text = message;
+      this.IsVisible = true;
+    });
+
+    // 2. 表示状態にする
+    this.IsVisible = true;
+    this.Opacity = 0; // 一旦 0 にしてからフェードイン
+
+    System.Diagnostics.Debug.WriteLine($"★★★ SnackBar表示: {message}");
+
+    // 3. アニメーション
     await this.FadeTo(1, 200);
     await Task.Delay(durationMs);
     await this.FadeTo(0, 200);
 
-    IsVisible = false;
+    this.IsVisible = false;
   }
 }

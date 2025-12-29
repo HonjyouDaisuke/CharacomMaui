@@ -8,21 +8,30 @@
   HorizontalOptions="Fill"
   Margin="16">
 
-  <Border
-    x:Name="Root"
-    StrokeShape="RoundRectangle 12"
-    Padding="14">
-
-    <HorizontalStackLayout Spacing="12">
+  <Border x:Name="Root"
+          BackgroundColor="Gray"
+          StrokeShape="RoundRectangle 12"
+          Padding="14">
+    <Grid ColumnDefinitions="Auto, *"
+          ColumnSpacing="12"
+          VerticalOptions="Center">
       <Label
+        Grid.Column="0"
         x:Name="Icon"
-        FontFamily="FontAwesome"
-        FontSize="18"/>
+        FontFamily="MaterialOutlineIcons"
+        FontSize="24"
+        TextColor="White"
+        VerticalOptions="Center"
+        HorizontalOptions="Center"
+        WidthRequest="30"/>
 
       <Label
+        Grid.Column="1"
         x:Name="Message"
-        FontSize="14"
-        LineBreakMode="WordWrap"/>
-    </HorizontalStackLayout>
+        FontSize="18"
+        TextColor="White"
+        LineBreakMode="WordWrap"
+        VerticalOptions="Center"/>
+    </Grid>
   </Border>
 </ContentView>

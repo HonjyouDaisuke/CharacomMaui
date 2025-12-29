@@ -123,9 +123,21 @@ public partial class HomePage : ContentPage
     }
 
   }
-  private async void OnToastClicked(object sender, EventArgs e)
+  private async void OnSuccessToastClicked(object sender, EventArgs e)
   {
-    await SnackBarHost.ShowAsync("データを保存しました", SnackBarType.Success);
+    await SnackBarService.Success("データを保存しました");
+  }
+  private async void OnErrorToastClicked(object sender, EventArgs e)
+  {
+    await SnackBarService.Error("データを保存しました");
+  }
+  private async void OnWarningToastClicked(object sender, EventArgs e)
+  {
+    await SnackBarService.Warning("データを保存しました");
+  }
+  private async void OnInfoToastClicked(object sender, EventArgs e)
+  {
+    await SnackBarService.Info("データを保存しました");
   }
   private async void OnStartDownloadClicked(object sender, EventArgs e)
   {

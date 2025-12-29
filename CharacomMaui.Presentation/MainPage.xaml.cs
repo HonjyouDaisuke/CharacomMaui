@@ -92,10 +92,7 @@ public partial class MainPage : ContentPage
       MainThread.BeginInvokeOnMainThread(() =>
       {
         // App クラスのインスタンスをキャストしてメソッドを呼ぶ
-        if (MauiApp.Current is App myApp)
-        {
-          myApp.MainPage = new AppShell();
-        }
+        MauiApp.Current!.Windows[0].Page = new AppShell();
       });
       //MauiApp.Current!.Windows[0].Page = new AppShell();
     }
