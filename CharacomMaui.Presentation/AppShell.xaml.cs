@@ -1,4 +1,7 @@
-﻿namespace CharacomMaui.Presentation;
+﻿using CharacomMaui.Presentation.Components;
+using CharacomMaui.Presentation.Services;
+
+namespace CharacomMaui.Presentation;
 
 public partial class AppShell : Shell
 {

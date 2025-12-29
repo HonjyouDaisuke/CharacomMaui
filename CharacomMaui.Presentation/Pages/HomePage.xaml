@@ -14,17 +14,6 @@
       <Label Text="ホームのページでゴンスここを編集してタイトル作るよ"
              VerticalOptions="Center"
              FontSize="24"/>
-      <!--
-      <Image Grid.Column="1"
-             Source="{Binding UserAvatar}"
-             WidthRequest="36"
-             HeightRequest="36"
-             Aspect="AspectFill"
-             VerticalOptions="Center"
-             HorizontalOptions="End"
-             Margin="0,0,10,0"
-             Clip="EllipseGeometry, CenterX=18, CenterY=18, RadiusX=18, RadiusY=18"/>
-      -->
     </Grid>
   </Shell.TitleView>
   <ScrollView>
@@ -57,7 +46,7 @@
               Text="Box ClientId取得"/>
       <Button
         x:Name="PlatformBtn"
-        Clicked="OnPlatformClicked"
+        Clicked="OnPlatfromClicked"
         HorizontalOptions="Fill"
         SemanticProperties.Hint="デバイスのプラットフォームを取得します"
         Text="Platforms取得"/>
@@ -80,6 +69,26 @@
         x:Name="ListFilesBtn"
         Clicked="OnListFilesClicked"
         Text="ルートフォルダ一覧を取得"/>
+      <HorizontalStackLayout
+        Margin="10"
+        Spacing="10">
+        <Button
+          x:Name="SuccessToastBtn"
+          Clicked="OnSuccessToastClicked"
+          Text="[成功]トースト通知を表示"/>
+        <Button
+          x:Name="ErrorToastBtn"
+          Clicked="OnErrorToastClicked"
+          Text="[エラー]トースト通知を表示"/>
+        <Button
+          x:Name="WarningToastBtn"
+          Clicked="OnWarningToastClicked"
+          Text="[警告]トースト通知を表示"/>
+        <Button
+          x:Name="InfoToastBtn"
+          Clicked="OnInfoToastClicked"
+          Text="[情報]トースト通知を表示"/>
+      </HorizontalStackLayout>
 
       <CollectionView
         x:Name="FilesCollection"

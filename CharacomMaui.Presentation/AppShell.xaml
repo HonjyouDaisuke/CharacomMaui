@@ -6,12 +6,34 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:CharacomMaui.Presentation"
   xmlns:pages="clr-namespace:CharacomMaui.Presentation.Pages"
+  xmlns:component="clr-namespace:CharacomMaui.Presentation.Components"
   Title="CharacomMaui"
   Shell.ForegroundColor="{AppThemeBinding
       Light={DynamicResource Primary},
       Dark={DynamicResource PrimaryDark}}"
   Shell.FlyoutBehavior="Flyout"
   FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
+
+  <Shell.Resources>
+    <ResourceDictionary>
+      <ControlTemplate x:Key="PageOverlayTemplate">
+        <Grid>
+          <ContentPresenter/>
+
+          <component:SnackBarView
+            ZIndex="999"
+            InputTransparent="True"/>
+        </Grid>
+      </ControlTemplate>
+
+      <Style TargetType="ContentPage"
+          ApplyToDerivedTypes="True">
+        <Setter Property="ControlTemplate"
+            Value="{StaticResource PageOverlayTemplate}"/>
+      </Style>
+    </ResourceDictionary>
+  </Shell.Resources>
+
   <Shell.FlyoutHeader>
     <VerticalStackLayout>
       <Label Text="Characom Imager Pro Maui"

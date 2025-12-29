@@ -2,6 +2,7 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Helpers;
+using CharacomMaui.Presentation.Services;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation;
@@ -41,6 +42,7 @@ public partial class LoadingPage : ContentPage
       catch
       {
         isValid = false;
+        await SnackBarService.Error("AccessTokenが有効ではありません。");
         System.Diagnostics.Debug.WriteLine($"Error --tokenRes isValid = {isValid}");
         MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
         return;
@@ -53,7 +55,8 @@ public partial class LoadingPage : ContentPage
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
       return;
     }
-    var user = await _userUseCase.GetUserInfoAsync(accessToken);
+
+    var user = await _userUseCase.GetUserInfoAsync(accessToken!);
 
     if (user == null || user.Id == null)
     {
@@ -62,12 +65,11 @@ public partial class LoadingPage : ContentPage
     System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
     if (isValid)
     {
-      if (isValid)
+      if (user != null) _statusUseCase.SetUserInfo(user);
+      MainThread.BeginInvokeOnMainThread(() =>
       {
-        if (user != null) _statusUseCase.SetUserInfo(user);
-      }
-
-      MauiApp.Current!.Windows[0].Page = new AppShell();
+        MauiApp.Current!.Windows[0].Page = new AppShell();
+      });
     }
     else
     {
