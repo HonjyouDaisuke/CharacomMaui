@@ -12,7 +12,6 @@ using UraniumUI.Dialogs;
 using MauiControls = Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Services;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -128,7 +127,6 @@ public partial class CharaSelectViewModel : ObservableObject
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-      await _progressDialog.CloseAsync();
     }
     finally
     {
@@ -159,7 +157,7 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  private async Task LoadProjectItems(string accessToken)
+  private async Task<bool> LoadProjectItems(string accessToken)
   {
     try
     {
@@ -215,11 +213,12 @@ public partial class CharaSelectViewModel : ObservableObject
       }
       InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
       InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
-
+      return true;
     }
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+      return false;
     }
 
   }
@@ -338,32 +337,38 @@ public partial class CharaSelectViewModel : ObservableObject
     _appStatus.CharaName = charaName;
     _appStatus.MaterialName = materialName;
     await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
-    var charaCount = GetCharaCount();
-    if (previousCharaName != charaName)
+    try
     {
-      // 資料名の数え直し
-      UpdateMaterialNames();
-      charaCount = GetCharaCount() + 2;
-    }
+      var charaCount = GetCharaCount();
+      if (previousCharaName != charaName)
+      {
+        // 資料名の数え直し
+        UpdateMaterialNames();
+        charaCount = GetCharaCount() + 2;
+      }
 
-    double amount = 1.0 / charaCount;
-    double value = amount;
-    if (previousCharaName != charaName)
+      double amount = 1.0 / charaCount;
+      double value = amount;
+      if (previousCharaName != charaName)
+      {
+        // Standard画像
+        _progressDialog.Update("標準画像を読み込んでいます", value);
+        await StandardImageUpdateAsync(accessToken);
+        value += amount;
+
+        // Stroke画像
+        _progressDialog.Update("筆順画像を読み込んでいます", value);
+        await StrokeImageUpdateAsync(accessToken);
+        value += amount;
+      }
+      // Chara選択画像群
+      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", value, amount);
+    }
+    finally
     {
-      // Standard画像
-      _progressDialog.Update("標準画像を読み込んでいます", value);
-      await StandardImageUpdateAsync(accessToken);
-      value += amount;
-
-      // Stroke画像
-      _progressDialog.Update("筆順画像を読み込んでいます", value);
-      await StrokeImageUpdateAsync(accessToken);
-      value += amount;
+      await Task.Delay(100);
+      await _progressDialog.CloseAsync();
     }
-    // Chara選択画像群
-    await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", value, amount);
-    await Task.Delay(100);
-    await _progressDialog.CloseAsync();
   }
 
   public async Task<byte[]?> LoadImageAsync(string accessToken, string fileId)

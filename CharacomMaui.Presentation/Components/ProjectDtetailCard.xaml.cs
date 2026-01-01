@@ -73,31 +73,7 @@ public partial class ProjectDetailCard : ContentView
   {
     InitializeComponent();
   }
-  private async Task InvokeAsync(Func<ProjectInfoEventArgs, Task>? handler)
-  {
-    if (handler == null)
-    {
-      NotifyActionCompleted();
-      return;
-    }
-    try
-    {
-      var invocationList = handler.GetInvocationList();
-      foreach (var d in invocationList)
-      {
-        var func = (Func<ProjectInfoEventArgs, Task>)d;
-        await func(CreateArgs()); // 1つずつ await
-      }
-    }
-    catch (Exception ex)
-    {
-      System.Diagnostics.Debug.WriteLine($"[InvokeAsync Error] {ex}");
-    }
-    finally
-    {
-      NotifyActionCompleted();
-    }
-  }
+
   private ProjectInfoEventArgs CreateArgs() => new()
   {
     ProjectId = ProjectId,

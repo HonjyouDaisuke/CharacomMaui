@@ -43,7 +43,7 @@ public partial class App : Microsoft.Maui.Controls.Application
         }
         catch (Exception ex)
         {
-          await Shell.Current.DisplayAlert("Box Login Error", ex.Message, "OK");
+          await SnackBarService.Error($"Box Login Error: {ex.Message}");
         }
       }
     }

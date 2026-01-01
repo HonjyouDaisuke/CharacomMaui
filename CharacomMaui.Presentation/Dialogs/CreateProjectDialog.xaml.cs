@@ -18,7 +18,7 @@ public partial class CreateProjectDialog : Popup
 {
   public string ProjectName => ProjectNameEntry.Text;
   public string ProjectDescription => ProjectDescriptionEditor.Text;
-  public bool IsCanceled = false;
+  public bool IsCanceled { get; private set; } = false;
   public BoxItem SelectedTopFolder => (BoxItem)TopFolderDropdown.SelectedItem;
   public BoxItem SelectedCharaFolder => (BoxItem)CharaFolderDropdown.SelectedItem;
   private IDialogService _dialogService;

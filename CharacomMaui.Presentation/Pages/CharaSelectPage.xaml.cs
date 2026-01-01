@@ -21,7 +21,6 @@ public partial class CharaSelectPage : ContentPage
   private readonly CharaSelectViewModel _viewModel;
   private string _pageMaterialName = string.Empty;
   private string _pageCharaName = string.Empty;
-  private ProgressDialog? _currentDialog;
 
   public SKBitmap? LoadedBitmap { get; set; }
   public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier, IProgressDialogService progressDialog)
@@ -31,7 +30,7 @@ public partial class CharaSelectPage : ContentPage
     _viewModel = viewModel;
     _notifier = notifier;
 
-    ((ProgressDialogService)progressDialog).SetHost(this);
+    progressDialog.SetHost(this);
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += OnAppStatusChanged;
 

@@ -47,13 +47,6 @@
         Margin="20, 0, 20, 20"
         ScaleY="5"
         ProgressColor="{AppThemeBinding Light={DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"/>
-      <!--
-      <ProgressBar Grid.Row="2"
-                   Progress="0.5"
-                   Height="50"
-                   HeightRequest="100"
-                   ProgressColor="{AppThemeBinding Light={DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"/>
-                   -->
     </Grid>
   </Border>
 </views:Popup>

@@ -26,7 +26,7 @@ public partial class ProgressDialog : Popup
     set => SetValue(MessageProperty, value);
   }
 
-  public ProgressDialog(string title, string message/**, IDialogService dialogService**/)
+  public ProgressDialog(string title, string message)
   {
     InitializeComponent();
     Title = title;
