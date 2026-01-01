@@ -61,6 +61,10 @@ public partial class ProjectDetailPage : ContentPage
       System.Diagnostics.Debug.WriteLine($"OnAppearing error: {ex.Message}");
       await DisplayAlert("エラー", "ページの初期化中にエラーが発生しました。", "OK");
     }
+
+    // 強制的に ItemsSource を再設定
+    CharaDataCollection.ItemsSource = null;
+    CharaDataCollection.ItemsSource = _viewModel.CharaDataSummaries;
   }
 
   private async Task GetCharaItemAsync()

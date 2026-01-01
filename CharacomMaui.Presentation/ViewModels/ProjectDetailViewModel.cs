@@ -114,25 +114,30 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       CharaCount = g.Count(),
       SelectedCount = g.Count(x => x.IsSelected == true),
     }).ToList();
-    CharaDataSummaries.Clear();
 
-    int _count = 0;
-    foreach (var item in grouped)
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
-      bool isSelected = false;
-      if (_appStatus.CharaName == item.CharaName && _appStatus.MaterialName == item.MaterialName)
+      CharaDataSummaries.Clear();
+
+      int _count = 0;
+      foreach (var item in grouped)
       {
-        isSelected = true;
+        bool isSelected = false;
+        if (_appStatus.CharaName == item.CharaName && _appStatus.MaterialName == item.MaterialName)
+        {
+          isSelected = true;
+        }
+        System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個 IsSelected = {isSelected}");
+        item.Number = _count;
+        item.IsOdd = _count % 2 == 1;
+        item.IsSelected = isSelected;
+        CharaDataSummaries.Add(item);
+        _count++;
       }
-      System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個 IsSelected = {isSelected}");
-      item.Number = _count;
-      item.IsOdd = _count % 2 == 1;
-      item.IsSelected = isSelected;
-      CharaDataSummaries.Add(item);
-      _count++;
-    }
-    System.Diagnostics.Debug.WriteLine($"appStatus = {_appStatus}");
-    System.Diagnostics.Debug.WriteLine($"行数は；；；{_count} CharaDataSummariesCount = {CharaDataSummaries.Count}");
+      System.Diagnostics.Debug.WriteLine($"appStatus = {_appStatus}");
+      System.Diagnostics.Debug.WriteLine($"行数は；；；{_count} CharaDataSummariesCount = {CharaDataSummaries.Count}");
+    });
+
   }
 
   public async Task SetProjectDetailsAsync(string projectId)
