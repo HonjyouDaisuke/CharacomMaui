@@ -24,36 +24,18 @@ public partial class CharaSelectPage : ContentPage
   private ProgressDialog? _currentDialog;
 
   public SKBitmap? LoadedBitmap { get; set; }
-  public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier)
+  public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier, IProgressDialogService progressDialog)
   {
+    InitializeComponent();
     _appStatus = appStatus;
     _viewModel = viewModel;
-    InitializeComponent();
     _notifier = notifier;
 
+    ((ProgressDialogService)progressDialog).SetHost(this);
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += OnAppStatusChanged;
-    _viewModel.ShowDialogRequested += (dialog) =>
-    {
-      _currentDialog = dialog;
-      // await せずに「表示」だけ行う
-      this.ShowPopup(dialog);
-      return Task.CompletedTask;
-    };
 
-    _viewModel.CloseDialogRequested += async () =>
-    {
-      if (_currentDialog != null)
-      {
-        // CloseAsync を呼び出す（CommunityToolkit.Maui の Popup メソッド）
-        await _currentDialog.CloseAsync();
-        _currentDialog = null;
-      }
-    };
     BindingContext = _viewModel;
-    //MaterialSelectBar.ItemSelected += OnMaterialSelectBarItemSelected;
-    //CharaSelectBar.ItemSelected += OnCharaSelectBarItemSelected;
-
   }
   protected override async void OnAppearing()
   {
@@ -61,9 +43,6 @@ public partial class CharaSelectPage : ContentPage
     LogEditor.Text += $"ProjectName = {_appStatus.ProjectName} id:{_appStatus.ProjectId}\n";
     LogEditor.Text += $"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}\n";
     LogEditor.Text += $"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}\n";
-    System.Diagnostics.Debug.WriteLine("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
-    System.Diagnostics.Debug.WriteLine($"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}");
-    System.Diagnostics.Debug.WriteLine($"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}");
 
     if (_pageCharaName != _appStatus.CharaName || _pageMaterialName != _appStatus.MaterialName)
     {

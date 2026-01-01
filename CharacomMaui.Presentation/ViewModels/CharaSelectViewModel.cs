@@ -12,6 +12,7 @@ using UraniumUI.Dialogs;
 using MauiControls = Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Services;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -37,6 +38,7 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly FetchBoxItemUseCase _fetchBoxItemUseCase;
   readonly UpdateCharaSelectedUseCase _updateCharaSelectUseCase;
   readonly IAppTokenStorageService _tokenStorage;
+  readonly IProgressDialogService _progressDialog;
   AppStatus _appStatus;
 
   private List<CharaData> allCharaData = new();
@@ -58,7 +60,8 @@ public partial class CharaSelectViewModel : ObservableObject
                               GetStrokeFileIdUseCase getStrokeFileIdUseCase,
                               UpdateCharaSelectedUseCase updateCharaSelectedUseCase,
                               IDialogService dialogService,
-                              IAppTokenStorageService tokenStorage)
+                              IAppTokenStorageService tokenStorage,
+                              IProgressDialogService progressDialog)
   {
     _useCase = useCase;
     _appStatus = appStatus;
@@ -68,6 +71,7 @@ public partial class CharaSelectViewModel : ObservableObject
     _updateCharaSelectUseCase = updateCharaSelectedUseCase;
     _dialogService = dialogService;
     _tokenStorage = tokenStorage;
+    _progressDialog = progressDialog;
     // CharaButtonCommand = new AsyncRelayCommand<string>(OnCharaTapped);
   }
 
@@ -97,37 +101,39 @@ public partial class CharaSelectViewModel : ObservableObject
     var accessToken = tokens?.AccessToken;
     if (accessToken == null) return;
 
-    // 1. ダイアログの表示を開始 (表示が完了するのを待たず、表示命令を出したら次へ行く)
-    _ = ShowProgressDialogAsync("読み込み中", "データを取得しています...");
-
     try
     {
+      // 1. ダイアログの表示を開始 
+      await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
       // Projectデータ読み込み
-      UpdateProgressMessage("プロジェクトデータを読み込んでいます...", 0.25);
       await LoadProjectItems(accessToken);
-
+      // 画像総数カウント
+      var CharaCount = GetCharaCount() + 2;
+      double IncreaseAmount = 1.0 / CharaCount;
+      var currentValue = IncreaseAmount;
+      System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {IncreaseAmount} Characount: {CharaCount}");
       // Standard画像
-      UpdateProgressMessage("Standard画像を読み込んでいます...", 0.5);
+      _progressDialog.Update("標準画像を読み込んでいます", currentValue);
       await StandardImageUpdateAsync(accessToken);
+      currentValue += IncreaseAmount;
 
       // Stroke画像
-      UpdateProgressMessage("Stroke画像を読み込んでいます...", 0.75);
+      _progressDialog.Update("筆順画像を読み込んでいます", currentValue);
       await StrokeImageUpdateAsync(accessToken);
+      currentValue += IncreaseAmount;
 
       // Chara選択画像群
-      UpdateProgressMessage("Chara選択画像群を読み込んでいます...", 1.00);
-      await UpdateCurrentCharaItemsAsync(accessToken);
+      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", currentValue, IncreaseAmount);
     }
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-      await CloseProgressDialogAsync();
+      await _progressDialog.CloseAsync();
     }
     finally
     {
-      // 4. 確実に閉じる (少し遅延を入れるとUIのチラつきが抑えられ、確実に閉じやすくなります)
       await Task.Delay(100);
-      await CloseProgressDialogAsync();
+      await _progressDialog.CloseAsync();
     }
   }
 
@@ -217,8 +223,13 @@ public partial class CharaSelectViewModel : ObservableObject
     }
 
   }
-
-  private async Task UpdateCurrentCharaItemsAsync(string accessToken)
+  private int GetCharaCount()
+  {
+    return allCharaData
+        .Count(x => x.CharaName == _appStatus.CharaName
+                 && x.MaterialName == _appStatus.MaterialName);
+  }
+  private async Task UpdateCurrentCharaItemsAsync(string accessToken, string message, double value, double amount)
   {
     var sw = System.Diagnostics.Stopwatch.StartNew();
     var tempList = new List<CharaSelectCardData>();
@@ -231,6 +242,7 @@ public partial class CharaSelectViewModel : ObservableObject
         continue;
       }
       System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
+      _progressDialog.Update(message, value);
       var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
       if (image.Length > 0)
       {
@@ -244,6 +256,7 @@ public partial class CharaSelectViewModel : ObservableObject
           RawImageData = image
         });
       }
+      value += amount;
     }
 
     await MainThread.InvokeOnMainThreadAsync(() =>
@@ -324,18 +337,33 @@ public partial class CharaSelectViewModel : ObservableObject
     if (accessToken == null) return;
     _appStatus.CharaName = charaName;
     _appStatus.MaterialName = materialName;
+    await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
+    var charaCount = GetCharaCount();
+    if (previousCharaName != charaName)
+    {
+      // 資料名の数え直し
+      UpdateMaterialNames();
+      charaCount = GetCharaCount() + 2;
+    }
+
+    double amount = 1.0 / charaCount;
+    double value = amount;
     if (previousCharaName != charaName)
     {
       // Standard画像
+      _progressDialog.Update("標準画像を読み込んでいます", value);
       await StandardImageUpdateAsync(accessToken);
+      value += amount;
+
       // Stroke画像
+      _progressDialog.Update("筆順画像を読み込んでいます", value);
       await StrokeImageUpdateAsync(accessToken);
-      // 資料名の数え直し
-      UpdateMaterialNames();
+      value += amount;
     }
     // Chara選択画像群
-    await UpdateCurrentCharaItemsAsync(accessToken);
-
+    await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", value, amount);
+    await Task.Delay(100);
+    await _progressDialog.CloseAsync();
   }
 
   public async Task<byte[]?> LoadImageAsync(string accessToken, string fileId)
@@ -431,38 +459,5 @@ public partial class CharaSelectViewModel : ObservableObject
     CharaImageBitmap ??= await CreateWhiteBitmap(320, 320);
 
     CharaImageBitmap = OverlayProcess.Overlay(CharaImageBitmap, result);
-  }
-
-  // 現在表示中のダイアログを保持する変数
-  private ProgressDialog? _activeDialog;
-  // Page側がこれを聞き取って表示する
-  public event Func<ProgressDialog, Task>? ShowDialogRequested;
-  public event Func<Task>? CloseDialogRequested;
-  public async Task ShowProgressDialogAsync(string title, string message)
-  {
-    _activeDialog = new ProgressDialog(title, message, _dialogService);
-    if (ShowDialogRequested != null)
-      await ShowDialogRequested.Invoke(_activeDialog);
-  }
-
-  // ★追加：メッセージを更新するメソッド
-  public void UpdateProgressMessage(string newMessage, double value)
-  {
-    if (_activeDialog != null)
-    {
-      // UIスレッドで更新する必要がある
-      MainThread.BeginInvokeOnMainThread(async () =>
-      {
-        _activeDialog.Message = newMessage;
-        await _activeDialog.AnimateProgressAsync(value);
-      });
-    }
-  }
-
-  public async Task CloseProgressDialogAsync()
-  {
-    if (CloseDialogRequested != null)
-      await CloseDialogRequested.Invoke();
-    _activeDialog = null; // 参照をクリア
   }
 }
