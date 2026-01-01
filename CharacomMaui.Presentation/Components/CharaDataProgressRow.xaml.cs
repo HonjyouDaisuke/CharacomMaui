@@ -14,8 +14,6 @@ public partial class CharaDataProgressRow : ContentView
   public CharaDataProgressRow()
   {
     InitializeComponent();
-    // 初期状態を明示
-    // VisualStateManager.GoToState(BackgroundBorder, "Normal");
   }
 
   public string CharaName { get => (string)GetValue(CharaNameProperty); set => SetValue(CharaNameProperty, value); }
@@ -190,11 +188,7 @@ public partial class CharaDataProgressRow : ContentView
     int selected = view.SelectedCount;
 
     double ratio = total == 0 ? 0 : (double)selected / total;
-
-    AbsoluteLayout.SetLayoutBounds(
-        view.SelectedBar,
-        new Rect(0, 0, ratio, 1)
-    );
+    view.SelectedProgress.Progress = ratio;
   }
 }
 public class CharaDataProgressRowEventArgs : EventArgs

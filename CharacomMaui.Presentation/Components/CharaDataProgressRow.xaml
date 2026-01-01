@@ -99,26 +99,14 @@
              x:Name="SelectedCountLabel"
              Text="{Binding SelectedCount, Source={x:Reference This}}"/>
 
-      <AbsoluteLayout x:Name="ProgressRoot"
-                      Grid.Column="4"
-                      IsEnabled="True"
-                      HeightRequest="30">
-        <!-- 背景 -->
-        <BoxView
-          Color="{AppThemeBinding Light={StaticResource DisabledBackground}, Dark={StaticResource DisabledBackgroundDark}}"
-          AbsoluteLayout.LayoutBounds="0,0,1,1"
-          AbsoluteLayout.LayoutFlags="All"
-          CornerRadius="4"/>
-
-        <!-- 進捗 -->
-        <BoxView x:Name="SelectedBar"
-                 IsEnabled="True"
-                 InputTransparent="True"
-                 Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                 AbsoluteLayout.LayoutBounds="0,0,0,1"
-                 AbsoluteLayout.LayoutFlags="All"
-                 CornerRadius="4"/>
-      </AbsoluteLayout>
+      <ProgressBar
+        x:Name="SelectedProgress"
+        Grid.Column="4"
+        Progress="0.0"
+        HeightRequest="10"
+        Margin="20,10,20,10"
+        ScaleY="6"
+        ProgressColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
     </Grid>
 
     <!-- 下線 -->

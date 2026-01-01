@@ -39,7 +39,7 @@ public partial class App : Microsoft.Maui.Controls.Application
           //var boxAuthService = ServiceHelper.GetService<IBoxApiAuthService>();
           //var result = await boxAuthService.ExchangeCodeForTokenAsync(code, "myapp://callback");
 
-          //await Shell.Current.DisplayAlert("Box Login", $"Access Token: {result.AccessToken}", "OK");
+
         }
         catch (Exception ex)
         {

@@ -51,7 +51,7 @@ public static class ServicesRegistration
     services.AddSingleton<CreateAppUserViewModel>();
     services.AddSingleton<CreateProjectViewModel>();
     services.AddSingleton<BoxFolderViewModel>();
-    services.AddTransient<ProjectDetailViewModel>();
+    services.AddSingleton<ProjectDetailViewModel>();
     services.AddSingleton<BoxItemViewModel>();
     services.AddSingleton<BoxImageItemViewModel>();
     services.AddSingleton<TitleBarViewModel>();
