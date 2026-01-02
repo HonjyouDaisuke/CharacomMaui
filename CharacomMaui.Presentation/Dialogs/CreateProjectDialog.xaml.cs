@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Services;
 using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -129,6 +130,11 @@ public partial class CreateProjectDialog : Popup
   {
     try
     {
+      if (SelectedTopFolder == null || SelectedCharaFolder == null)
+      {
+        await SnackBarService.Error("プロジェクトフォルダ、または個別画像フォルダを選択してください。");
+        return;
+      }
       using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
       {
         // Indicate a long running operation

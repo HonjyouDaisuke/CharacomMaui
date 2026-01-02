@@ -241,7 +241,7 @@ public partial class CharaSelectViewModel : ObservableObject
         continue;
       }
       System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
-      _progressDialog.Update(message, value);
+      await _progressDialog.Update(message, value);
       var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
       if (image.Length > 0)
       {
@@ -346,18 +346,22 @@ public partial class CharaSelectViewModel : ObservableObject
         UpdateMaterialNames();
         charaCount = GetCharaCount() + 2;
       }
-
+      if (charaCount <= 0)
+      {
+        await SnackBarService.Error("文字が見つかりませんでした");
+        return;
+      }
       double amount = 1.0 / charaCount;
       double value = amount;
       if (previousCharaName != charaName)
       {
         // Standard画像
-        _progressDialog.Update("標準画像を読み込んでいます", value);
+        await _progressDialog.Update("標準画像を読み込んでいます", value);
         await StandardImageUpdateAsync(accessToken);
         value += amount;
 
         // Stroke画像
-        _progressDialog.Update("筆順画像を読み込んでいます", value);
+        await _progressDialog.Update("筆順画像を読み込んでいます", value);
         await StrokeImageUpdateAsync(accessToken);
         value += amount;
       }
