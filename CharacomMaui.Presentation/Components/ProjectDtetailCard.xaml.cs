@@ -84,6 +84,11 @@ public partial class ProjectDetailCard : ContentView
   };
   public void NotifyActionCompleted()
   {
+    if (!_isActionProcessing)
+    {
+      System.Diagnostics.Debug.WriteLine("Warning: NotifyActionCompleted called when no action was processing");
+      return;
+    }
     _isActionProcessing = false;
     System.Diagnostics.Debug.WriteLine($"Completed IsActionProcessing={_isActionProcessing}");
     SetButtonsEnabled();
