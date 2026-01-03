@@ -4,9 +4,11 @@ using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
 using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Presentation.Services;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
+using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -32,13 +34,7 @@ public partial class ProjectDetailPage : ContentPage
     ProjectDetailCard.DeleteRequested += OnDeleteRequestedAsync;
     ProjectDetailCard.InviteRequested += OnInviteRequestedAsync;
   }
-  protected override void OnDisappearing()
-  {
-    base.OnDisappearing();
-    ProjectDetailCard.UpdateRequested -= OnUpdateRequestedAsync;
-    ProjectDetailCard.DeleteRequested -= OnDeleteRequestedAsync;
-    ProjectDetailCard.InviteRequested -= OnInviteRequestedAsync;
-  }
+
   protected override async void OnAppearing()
   {
     base.OnAppearing();
@@ -46,7 +42,7 @@ public partial class ProjectDetailPage : ContentPage
     {
       if (string.IsNullOrWhiteSpace(_appStatus.ProjectId))
       {
-        await DisplayAlert("エラー", "ProjectIdが設定されていません", "OK");
+        await SnackBarService.Error("ProjectIdが設定されていません");
         return;
       }
       await GetCharaItemAsync();
@@ -59,8 +55,12 @@ public partial class ProjectDetailPage : ContentPage
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"OnAppearing error: {ex.Message}");
-      await DisplayAlert("エラー", "ページの初期化中にエラーが発生しました。", "OK");
+      await SnackBarService.Error("ページの初期化中にエラーが発生しました。");
     }
+
+    // 強制的に ItemsSource を再設定
+    CharaDataCollection.ItemsSource = null;
+    CharaDataCollection.ItemsSource = _viewModel.CharaDataSummaries;
   }
 
   private async Task GetCharaItemAsync()
@@ -135,6 +135,7 @@ public partial class ProjectDetailPage : ContentPage
   {
     try
     {
+      // var tcs = new TaskCompletionSource();
       System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} folder{e.ProjectFolderId} chara{e.CharaFolderId})\n");
       LogEditor.Text += $"編集: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription} [ {e.ProjectFolderId} ][ {e.CharaFolderId} ]\n";
       LogEditor.Text += "プロジェクトの更新！！\n";
@@ -143,17 +144,17 @@ public partial class ProjectDetailPage : ContentPage
       var project = MakeProjectFromEventArgs(e);
 
       var dialog = new CreateProjectDialog("プロジェクトの更新", topFolderItems, _dialogService, _createViewModel, project);
-      await this.ShowPopupAsync(dialog);
+      dialog.Closed += (_, __) =>
+      {
+        System.Diagnostics.Debug.WriteLine("Dialog Closed → unlock");
+        this.ProjectDetailCard.NotifyActionCompleted();
+      };
 
-      // ダイアログから返ってきてから。。。
-      if (dialog.SelectedTopFolder == null)
+      await this.ShowPopupAsync(dialog);
+      // await tcs.Task;
+      if (dialog.IsCanceled)
       {
-        LogEditor.Text += "選択されていない";
-        return;
-      }
-      if (dialog.SelectedCharaFolder == null)
-      {
-        LogEditor.Text += "個別文字フォルダが選択されていない";
+        LogEditor.Text += "キャンセルされました\n";
         return;
       }
       project.Name = dialog.ProjectName;
@@ -162,17 +163,28 @@ public partial class ProjectDetailPage : ContentPage
       project.CharaFolderId = dialog.SelectedCharaFolder.Id;
       LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
-      // プロジェクトを更新
-      using (await _dialogService.DisplayProgressAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。"))
+      using (await _dialogService.DisplayProgressAsync(
+               "プロジェクト更新", "更新中..."))
       {
-        LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
-        await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
+        var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
+        if (result.Success)
+        {
+          await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
+          await SnackBarService.Success($"プロジェクトを更新しました。 プロジェクト名：{project.Name}");
+        }
+        else
+        {
+          await SnackBarService.Error($"プロジェクト更新中にエラーが発生しました。 プロジェクト名：{project.Name}");
+        }
       }
+
+      LogEditor.Text += "プロジェクトを更新しました\n";
+
     }
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Update error: {ex.Message}");
-      await DisplayAlert("エラー", $"プロジェクトの更新中にエラーが発生しました: {ex.Message}", "OK");
+      await SnackBarService.Error($"プロジェクトの更新中に想定外のエラーが発生しました");
     }
   }
 
@@ -195,7 +207,7 @@ public partial class ProjectDetailPage : ContentPage
           LogEditor.Text += $"削除結果: {result.Success}\n";
           if (!result.Success)
           {
-            await DisplayAlert("削除エラー", result.Message, "OK");
+            await SnackBarService.Error($"プロジェクトの削除に失敗しました。 プロジェクト名：{e.ProjectName}");
             return;
           }
 
@@ -210,7 +222,7 @@ public partial class ProjectDetailPage : ContentPage
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Delete error: {ex.Message}");
-      await DisplayAlert("エラー", $"プロジェクトの削除中にエラーが発生しました: {ex.Message}", "OK");
+      await SnackBarService.Error($"プロジェクトの削除中に想定外のエラーが発生しました: {e.ProjectName}");
     }
   }
   private async Task OnInviteRequestedAsync(ProjectInfoEventArgs e)

@@ -9,6 +9,7 @@ using CharacomMaui.Presentation.ViewModels;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using Microsoft.Extensions.DependencyInjection;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.DependencyInjection;
 
@@ -51,7 +52,7 @@ public static class ServicesRegistration
     services.AddSingleton<CreateAppUserViewModel>();
     services.AddSingleton<CreateProjectViewModel>();
     services.AddSingleton<BoxFolderViewModel>();
-    services.AddTransient<ProjectDetailViewModel>();
+    services.AddSingleton<ProjectDetailViewModel>();
     services.AddSingleton<BoxItemViewModel>();
     services.AddSingleton<BoxImageItemViewModel>();
     services.AddSingleton<TitleBarViewModel>();
@@ -71,6 +72,7 @@ public static class ServicesRegistration
 
     // その他
     services.AddSingleton<IDialogService, MopupsDialogService>();
+    services.AddSingleton<IProgressDialogService, ProgressDialogService>();
 
     return services;
   }

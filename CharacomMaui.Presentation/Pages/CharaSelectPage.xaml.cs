@@ -1,12 +1,13 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Box.Sdk.Gen.Schemas;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
+using CharacomMaui.Presentation.Interfaces;
+using CharacomMaui.Presentation.Services;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
@@ -22,48 +23,57 @@ public partial class CharaSelectPage : ContentPage
   private readonly CharaSelectViewModel _viewModel;
   private string _pageMaterialName = string.Empty;
   private string _pageCharaName = string.Empty;
-
+  private bool _isFirstLoaded = false;
   public SKBitmap? LoadedBitmap { get; set; }
-  public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier)
+  public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier, IProgressDialogService progressDialog)
   {
+    InitializeComponent();
     _appStatus = appStatus;
     _viewModel = viewModel;
-    InitializeComponent();
     _notifier = notifier;
 
+    progressDialog.SetHost(this);
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += OnAppStatusChanged;
 
     BindingContext = _viewModel;
-    //MaterialSelectBar.ItemSelected += OnMaterialSelectBarItemSelected;
-    //CharaSelectBar.ItemSelected += OnCharaSelectBarItemSelected;
-
   }
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    LogEditor.Text += $"ProjectName = {_appStatus.ProjectName} id:{_appStatus.ProjectId}\n";
-    LogEditor.Text += $"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}\n";
-    LogEditor.Text += $"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}\n";
-    System.Diagnostics.Debug.WriteLine("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
-    System.Diagnostics.Debug.WriteLine($"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}");
-    System.Diagnostics.Debug.WriteLine($"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}");
+    LogEditor.Text += "✳️✡️☆表示！\n";
+    LogEditor.Text += "--------------------------\n";
+    LogEditor.Text += $"_pageCharaName: {_pageCharaName} vs _appStatus.CharaNam: {_appStatus.CharaName} \n";
+    LogEditor.Text += $"_pageMaterialName: {_pageMaterialName} vs _appStatus.MaterialName: {_appStatus.MaterialName} \n";
+    LogEditor.Text += "--------------------------\n";
+
+    //LogEditor.Text += $"ProjectName = {_appStatus.ProjectName} id:{_appStatus.ProjectId}\n";
+    //LogEditor.Text += $"CharaName = {_appStatus.CharaName} pageCharaName={_pageCharaName}\n";
+    //LogEditor.Text += $"MaterialName = {_appStatus.MaterialName} pageMaterialName={_pageMaterialName}\n";
 
     if (_pageCharaName != _appStatus.CharaName || _pageMaterialName != _appStatus.MaterialName)
     {
       try
       {
         await _viewModel.GetCharaItemAsync();
+        _pageCharaName = _appStatus.CharaName!;
+        _pageMaterialName = _appStatus.MaterialName;
       }
       catch (Exception ex)
       {
         System.Diagnostics.Debug.WriteLine($"Error loading chara items: {ex.Message}");
-        // TODO: ユーザーにエラーを通知
+        await SnackBarService.Error("個別画像を表示中にエラーが発生しました");
       }
-
-      _pageCharaName = _appStatus.CharaName!;
-      _pageMaterialName = _appStatus.MaterialName;
     }
+
+    if (!_isFirstLoaded)
+    {
+      BindingContext = null;
+      BindingContext = _viewModel;
+      _isFirstLoaded = true;
+    }
+
+    System.Diagnostics.Debug.WriteLine($"ViewModel Items Count: {_viewModel.CurrentCharaItems.Count}");
   }
 
   private async void OnAppStatusChanged(object sender, PropertyChangedEventArgs e)
@@ -109,6 +119,7 @@ public partial class CharaSelectPage : ContentPage
   private async void OnCharaSelectBarItemSelected(object? sender, SelectBarEventArgs item)
   {
     if (_viewModel.IsLoading) return;
+    LogEditor.Text += "押されたぞ！\n";
     System.Diagnostics.Debug.WriteLine($"OnCharaSelectBarItemSelected isChanging = {_isChanging}");
     LogEditor.Text += $"選択された文字種: {item.SelectedName} pageCharaName={_pageCharaName}\n";
     if (string.IsNullOrEmpty(item.SelectedName)) return;

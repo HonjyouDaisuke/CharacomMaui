@@ -29,6 +29,7 @@
       IsDeleteVisible="True"/>
 
     <components:CharaDataProgressRowTitle/>
+
     <CollectionView
       x:Name="CharaDataCollection"
       HeightRequest="400"
@@ -44,15 +45,16 @@
             SelectedCount="{Binding SelectedCount}"
             IsSelected="{Binding IsSelected}"
             RowClicked="OnRowClicked"
-            IsOdd="{Binding IsOdd}"
-            RowDoubleClicked="OnRowDoubleClicked"/>
+            RowDoubleClicked="OnRowDoubleClicked"
+            IsOdd="{Binding IsOdd}"/>
         </DataTemplate>
       </CollectionView.ItemTemplate>
     </CollectionView>
 
-    <ScrollView x:Name="LogScrollView"
-                HeightRequest="300"
-                BackgroundColor="black">
+    <ScrollView
+      x:Name="LogScrollView"
+      HeightRequest="300"
+      BackgroundColor="black">
       <Editor x:Name="LogEditor"
               HeightRequest="300"
               BackgroundColor="Black"

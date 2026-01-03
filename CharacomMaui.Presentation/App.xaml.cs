@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Presentation.Services;
 
 namespace CharacomMaui.Presentation;
 
@@ -38,11 +39,11 @@ public partial class App : Microsoft.Maui.Controls.Application
           //var boxAuthService = ServiceHelper.GetService<IBoxApiAuthService>();
           //var result = await boxAuthService.ExchangeCodeForTokenAsync(code, "myapp://callback");
 
-          //await Shell.Current.DisplayAlert("Box Login", $"Access Token: {result.AccessToken}", "OK");
+
         }
         catch (Exception ex)
         {
-          await Shell.Current.DisplayAlert("Box Login Error", ex.Message, "OK");
+          await SnackBarService.Error($"Box Login Error: {ex.Message}");
         }
       }
     }

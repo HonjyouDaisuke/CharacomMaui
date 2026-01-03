@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Services;
 using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,10 +9,16 @@ using System.Threading.Tasks;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
+public sealed class CreateProjectResult
+{
+  public bool IsCanceled { get; init; }
+  public Project? Project { get; init; }
+}
 public partial class CreateProjectDialog : Popup
 {
   public string ProjectName => ProjectNameEntry.Text;
   public string ProjectDescription => ProjectDescriptionEditor.Text;
+  public bool IsCanceled { get; private set; } = false;
   public BoxItem SelectedTopFolder => (BoxItem)TopFolderDropdown.SelectedItem;
   public BoxItem SelectedCharaFolder => (BoxItem)CharaFolderDropdown.SelectedItem;
   private IDialogService _dialogService;
@@ -31,6 +38,9 @@ public partial class CreateProjectDialog : Popup
     get => (string)GetValue(TitleProperty);
     set => SetValue(TitleProperty, value);
   }
+
+  public event Func<CreateProjectResult, Task>? Completed;
+  public event Action? Finished;
   public CreateProjectDialog(string title, List<BoxItem> topFolders, IDialogService dialogService, CreateProjectViewModel viewModel, Project? project = null)
   {
     InitializeComponent();
@@ -111,30 +121,66 @@ public partial class CreateProjectDialog : Popup
       }
     }
   }
-
   private async void OnOkClicked(object sender, EventArgs e)
   {
-    using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
-    {
-      // Indicate a long running operation
-      // エントリーの作成
-      var project = new Project
-      {
-        Id = _project?.Id ?? string.Empty,
-        Name = ProjectName,
-        Description = ProjectDescription,
-        FolderId = SelectedTopFolder.Id,
-        CharaFolderId = SelectedCharaFolder.Id,
-      };
-
-      var res = await _viewModel.CreateOrUpdateProjectAsync(project);
-      System.Diagnostics.Debug.WriteLine(res.ToString());
-    }
-    await CloseAsync(); // Close に渡す値は任意。複数渡したい場合は Tuple かクラスにまとめる
+    await OnOkClickedAsync(sender, e);
   }
-
-  private void OnCancelClicked(object sender, EventArgs e)
+  private async Task OnOkClickedAsync(object sender, EventArgs e)
   {
-    CloseAsync();
+    if (SelectedTopFolder == null || SelectedCharaFolder == null)
+    {
+      await SnackBarService.Error("プロジェクトフォルダ、または個別画像フォルダを選択してください。");
+      return;
+    }
+
+    try
+    {
+      using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
+      {
+        // Indicate a long running operation
+        // エントリーの作成
+        var project = new Project
+        {
+          Id = _project?.Id ?? string.Empty,
+          Name = ProjectName,
+          Description = ProjectDescription,
+          FolderId = SelectedTopFolder.Id,
+          CharaFolderId = SelectedCharaFolder.Id,
+        };
+
+        if (Completed != null)
+        {
+          await Completed.Invoke(new CreateProjectResult
+          {
+            IsCanceled = false,
+            Project = project
+          });
+        }
+      }
+    }
+    catch (Exception ex)
+    {
+      Debug.WriteLine($"Error in OnOkClickedAsync: {ex}");
+      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+    }
+    finally
+    {
+      Finished?.Invoke();
+      await CloseAsync();
+    }
   }
+
+  private async void OnCancelClicked(object sender, EventArgs e)
+  {
+    try
+    {
+      IsCanceled = true;
+    }
+    finally
+    {
+      Finished?.Invoke();
+      await CloseAsync();
+    }
+  }
+
 }

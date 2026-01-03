@@ -82,71 +82,87 @@ public partial class ProjectDetailCard : ContentView
     ProjectFolderId = ProjectFolderId,
     CharaFolderId = CharaFolderId,
   };
+  public void NotifyActionCompleted()
+  {
+    if (!_isActionProcessing)
+    {
+      System.Diagnostics.Debug.WriteLine("Warning: NotifyActionCompleted called when no action was processing");
+      return;
+    }
+    _isActionProcessing = false;
+    System.Diagnostics.Debug.WriteLine($"Completed IsActionProcessing={_isActionProcessing}");
+    SetButtonsEnabled();
+  }
+
+  private void SetButtonsEnabled()
+  {
+    UpdateBtn.IsEnabled = IsUpdateVisible;
+    DeleteBtn.IsEnabled = IsDeleteVisible;
+    InviteBtn.IsEnabled = IsInviteVisible;
+  }
 
   private async void OnUpdateClicked(object sender, EventArgs e)
   {
-    await RunOnceAsync(async () =>
-    {
-      var handler = UpdateRequested;
-      if (handler != null)
-      {
-        await handler(CreateArgs());
-      }
-    });
-  }
-  private async void OnDeleteClicked(object sender, EventArgs e)
-  {
-    await RunOnceAsync(async () =>
-    {
-      var handler = DeleteRequested;
-      if (handler != null)
-      {
-        await handler(CreateArgs());
-      }
-    });
-  }
-  private async void OnInviteClicked(object sender, EventArgs e)
-  {
-    await RunOnceAsync(async () =>
-    {
-      var handler = InviteRequested;
-      if (handler != null)
-      {
-        await handler(CreateArgs());
-      }
-    });
-  }
-
-  private async Task RunOnceAsync(
-    Func<Task> action)
-  {
     if (_isActionProcessing)
-      return; // ← ここが重要
-
+    {
+      return;
+    }
     _isActionProcessing = true;
-
+    UpdateBtn.IsEnabled = false;
     try
     {
-      // 全ボタンをロック
-      UpdateBtn.IsEnabled = false;
-      DeleteBtn.IsEnabled = false;
-      InviteBtn.IsEnabled = false;
-
-      await action();
-    }
-    catch (Exception ex)
-    {
-      System.Diagnostics.Debug.WriteLine($"[Error] {ex.Message}");
+      if (UpdateRequested != null)
+      {
+        await UpdateRequested.Invoke(CreateArgs());
+      }
     }
     finally
     {
-      UpdateBtn.IsEnabled = IsUpdateVisible;
-      DeleteBtn.IsEnabled = IsDeleteVisible;
-      InviteBtn.IsEnabled = IsInviteVisible;
-
       _isActionProcessing = false;
+      SetButtonsEnabled();
+    }
+
+  }
+  private async void OnDeleteClicked(object sender, EventArgs e)
+  {
+    if (_isActionProcessing)
+    {
+      return;
+    }
+    _isActionProcessing = true;
+    DeleteBtn.IsEnabled = false;
+    try
+    {
+      if (DeleteRequested != null)
+      {
+        await DeleteRequested.Invoke(CreateArgs());
+      }
+    }
+    finally
+    {
+      _isActionProcessing = false;
+      SetButtonsEnabled();
+    }
+
+  }
+  private async void OnInviteClicked(object sender, EventArgs e)
+  {
+    if (_isActionProcessing) return;
+
+    _isActionProcessing = true;
+    InviteBtn.IsEnabled = false;
+    try
+    {
+      if (InviteRequested != null)
+      {
+        await InviteRequested.Invoke(CreateArgs());
+      }
+    }
+    finally
+    {
+      _isActionProcessing = false;
+      SetButtonsEnabled();
     }
   }
-
 }
 
