@@ -12,6 +12,7 @@ using UraniumUI.Dialogs;
 using MauiControls = Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Services;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -107,22 +108,22 @@ public partial class CharaSelectViewModel : ObservableObject
       // Projectデータ読み込み
       await LoadProjectItems(accessToken);
       // 画像総数カウント
-      var CharaCount = GetCharaCount() + 2;
-      double IncreaseAmount = 1.0 / CharaCount;
-      var currentValue = IncreaseAmount;
-      System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {IncreaseAmount} Characount: {CharaCount}");
+      var charaCount = GetCharaCount() + 2;
+      double increaseAmount = 1.0 / charaCount;
+      var currentValue = increaseAmount;
+      System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {increaseAmount} Characount: {charaCount}");
       // Standard画像
       _progressDialog.Update("標準画像を読み込んでいます", currentValue);
       await StandardImageUpdateAsync(accessToken);
-      currentValue += IncreaseAmount;
+      currentValue += increaseAmount;
 
       // Stroke画像
       _progressDialog.Update("筆順画像を読み込んでいます", currentValue);
       await StrokeImageUpdateAsync(accessToken);
-      currentValue += IncreaseAmount;
+      currentValue += increaseAmount;
 
       // Chara選択画像群
-      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", currentValue, IncreaseAmount);
+      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", currentValue, increaseAmount);
     }
     catch (Exception ex)
     {

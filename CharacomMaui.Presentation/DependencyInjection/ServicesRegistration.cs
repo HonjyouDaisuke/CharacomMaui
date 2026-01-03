@@ -9,6 +9,7 @@ using CharacomMaui.Presentation.ViewModels;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using Microsoft.Extensions.DependencyInjection;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.DependencyInjection;
 

@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Maui.Extensions;
 using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Services;
 
