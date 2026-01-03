@@ -189,15 +189,16 @@ public partial class UserProfileDialog : Popup
       return;
     }
     var res = await _userInfoUseCase.ExecuteAsync(accessToken, _appStatus.UserId, AppUserName, AppEmailAddress, AvatarUrl);
-    await CloseAsync();
     if (res.Success)
     {
       await SnackBarService.Success("ユーザー情報を更新しました。");
+      await CloseAsync();
     }
     else
     {
       await SnackBarService.Error("エラーが発生しました。");
       System.Diagnostics.Debug.WriteLine($"エラーが発生しました。{res.Message}");
+      // ダイアログを開いたままにして、ユーザーが修正できるようにする
     }
   }
 
