@@ -159,7 +159,6 @@ public partial class CreateProjectDialog : Popup
     finally
     {
       Finished?.Invoke();
-      IsCanceled = false;
       await CloseAsync();
     }
   }

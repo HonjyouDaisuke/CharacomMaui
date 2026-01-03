@@ -113,12 +113,12 @@ public partial class CharaSelectViewModel : ObservableObject
       var currentValue = increaseAmount;
       System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {increaseAmount} Characount: {charaCount}");
       // Standard画像
-      _progressDialog.Update("標準画像を読み込んでいます", currentValue);
+      await _progressDialog.Update("標準画像を読み込んでいます", currentValue);
       await StandardImageUpdateAsync(accessToken);
       currentValue += increaseAmount;
 
       // Stroke画像
-      _progressDialog.Update("筆順画像を読み込んでいます", currentValue);
+      await _progressDialog.Update("筆順画像を読み込んでいます", currentValue);
       await StrokeImageUpdateAsync(accessToken);
       currentValue += increaseAmount;
 
