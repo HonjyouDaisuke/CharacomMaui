@@ -4,6 +4,7 @@ using UraniumUI.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using CharacomMaui.Presentation.ViewModels;
+using CharacomMaui.Presentation.Services;
 using System.Threading.Tasks;
 using Mopups.Pages;
 using Mopups.Services;
@@ -188,16 +189,22 @@ public partial class UserProfileDialog : Popup
       return;
     }
     var res = await _userInfoUseCase.ExecuteAsync(accessToken, _appStatus.UserId, AppUserName, AppEmailAddress, AvatarUrl);
-    if (!res.Success)
+    await CloseAsync();
+    if (res.Success)
     {
+      await SnackBarService.Success("ユーザー情報を更新しました。");
+    }
+    else
+    {
+      await SnackBarService.Error("エラーが発生しました。");
       System.Diagnostics.Debug.WriteLine($"エラーが発生しました。{res.Message}");
     }
-    await CloseAsync();
   }
 
   private async void OnCancelClicked(object sender, EventArgs e)
   {
     await CloseAsync();
+    await SnackBarService.Warning("キャンセルされました。");
   }
 
   private void OnAvaterSelectClicked(object sender, EventArgs e)
