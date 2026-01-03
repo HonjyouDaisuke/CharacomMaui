@@ -146,6 +146,7 @@ public partial class CreateProjectDialog : Popup
           FolderId = SelectedTopFolder.Id,
           CharaFolderId = SelectedCharaFolder.Id,
         };
+
         if (Completed != null)
         {
           await Completed.Invoke(new CreateProjectResult
@@ -155,6 +156,11 @@ public partial class CreateProjectDialog : Popup
           });
         }
       }
+    }
+    catch (Exception ex)
+    {
+      Debug.WriteLine($"Error in OnOkClickedAsync: {ex}");
+      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
     }
     finally
     {
