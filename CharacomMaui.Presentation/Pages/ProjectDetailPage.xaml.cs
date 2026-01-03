@@ -9,6 +9,7 @@ using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using MauiApp = Microsoft.Maui.Controls.Application;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -20,7 +21,14 @@ public partial class ProjectDetailPage : ContentPage
   private ProjectDetailViewModel _viewModel;
   private CreateProjectViewModel _createViewModel;
   private IDialogService _dialogService;
-  public ProjectDetailPage(AppStatus appStatus, GetProjectCharaItemsUseCase useCase, CreateProjectViewModel createProjectViewModel, ProjectDetailViewModel viewModel, IDialogService dialogService)
+  private ISimpleProgressDialogService _simpleDialog;
+
+  public ProjectDetailPage(AppStatus appStatus,
+  GetProjectCharaItemsUseCase useCase,
+  CreateProjectViewModel createProjectViewModel,
+  ProjectDetailViewModel viewModel,
+  IDialogService dialogService,
+  ISimpleProgressDialogService simpleDialog)
   {
     InitializeComponent();
     _appStatus = appStatus;
@@ -28,6 +36,8 @@ public partial class ProjectDetailPage : ContentPage
     _dialogService = dialogService;
     _viewModel = viewModel;
     _createViewModel = createProjectViewModel;
+    _simpleDialog = simpleDialog;
+    _simpleDialog.SetHost(this);
     BindingContext = _viewModel;
 
     ProjectDetailCard.UpdateRequested += OnUpdateRequestedAsync;
@@ -65,11 +75,10 @@ public partial class ProjectDetailPage : ContentPage
 
   private async Task GetCharaItemAsync()
   {
-    using (await _dialogService.DisplayProgressAsync("プロジェクト詳細ページ準備中", "プロジェクト画面を準備しています。少々お待ちください。"))
-    {
-      await _viewModel.FetchCharaDataAsync(_appStatus.ProjectId);
-    }
+
+    await _viewModel.FetchCharaDataAsync(_appStatus.ProjectId);
   }
+
 
   private void OnRowClicked(object sender, CharaDataProgressRowEventArgs e)
   {
@@ -155,6 +164,7 @@ public partial class ProjectDetailPage : ContentPage
       if (dialog.IsCanceled)
       {
         LogEditor.Text += "キャンセルされました\n";
+        await SnackBarService.Warning("削除がキャンセルされました。");
         return;
       }
       project.Name = dialog.ProjectName;
@@ -163,31 +173,30 @@ public partial class ProjectDetailPage : ContentPage
       project.CharaFolderId = dialog.SelectedCharaFolder.Id;
       LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
-      using (await _dialogService.DisplayProgressAsync(
-               "プロジェクト更新", "更新中..."))
-      {
-        var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
-        if (result.Success)
-        {
-          await _viewModel.SetProjectDetailsAsync(_appStatus.ProjectId);
-          await SnackBarService.Success($"プロジェクトを更新しました。 プロジェクト名：{project.Name}");
-        }
-        else
-        {
-          await SnackBarService.Error($"プロジェクト更新中にエラーが発生しました。 プロジェクト名：{project.Name}");
-        }
-      }
+      await _simpleDialog.ShowAsync("プロジェクトの更新", "プロジェクトを更新しています。少々お待ちください");
 
-      LogEditor.Text += "プロジェクトを更新しました\n";
+      var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
+
+      await Task.Delay(100);
+      await _simpleDialog.CloseAsync();
+      await Task.Delay(100);
+      if (result.Success)
+      {
+        await SnackBarService.Success("プロジェクトを更新しました");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
+        await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
+      }
 
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"Update error: {ex.Message}");
-      await SnackBarService.Error($"プロジェクトの更新中に想定外のエラーが発生しました");
+      System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {ex.Message}");
+      await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
     }
   }
-
   private async Task OnDeleteRequestedAsync(ProjectInfoEventArgs e)
   {
     try
@@ -200,23 +209,26 @@ public partial class ProjectDetailPage : ContentPage
 
       if (dialog.IsConfirmed)
       {
-        using (await _dialogService.DisplayProgressAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・\nしばらくお待ち下さい。"))
-        {
-          LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
-          var result = await _createViewModel.DeleteProjectAsync(e.ProjectId);
-          LogEditor.Text += $"削除結果: {result.Success}\n";
-          if (!result.Success)
-          {
-            await SnackBarService.Error($"プロジェクトの削除に失敗しました。 プロジェクト名：{e.ProjectName}");
-            return;
-          }
+        await _simpleDialog.ShowAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・しばらくお待ち下さい。");
 
-          await Shell.Current.GoToAsync("///ProjectListPage");
+        LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+        var result = await _createViewModel.DeleteProjectAsync(e.ProjectId);
+        LogEditor.Text += $"削除結果: {result.Success}\n";
+
+        await _simpleDialog.CloseAsync();
+        if (!result.Success)
+        {
+          await SnackBarService.Error($"プロジェクトの削除に失敗しました。 プロジェクト名：{e.ProjectName}");
+          return;
         }
+        await SnackBarService.Success($"プロジェクトを削除しました。");
+        await Shell.Current.GoToAsync("///ProjectListPage");
+
       }
       else
       {
         LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
+        await SnackBarService.Warning("削除がキャンセルされました。");
       }
     }
     catch (Exception ex)

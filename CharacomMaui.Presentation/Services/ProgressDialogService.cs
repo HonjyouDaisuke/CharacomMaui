@@ -9,8 +9,8 @@ public class ProgressDialogService : IProgressDialogService
 {
   private ProgressDialog? _dialog;
   private Page? _hostPage;
+  private bool _isShowing;
 
-  // AppShell / Page 起動時に注入
   public void SetHost(Page page)
   {
     _hostPage = page;
@@ -19,6 +19,10 @@ public class ProgressDialogService : IProgressDialogService
   public async Task ShowAsync(string title, string message)
   {
     if (_hostPage == null) return;
+    if (_isShowing) return;
+
+
+    _isShowing = true;
     if (_dialog != null)
     {
       System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
@@ -31,26 +35,38 @@ public class ProgressDialogService : IProgressDialogService
     });
   }
 
-  public async Task Update(string message, double progress)
+  public async Task UpdateAsync(string message, double progress)
   {
     if (_dialog == null) return;
 
-    await MainThread.InvokeOnMainThreadAsync(async () =>
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
-      System.Diagnostics.Debug.WriteLine($"progress = {progress}");
       _dialog.Message = message;
-      await _dialog.AnimateProgressAsync(progress);
+      _dialog.AnimateProgress(progress);
     });
   }
 
   public async Task CloseAsync()
   {
-    if (_dialog == null) return;
+    System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
+    if (!_isShowing || _dialog == null)
+    {
+      _isShowing = false;
+      return;
+    }
 
     await MainThread.InvokeOnMainThreadAsync(async () =>
     {
-      await _dialog.CloseAsync();
-      _dialog = null;
+      try
+      {
+        await _dialog.CloseAsync();
+      }
+      finally
+      {
+        _dialog = null;
+        _isShowing = false; // ここでフラグを false に戻す
+      }
     });
   }
 }
+

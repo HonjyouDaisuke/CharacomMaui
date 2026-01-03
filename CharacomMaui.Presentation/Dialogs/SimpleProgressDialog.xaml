@@ -41,6 +41,7 @@
       <ActivityIndicator
         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
         IsRunning="True"
+        Margin="10"
         Grid.Row="2"/>
 
     </Grid>

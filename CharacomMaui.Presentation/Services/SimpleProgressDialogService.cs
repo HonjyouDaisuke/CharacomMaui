@@ -9,6 +9,8 @@ public class SimpleProgressDialogService : ISimpleProgressDialogService
 {
   private SimpleProgressDialog? _dialog;
   private Page? _hostPage;
+  private bool _isShowing = false;
+
 
   // AppShell / Page 起動時に注入
   public void SetHost(Page page)
@@ -19,6 +21,10 @@ public class SimpleProgressDialogService : ISimpleProgressDialogService
   public async Task ShowAsync(string title, string message)
   {
     if (_hostPage == null) return;
+    if (_isShowing) return;
+
+
+    _isShowing = true;
     if (_dialog != null)
     {
       System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
@@ -33,7 +39,8 @@ public class SimpleProgressDialogService : ISimpleProgressDialogService
 
   public async Task CloseAsync()
   {
-    if (_dialog == null) return;
+    System.Diagnostics.Debug.WriteLine("[SimpleDialog]クローズ呼びました。");
+    if (!_isShowing || _dialog == null) return;
 
     await MainThread.InvokeOnMainThreadAsync(async () =>
     {

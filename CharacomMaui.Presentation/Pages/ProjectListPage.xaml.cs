@@ -170,12 +170,36 @@ public partial class ProjectListPage : ContentPage
       return;
     }
 
-    var projectName = dialog.ProjectName;
-    var projectDescription = dialog.ProjectDescription;
-    var selectedFolder = dialog.SelectedTopFolder;
-    var selectedCharaFolder = dialog.SelectedCharaFolder;
+    Project project = new()
+    {
+      Name = dialog.ProjectName,
+      Description = dialog.ProjectDescription,
+      FolderId = dialog.SelectedTopFolder.Id,
+      CharaFolderId = dialog.SelectedCharaFolder.Id
+    };
+    LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
-    LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
+    await _simpleDialog.ShowAsync("プロジェクトの作成", "プロジェクトを作成しています。少々お待ちください");
+
+    var result = await _viewModel.CreateOrUpdateProjectAsync(project);
+
+    await Task.Delay(100);
+    await _simpleDialog.CloseAsync();
+    await Task.Delay(100);
+    if (result.Success)
+    {
+      var projects = await _viewModel.GetProjectsAsync();
+      BindableLayout.SetItemsSource(ProjectsFlex, projects);
+
+      await SnackBarService.Success("プロジェクトを作成しました");
+    }
+    else
+    {
+      System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
+      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+    }
+
+    //LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
   }
 
   private async Task ResultNotification(SimpleApiResult result, string target)

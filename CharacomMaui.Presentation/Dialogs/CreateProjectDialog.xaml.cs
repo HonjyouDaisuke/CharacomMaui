@@ -133,41 +133,28 @@ public partial class CreateProjectDialog : Popup
       return;
     }
 
-    try
+    // Indicate a long running operation
+    // エントリーの作成
+    var project = new Project
     {
-      using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
-      {
-        // Indicate a long running operation
-        // エントリーの作成
-        var project = new Project
-        {
-          Id = _project?.Id ?? string.Empty,
-          Name = ProjectName,
-          Description = ProjectDescription,
-          FolderId = SelectedTopFolder.Id,
-          CharaFolderId = SelectedCharaFolder.Id,
-        };
+      Id = _project?.Id ?? string.Empty,
+      Name = ProjectName,
+      Description = ProjectDescription,
+      FolderId = SelectedTopFolder.Id,
+      CharaFolderId = SelectedCharaFolder.Id,
+    };
 
-        if (Completed != null)
-        {
-          await Completed.Invoke(new CreateProjectResult
-          {
-            IsCanceled = false,
-            Project = project
-          });
-        }
-      }
-    }
-    catch (Exception ex)
+    if (Completed != null)
     {
-      Debug.WriteLine($"Error in OnOkClickedAsync: {ex}");
-      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+      await Completed.Invoke(new CreateProjectResult
+      {
+        IsCanceled = false,
+        Project = project
+      });
     }
-    finally
-    {
-      Finished?.Invoke();
-      await CloseAsync();
-    }
+
+    Finished?.Invoke();
+    await CloseAsync();
   }
 
   private async void OnCancelClicked(object sender, EventArgs e)
