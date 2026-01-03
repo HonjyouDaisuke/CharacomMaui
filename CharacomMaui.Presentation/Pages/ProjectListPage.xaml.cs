@@ -6,6 +6,7 @@ using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
+using CharacomMaui.Presentation.Services;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
@@ -164,26 +165,44 @@ public partial class ProjectListPage : ContentPage
     LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
   }
 
+  private async Task ResultNotification(SimpleApiResult result, string target)
+  {
+
+    if (result.Success)
+    {
+      await SnackBarService.Success($"{target}を作成・更新しました。");
+    }
+    else
+    {
+      await SnackBarService.Error($"{target}の作成・更新に失敗しました。");
+    }
+
+  }
   private async void OnStrokeBtnClicked(object sender, EventArgs e)
   {
+    SimpleApiResult result = new();
     using (await _dialogService.DisplayProgressAsync("筆順書体マスター", "筆順書体マスターを作成しています。少々お待ちください。"))
     {
       // Indicate a long running operation
       // エントリーの作成
-      var res = await _viewModel.UpdateStrokeAsync();
-      System.Diagnostics.Debug.WriteLine(res.ToString());
+      result = await _viewModel.UpdateStrokeAsync();
+      System.Diagnostics.Debug.WriteLine(result.ToString());
+      await ResultNotification(result, "筆順書体");
+
     }
   }
 
   // 標準画像の更新
   private async void OnStandardBtnClicked(object sender, EventArgs e)
   {
+    SimpleApiResult result = new();
     using (await _dialogService.DisplayProgressAsync("標準書体マスター", "標準書体マスターを作成しています。少々お待ちください。"))
     {
       // Indicate a long running operation
       // エントリーの作成
-      var res = await _viewModel.UpdateStandardAsync();
-      System.Diagnostics.Debug.WriteLine(res.ToString());
+      result = await _viewModel.UpdateStandardAsync();
+      System.Diagnostics.Debug.WriteLine(result.ToString());
+      await ResultNotification(result, "標準書体");
     }
   }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
