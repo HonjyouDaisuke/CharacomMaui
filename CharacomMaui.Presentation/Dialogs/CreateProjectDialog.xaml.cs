@@ -127,13 +127,14 @@ public partial class CreateProjectDialog : Popup
   }
   private async Task OnOkClickedAsync(object sender, EventArgs e)
   {
+    if (SelectedTopFolder == null || SelectedCharaFolder == null)
+    {
+      await SnackBarService.Error("プロジェクトフォルダ、または個別画像フォルダを選択してください。");
+      return;
+    }
+
     try
     {
-      if (SelectedTopFolder == null || SelectedCharaFolder == null)
-      {
-        await SnackBarService.Error("プロジェクトフォルダ、または個別画像フォルダを選択してください。");
-        return;
-      }
       using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
       {
         // Indicate a long running operation
