@@ -1,0 +1,48 @@
+<views:Popup
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:views="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+  xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+  xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+  xmlns:validation="clr-namespace:InputKit.Shared.Validations;assembly=InputKit.Maui"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  x:Class="CharacomMaui.Presentation.Dialogs.SimpleProgressDialog"
+  x:Name="Root"
+  Padding="0"
+  Margin="0"
+  BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}">
+
+  <Border StrokeThickness="0"
+          BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
+          Padding="0">
+
+    <!-- 全体レイアウト -->
+    <Grid RowDefinitions="Auto, Auto, Auto"
+          WidthRequest="600">
+      <!-- ダイアログタイトル -->
+      <Label x:Name="TitleLabel"
+             Text="{Binding Source={x:Reference Root}, Path=DialogTitle}"
+             FontSize="20"
+             FontAttributes="Bold"
+             Padding="15"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryContainer}, Dark={DynamicResource PrimaryContainerDark}}"
+             TextColor="{AppThemeBinding Light={DynamicResource OnPrimaryContainer}, Dark={DynamicResource OnPrimaryContainerDark}}"
+             HorizontalTextAlignment="Center"
+             HorizontalOptions="Fill"
+             Grid.Row="0"/>
+      <!-- Message -->
+      <Label Grid.Row="1"
+             Text="{Binding Source={x:Reference Root}, Path=Message}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
+             Padding="10"
+             Margin="10"/>
+
+      <!-- ActivityIndicator -->
+      <ActivityIndicator
+        Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+        IsRunning="True"
+        Grid.Row="2"/>
+
+    </Grid>
+  </Border>
+</views:Popup>

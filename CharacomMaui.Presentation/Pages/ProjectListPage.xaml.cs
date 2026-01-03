@@ -7,6 +7,7 @@ using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.ViewModels;
 using CharacomMaui.Presentation.Services;
+using CharacomMaui.Presentation.Interfaces;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
@@ -22,7 +23,13 @@ public partial class ProjectListPage : ContentPage
   private readonly CreateProjectViewModel _viewModel;
   private readonly AppStatusUseCase _appStatusUseCase;
   private readonly AppStatusNotifier _notifier;
-  public ProjectListPage(IBoxFolderRepository repository, IDialogService dialogService, CreateProjectViewModel viewModel, AppStatusUseCase appStatusUseCase, AppStatusNotifier notifier)
+  private readonly ISimpleProgressDialogService _simpleDialog;
+  public ProjectListPage(IBoxFolderRepository repository,
+    IDialogService dialogService,
+    CreateProjectViewModel viewModel,
+    AppStatusUseCase appStatusUseCase,
+    AppStatusNotifier notifier,
+    ISimpleProgressDialogService simpleDialog)
   {
     InitializeComponent();
     _repository = repository;
@@ -30,7 +37,9 @@ public partial class ProjectListPage : ContentPage
     _appStatusUseCase = appStatusUseCase;
     _viewModel = viewModel;
     _notifier = notifier;
+    _simpleDialog = simpleDialog;
     _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
+    simpleDialog.SetHost(this);
     System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
     BindingContext = _viewModel;
   }
@@ -40,8 +49,6 @@ public partial class ProjectListPage : ContentPage
     base.OnAppearing();
     var projects = await _viewModel.GetProjectsAsync();
     if (projects == null) return;
-    // TODO:いる？
-    // _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
     BindableLayout.SetItemsSource(ProjectsFlex, projects);
     foreach (var project in projects)
     {
@@ -90,15 +97,19 @@ public partial class ProjectListPage : ContentPage
     LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
     // プロジェクトを更新
-    using (await _dialogService.DisplayProgressAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。"))
+    await _simpleDialog.ShowAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。");
+    var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
+    await Task.Delay(100);
+    await _simpleDialog.CloseAsync();
+    await Task.Delay(100);
+    if (updateResult.Success)
     {
-      var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
-      if (!updateResult.Success)
-      {
-        LogEditor.Text += $"プロジェクトの更新に失敗しました。{updateResult.Message}\n";
-        return;
-      }
-      LogEditor.Text += $"プロジェクトを更新しました。ProjectName={project.Name}";
+      await SnackBarService.Success("プロジェクトを更新しました");
+    }
+    else
+    {
+      System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {updateResult.Message}");
+      await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
     }
   }
 
@@ -112,26 +123,28 @@ public partial class ProjectListPage : ContentPage
 
     if (dialog.IsConfirmed)
     {
-      using (await _dialogService.DisplayProgressAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・\nしばらくお待ち下さい。"))
-      {
-        LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
-        var result = await _viewModel.DeleteProjectAsync(e.ProjectId);
-        LogEditor.Text += $"削除結果: {result.Success}\n";
-        if (!result.Success)
-        {
-          await _dialogService.DisplayTextPromptAsync("削除エラー", result.Message, "OK");
-          return;
-        }
-        // プロジェクトリストを再取得
-        var projects = await _viewModel.GetProjectsAsync();
+      await _simpleDialog.ShowAsync("プロジェクトの削除", "プロジェクトを削除中・・・\nしばらくお待ち下さい。");
 
-        if (projects == null) return;
-        BindableLayout.SetItemsSource(ProjectsFlex, projects);
+      LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+      var result = await _viewModel.DeleteProjectAsync(e.ProjectId);
+      LogEditor.Text += $"削除結果: {result.Success}\n";
+      await _simpleDialog.CloseAsync();
+      if (!result.Success)
+      {
+        await SnackBarService.Error($"削除中にエラーが発生しました。: {e.ProjectName} (ID: {e.ProjectId})");
+        return;
       }
+      // プロジェクトリストを再取得
+      var projects = await _viewModel.GetProjectsAsync();
+
+      if (projects == null) return;
+      BindableLayout.SetItemsSource(ProjectsFlex, projects);
+
     }
     else
     {
       LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
+      await SnackBarService.Warning($"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})");
     }
   }
 
@@ -180,30 +193,26 @@ public partial class ProjectListPage : ContentPage
   }
   private async void OnStrokeBtnClicked(object sender, EventArgs e)
   {
-    SimpleApiResult result = new();
-    using (await _dialogService.DisplayProgressAsync("筆順書体マスター", "筆順書体マスターを作成しています。少々お待ちください。"))
-    {
-      // Indicate a long running operation
-      // エントリーの作成
-      result = await _viewModel.UpdateStrokeAsync();
-      System.Diagnostics.Debug.WriteLine(result.ToString());
-      await ResultNotification(result, "筆順書体");
-
-    }
+    await _simpleDialog.ShowAsync("筆順書体マスター作成中", "筆順書体マスターを作成しています。少々お待ちください。");
+    var result = await _viewModel.UpdateStrokeAsync();
+    System.Diagnostics.Debug.WriteLine(result.ToString());
+    await Task.Delay(100);
+    await _simpleDialog.CloseAsync();
+    await Task.Delay(100);
+    await ResultNotification(result, "筆順書体");
   }
 
   // 標準画像の更新
   private async void OnStandardBtnClicked(object sender, EventArgs e)
   {
-    SimpleApiResult result = new();
-    using (await _dialogService.DisplayProgressAsync("標準書体マスター", "標準書体マスターを作成しています。少々お待ちください。"))
-    {
-      // Indicate a long running operation
-      // エントリーの作成
-      result = await _viewModel.UpdateStandardAsync();
-      System.Diagnostics.Debug.WriteLine(result.ToString());
-      await ResultNotification(result, "標準書体");
-    }
+    await _simpleDialog.ShowAsync("標準書体マスター作成中", "標準書体マスターを作成しています。少々お待ちください。");
+
+    var result = await _viewModel.UpdateStandardAsync();
+    System.Diagnostics.Debug.WriteLine(result.ToString());
+    await Task.Delay(100);
+    await _simpleDialog.CloseAsync();
+    await Task.Delay(100);
+    await ResultNotification(result, "標準書体");
   }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
   {
