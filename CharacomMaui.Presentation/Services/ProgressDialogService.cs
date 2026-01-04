@@ -39,7 +39,7 @@ public class ProgressDialogService : IProgressDialogService
   public async Task CloseAsync()
   {
     System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
-    if (!_isShowing || _dialog == null)
+    if (_dialog == null)
     {
       _isShowing = false;
       return;
@@ -50,6 +50,10 @@ public class ProgressDialogService : IProgressDialogService
       try
       {
         await _dialog.CloseAsync();
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine($"[ProgressDialog] Close error: {ex.Message}");
       }
       finally
       {
