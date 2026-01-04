@@ -73,6 +73,7 @@ public static class ServicesRegistration
     // その他
     services.AddSingleton<IDialogService, MopupsDialogService>();
     services.AddSingleton<IProgressDialogService, ProgressDialogService>();
+    services.AddSingleton<ISimpleProgressDialogService, SimpleProgressDialogService>();
 
     return services;
   }

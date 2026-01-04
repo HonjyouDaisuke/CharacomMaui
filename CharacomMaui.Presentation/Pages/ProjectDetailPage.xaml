@@ -15,6 +15,7 @@
 
     <components:ProjectDetailCard
       x:Name="ProjectDetailCard"
+      BindingContext="{Binding}"
       ProjectName="{Binding ProjectName}"
       ProjectId="{Binding ProjectId}"
       ProjectDescription="{Binding ProjectDescription}"

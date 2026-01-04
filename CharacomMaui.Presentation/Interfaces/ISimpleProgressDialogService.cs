@@ -1,9 +1,8 @@
 
 namespace CharacomMaui.Presentation.Interfaces;
 
-public interface IProgressDialogService
+public interface ISimpleProgressDialogService
 {
   Task ShowAsync(string title, string message);
-  Task UpdateAsync(string message, double progress);
   Task CloseAsync();
 }

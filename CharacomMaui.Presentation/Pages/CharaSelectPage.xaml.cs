@@ -32,7 +32,6 @@ public partial class CharaSelectPage : ContentPage
     _viewModel = viewModel;
     _notifier = notifier;
 
-    progressDialog.SetHost(this);
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += OnAppStatusChanged;
 

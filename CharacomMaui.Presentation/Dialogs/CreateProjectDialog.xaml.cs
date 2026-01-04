@@ -133,34 +133,31 @@ public partial class CreateProjectDialog : Popup
       return;
     }
 
+    // Indicate a long running operation
+    // エントリーの作成
+    var project = new Project
+    {
+      Id = _project?.Id ?? string.Empty,
+      Name = ProjectName,
+      Description = ProjectDescription,
+      FolderId = SelectedTopFolder.Id,
+      CharaFolderId = SelectedCharaFolder.Id,
+    };
+
     try
     {
-      using (await _dialogService.DisplayProgressAsync("Loading", "Work in progress, please wait..."))
+      if (Completed != null)
       {
-        // Indicate a long running operation
-        // エントリーの作成
-        var project = new Project
+        await Completed.Invoke(new CreateProjectResult
         {
-          Id = _project?.Id ?? string.Empty,
-          Name = ProjectName,
-          Description = ProjectDescription,
-          FolderId = SelectedTopFolder.Id,
-          CharaFolderId = SelectedCharaFolder.Id,
-        };
-
-        if (Completed != null)
-        {
-          await Completed.Invoke(new CreateProjectResult
-          {
-            IsCanceled = false,
-            Project = project
-          });
-        }
+          IsCanceled = false,
+          Project = project
+        });
       }
     }
     catch (Exception ex)
     {
-      Debug.WriteLine($"Error in OnOkClickedAsync: {ex}");
+      Debug.WriteLine($"プロジェクト作成中にエラーが発生: {ex.Message}");
       await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
     }
     finally

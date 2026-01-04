@@ -38,9 +38,9 @@ public partial class ProgressDialog : Popup
   /// プログレスバーをアニメーションさせながら更新します
   /// </summary>
   /// <param name="targetValue">目標値 (0.0 ～ 1.0)</param>
-  public async Task AnimateProgressAsync(double targetValue)
+  public void AnimateProgress(double targetValue)
   {
     // 500ms かけてスルスルと動かす
-    await MainProgressBar.ProgressTo(targetValue, 500, Easing.CubicOut);
+    MainProgressBar.ProgressTo(targetValue, 500, Easing.CubicOut);
   }
 }

@@ -5,10 +5,10 @@ using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Services;
 
-public class ProgressDialogService : IProgressDialogService
+public class SimpleProgressDialogService : ISimpleProgressDialogService
 {
-  private ProgressDialog? _dialog;
-  private bool _isShowing;
+  private SimpleProgressDialog? _dialog;
+  private bool _isShowing = false;
 
   public async Task ShowAsync(string title, string message)
   {
@@ -16,31 +16,25 @@ public class ProgressDialogService : IProgressDialogService
     if (currentPage == null) return;
     if (_isShowing && _dialog != null) return;
 
+    // 不整合な状態をクリーンアップ
+    if (_dialog != null)
+    {
+      System.Diagnostics.Debug.WriteLine("[警告] 不整合な状態を検出: _dialogがnullではありません");
+      await CloseAsync();
+    }
     _isShowing = true;
-
     await MainThread.InvokeOnMainThreadAsync(() =>
     {
-      _dialog = new ProgressDialog(title, message);
+      _dialog = new SimpleProgressDialog(title, message);
       currentPage.ShowPopup(_dialog);
-    });
-  }
-
-  public async Task UpdateAsync(string message, double progress)
-  {
-    if (_dialog == null) return;
-
-    await MainThread.InvokeOnMainThreadAsync(() =>
-    {
-      _dialog.Message = message;
-      _dialog.AnimateProgress(progress);
     });
   }
 
   public async Task CloseAsync()
   {
-    System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
     if (_dialog == null)
     {
+      _isShowing = false;
       return;
     }
 
@@ -52,14 +46,13 @@ public class ProgressDialogService : IProgressDialogService
       }
       catch (Exception ex)
       {
-        System.Diagnostics.Debug.WriteLine($"[ProgressDialog] Close error: {ex.Message}");
+        System.Diagnostics.Debug.WriteLine($"errorMsg = {ex.Message}");
       }
       finally
       {
+        _isShowing = false;
         _dialog = null;
-        _isShowing = false; // ここでフラグを false に戻す
       }
     });
   }
 }
-
