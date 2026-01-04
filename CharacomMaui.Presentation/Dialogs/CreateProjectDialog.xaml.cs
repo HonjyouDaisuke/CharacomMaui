@@ -155,6 +155,11 @@ public partial class CreateProjectDialog : Popup
         });
       }
     }
+    catch (Exception ex)
+    {
+      Debug.WriteLine($"プロジェクト作成中にエラーが発生: {ex.Message}");
+      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+    }
     finally
     {
       Finished?.Invoke();
