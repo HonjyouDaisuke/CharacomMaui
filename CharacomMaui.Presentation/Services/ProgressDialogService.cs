@@ -14,11 +14,11 @@ public class ProgressDialogService : IProgressDialogService
   {
     var currentPage = Shell.Current?.CurrentPage;
     if (currentPage == null) return;
-    if (_isShowing) return;
+    if (_isShowing && _dialog != null) return;
 
     _isShowing = true;
 
-    await MainThread.InvokeOnMainThreadAsync(async () =>
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
       _dialog = new ProgressDialog(title, message);
       currentPage.ShowPopup(_dialog);

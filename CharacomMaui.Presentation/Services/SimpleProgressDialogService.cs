@@ -14,16 +14,16 @@ public class SimpleProgressDialogService : ISimpleProgressDialogService
   {
     var currentPage = Shell.Current?.CurrentPage;
     if (currentPage == null) return;
-    if (_isShowing) return;
+    if (_isShowing && _dialog != null) return;
 
-
+    // 不整合な状態をクリーンアップ
     if (_dialog != null)
     {
-      System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
+      System.Diagnostics.Debug.WriteLine("[警告] 不整合な状態を検出: _dialogがnullではありません");
       await CloseAsync();
     }
     _isShowing = true;
-    await MainThread.InvokeOnMainThreadAsync(async () =>
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
       _dialog = new SimpleProgressDialog(title, message);
       currentPage.ShowPopup(_dialog);
