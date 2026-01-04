@@ -1,6 +1,4 @@
 using CommunityToolkit.Maui.Views;
-using CharacomMaui.Domain.Entities;
-using UraniumUI.Dialogs;
 
 namespace CharacomMaui.Presentation.Dialogs;
 

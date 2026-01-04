@@ -32,7 +32,7 @@ public class SimpleProgressDialogService : ISimpleProgressDialogService
 
   public async Task CloseAsync()
   {
-    if (!_isShowing || _dialog == null)
+    if (_dialog == null)
     {
       _isShowing = false;
       return;

@@ -16,12 +16,6 @@ public class ProgressDialogService : IProgressDialogService
     if (currentPage == null) return;
     if (_isShowing) return;
 
-
-    if (_dialog != null)
-    {
-      System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
-      await CloseAsync();
-    }
     _isShowing = true;
 
     await MainThread.InvokeOnMainThreadAsync(async () =>

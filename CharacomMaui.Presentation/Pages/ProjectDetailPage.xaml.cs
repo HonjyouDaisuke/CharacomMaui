@@ -173,20 +173,23 @@ public partial class ProjectDetailPage : ContentPage
       LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
       await _simpleDialog.ShowAsync("プロジェクトの更新", "プロジェクトを更新しています。少々お待ちください");
-
-      var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
-
-      await _simpleDialog.CloseAsync();
-      if (result.Success)
+      try
       {
-        await SnackBarService.Success("プロジェクトを更新しました");
+        var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
+        if (result.Success)
+        {
+          await SnackBarService.Success("プロジェクトを更新しました");
+        }
+        else
+        {
+          System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
+          await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
+        }
       }
-      else
+      finally
       {
-        System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
-        await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
+        await _simpleDialog.CloseAsync();
       }
-
     }
     catch (Exception ex)
     {
@@ -207,20 +210,29 @@ public partial class ProjectDetailPage : ContentPage
       if (dialog.IsConfirmed)
       {
         await _simpleDialog.ShowAsync("プロジェクトの削除", "プロジェクトデータ削除中・・・しばらくお待ち下さい。");
-
-        LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
-        var result = await _createViewModel.DeleteProjectAsync(e.ProjectId);
-        LogEditor.Text += $"削除結果: {result.Success}\n";
-
-        await _simpleDialog.CloseAsync();
-        if (!result.Success)
+        try
         {
-          await SnackBarService.Error($"プロジェクトの削除に失敗しました。 プロジェクト名：{e.ProjectName}");
-          return;
-        }
-        await SnackBarService.Success($"プロジェクトを削除しました。");
-        await Shell.Current.GoToAsync("///ProjectListPage");
 
+          LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+          var result = await _createViewModel.DeleteProjectAsync(e.ProjectId);
+          LogEditor.Text += $"削除結果: {result.Success}\n";
+
+          if (!result.Success)
+          {
+            await SnackBarService.Error($"プロジェクトの削除に失敗しました。 プロジェクト名：{e.ProjectName}");
+            return;
+          }
+          await SnackBarService.Success($"プロジェクトを削除しました。");
+          await Shell.Current.GoToAsync("///ProjectListPage");
+        }
+        catch (Exception ex)
+        {
+          System.Diagnostics.Debug.WriteLine($"エラーが発生しました。{ex.Message}");
+        }
+        finally
+        {
+          await _simpleDialog.CloseAsync();
+        }
       }
       else
       {

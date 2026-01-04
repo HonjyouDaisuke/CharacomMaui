@@ -146,7 +146,6 @@ public partial class ProjectListPage : ContentPage
 
       if (projects == null)
       {
-        await _simpleDialog.CloseAsync();
         return;
       }
       BindableLayout.SetItemsSource(ProjectsFlex, projects);
@@ -234,23 +233,33 @@ public partial class ProjectListPage : ContentPage
   private async void OnStrokeBtnClicked(object sender, EventArgs e)
   {
     await _simpleDialog.ShowAsync("筆順書体マスター作成中", "筆順書体マスターを作成しています。少々お待ちください。");
-    var result = await _viewModel.UpdateStrokeAsync();
-    System.Diagnostics.Debug.WriteLine(result.ToString());
-    await _simpleDialog.CloseAsync();
-    await ResultNotification(result, "筆順書体");
+    try
+    {
+      var result = await _viewModel.UpdateStrokeAsync();
+      System.Diagnostics.Debug.WriteLine(result.ToString());
+      await ResultNotification(result, "筆順書体");
+    }
+    finally
+    {
+      await _simpleDialog.CloseAsync();
+    }
   }
 
   // 標準画像の更新
   private async void OnStandardBtnClicked(object sender, EventArgs e)
   {
     await _simpleDialog.ShowAsync("標準書体マスター作成中", "標準書体マスターを作成しています。少々お待ちください。");
+    try
+    {
+      var result = await _viewModel.UpdateStandardAsync();
+      System.Diagnostics.Debug.WriteLine(result.ToString());
+      await ResultNotification(result, "標準書体");
+    }
+    finally
+    {
+      await _simpleDialog.CloseAsync();
 
-    var result = await _viewModel.UpdateStandardAsync();
-    System.Diagnostics.Debug.WriteLine(result.ToString());
-    await Task.Delay(100);
-    await _simpleDialog.CloseAsync();
-    await Task.Delay(100);
-    await ResultNotification(result, "標準書体");
+    }
   }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
   {
