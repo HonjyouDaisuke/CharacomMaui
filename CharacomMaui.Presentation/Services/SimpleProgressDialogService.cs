@@ -8,44 +8,51 @@ namespace CharacomMaui.Presentation.Services;
 public class SimpleProgressDialogService : ISimpleProgressDialogService
 {
   private SimpleProgressDialog? _dialog;
-  private Page? _hostPage;
   private bool _isShowing = false;
-
-
-  // AppShell / Page 起動時に注入
-  public void SetHost(Page page)
-  {
-    _hostPage = page;
-  }
 
   public async Task ShowAsync(string title, string message)
   {
-    if (_hostPage == null) return;
+    var currentPage = Shell.Current?.CurrentPage;
+    if (currentPage == null) return;
     if (_isShowing) return;
 
 
-    _isShowing = true;
     if (_dialog != null)
     {
       System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
       await CloseAsync();
     }
+    _isShowing = true;
     await MainThread.InvokeOnMainThreadAsync(async () =>
     {
       _dialog = new SimpleProgressDialog(title, message);
-      _hostPage.ShowPopup(_dialog);
+      currentPage.ShowPopup(_dialog);
     });
   }
 
   public async Task CloseAsync()
   {
-    System.Diagnostics.Debug.WriteLine("[SimpleDialog]クローズ呼びました。");
-    if (!_isShowing || _dialog == null) return;
+    if (!_isShowing || _dialog == null)
+    {
+      _isShowing = false;
+      return;
+    }
 
     await MainThread.InvokeOnMainThreadAsync(async () =>
     {
-      await _dialog.CloseAsync();
-      _dialog = null;
+      try
+      {
+        await _dialog.CloseAsync();
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine($"errorMsg = {ex.Message}");
+      }
+      finally
+      {
+        _isShowing = false;
+        _dialog = null;
+      }
     });
   }
 }

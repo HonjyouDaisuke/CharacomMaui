@@ -29,8 +29,8 @@ public partial class SimpleProgressDialog : Popup
   public SimpleProgressDialog(string title, string message)
   {
     InitializeComponent();
-    DialogTitle = title;
-    Message = message;
+    DialogTitle = title ?? string.Empty;
+    Message = message ?? string.Empty;
 
   }
 }

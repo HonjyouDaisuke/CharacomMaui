@@ -37,7 +37,6 @@ public partial class ProjectDetailPage : ContentPage
     _viewModel = viewModel;
     _createViewModel = createProjectViewModel;
     _simpleDialog = simpleDialog;
-    _simpleDialog.SetHost(this);
     BindingContext = _viewModel;
 
     ProjectDetailCard.UpdateRequested += OnUpdateRequestedAsync;
@@ -164,7 +163,7 @@ public partial class ProjectDetailPage : ContentPage
       if (dialog.IsCanceled)
       {
         LogEditor.Text += "キャンセルされました\n";
-        await SnackBarService.Warning("削除がキャンセルされました。");
+        await SnackBarService.Warning("更新がキャンセルされました。");
         return;
       }
       project.Name = dialog.ProjectName;
@@ -177,9 +176,7 @@ public partial class ProjectDetailPage : ContentPage
 
       var result = await _createViewModel.CreateOrUpdateProjectAsync(project);
 
-      await Task.Delay(100);
       await _simpleDialog.CloseAsync();
-      await Task.Delay(100);
       if (result.Success)
       {
         await SnackBarService.Success("プロジェクトを更新しました");

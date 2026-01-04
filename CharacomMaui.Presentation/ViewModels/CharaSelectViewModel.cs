@@ -444,16 +444,11 @@ public partial class CharaSelectViewModel : ObservableObject
       if (item == null) continue;
       if (item.IsSelected == true)
       {
-        System.Diagnostics.Debug.WriteLine($"Progress = {num} / {count} = {(double)((double)num / (double)count)}");
         double value = (double)num / (double)count;
         await _progressDialog.UpdateAsync($"画像処理中...({num} / {count})", value);
-        // using (await _dialogService.DisplayProgressAsync($"画像処理中...({num} / {count})", "画面を準備しています。しばらくお待ち下さい。"))
-        // {
-        System.Diagnostics.Debug.WriteLine($"item.fileId = {item.FileId}");
         SKBitmap src = SKBitmap.Decode(item.RawImageData);
         await UpdateCharaImageAsync(src);
         num++;
-        // }
       }
     }
     await _progressDialog.CloseAsync();

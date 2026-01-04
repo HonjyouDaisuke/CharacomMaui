@@ -39,7 +39,6 @@ public partial class ProjectListPage : ContentPage
     _notifier = notifier;
     _simpleDialog = simpleDialog;
     _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
-    simpleDialog.SetHost(this);
     System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
     BindingContext = _viewModel;
   }
@@ -98,18 +97,23 @@ public partial class ProjectListPage : ContentPage
 
     // プロジェクトを更新
     await _simpleDialog.ShowAsync("プロジェクトの更新", "プロジェクトを更新中・・・\nしばらくお待ち下さい。");
-    var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
-    await Task.Delay(100);
-    await _simpleDialog.CloseAsync();
-    await Task.Delay(100);
-    if (updateResult.Success)
+    try
     {
-      await SnackBarService.Success("プロジェクトを更新しました");
+      var updateResult = await _viewModel.CreateOrUpdateProjectAsync(project);
+      if (updateResult.Success)
+      {
+        await SnackBarService.Success("プロジェクトを更新しました");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {updateResult.Message}");
+        await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
+      }
     }
-    else
+    finally
     {
-      System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {updateResult.Message}");
-      await SnackBarService.Error("プロジェクトの作成・更新中にエラーが発生しました。");
+      await Task.Delay(100);
+      await _simpleDialog.CloseAsync();
     }
   }
 
@@ -121,31 +125,38 @@ public partial class ProjectListPage : ContentPage
     var dialog = new ConfirmDeleteDialog("プロジェクトの削除確認", _dialogService, project);
     await this.ShowPopupAsync(dialog);
 
-    if (dialog.IsConfirmed)
+    if (!dialog.IsConfirmed)
     {
-      await _simpleDialog.ShowAsync("プロジェクトの削除", "プロジェクトを削除中・・・\nしばらくお待ち下さい。");
+      LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
+      await SnackBarService.Warning($"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})");
+      return;
+    }
 
-      LogEditor.Text += $"削除が確認されました: {e.ProjectName} (ID: {e.ProjectId})\n";
+    await _simpleDialog.ShowAsync("プロジェクトの削除", "プロジェクトを削除中・・・\nしばらくお待ち下さい。");
+
+    try
+    {
       var result = await _viewModel.DeleteProjectAsync(e.ProjectId);
-      LogEditor.Text += $"削除結果: {result.Success}\n";
-      await _simpleDialog.CloseAsync();
       if (!result.Success)
       {
         await SnackBarService.Error($"削除中にエラーが発生しました。: {e.ProjectName} (ID: {e.ProjectId})");
-        return;
       }
       // プロジェクトリストを再取得
       var projects = await _viewModel.GetProjectsAsync();
 
-      if (projects == null) return;
+      if (projects == null)
+      {
+        await _simpleDialog.CloseAsync();
+        return;
+      }
       BindableLayout.SetItemsSource(ProjectsFlex, projects);
-
     }
-    else
+    finally
     {
-      LogEditor.Text += $"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})\n";
-      await SnackBarService.Warning($"削除がキャンセルされました: {e.ProjectName} (ID: {e.ProjectId})");
+      await Task.Delay(100);
+      await _simpleDialog.CloseAsync();
     }
+
   }
 
   private void OnInviteRequested(object? sender, ProjectInfoEventArgs e)
@@ -180,23 +191,28 @@ public partial class ProjectListPage : ContentPage
     LogEditor.Text += $"Name: {project.Name}, Description: {project.Description}, Folder: {project.FolderId} CharaFolder: {project.CharaFolderId}\n";
 
     await _simpleDialog.ShowAsync("プロジェクトの作成", "プロジェクトを作成しています。少々お待ちください");
-
-    var result = await _viewModel.CreateOrUpdateProjectAsync(project);
-
-    await Task.Delay(100);
-    await _simpleDialog.CloseAsync();
-    await Task.Delay(100);
-    if (result.Success)
+    // ダイアログ表示待ち
+    await Task.Delay(1000);
+    try
     {
-      var projects = await _viewModel.GetProjectsAsync();
-      BindableLayout.SetItemsSource(ProjectsFlex, projects);
+      var result = await _viewModel.CreateOrUpdateProjectAsync(project);
+      if (result.Success)
+      {
+        var projects = await _viewModel.GetProjectsAsync();
+        BindableLayout.SetItemsSource(ProjectsFlex, projects);
 
-      await SnackBarService.Success("プロジェクトを作成しました");
+        await SnackBarService.Success("プロジェクトを作成しました");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
+        await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+      }
     }
-    else
+    finally
     {
-      System.Diagnostics.Debug.WriteLine($"[Error]Project create or update error... {result.Message}");
-      await SnackBarService.Error("プロジェクトの作成中にエラーが発生しました。");
+      System.Diagnostics.Debug.WriteLine("KOKO怪しい");
+      await _simpleDialog.CloseAsync();
     }
 
     //LogEditor.Text += $"Name: {projectName}, Description: {projectDescription}, Folder: {selectedFolder.Name} CharaFolder: {selectedCharaFolder}\n";
@@ -220,9 +236,7 @@ public partial class ProjectListPage : ContentPage
     await _simpleDialog.ShowAsync("筆順書体マスター作成中", "筆順書体マスターを作成しています。少々お待ちください。");
     var result = await _viewModel.UpdateStrokeAsync();
     System.Diagnostics.Debug.WriteLine(result.ToString());
-    await Task.Delay(100);
     await _simpleDialog.CloseAsync();
-    await Task.Delay(100);
     await ResultNotification(result, "筆順書体");
   }
 

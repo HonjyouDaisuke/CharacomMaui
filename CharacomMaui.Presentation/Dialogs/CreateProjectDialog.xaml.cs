@@ -144,17 +144,22 @@ public partial class CreateProjectDialog : Popup
       CharaFolderId = SelectedCharaFolder.Id,
     };
 
-    if (Completed != null)
+    try
     {
-      await Completed.Invoke(new CreateProjectResult
+      if (Completed != null)
       {
-        IsCanceled = false,
-        Project = project
-      });
+        await Completed.Invoke(new CreateProjectResult
+        {
+          IsCanceled = false,
+          Project = project
+        });
+      }
     }
-
-    Finished?.Invoke();
-    await CloseAsync();
+    finally
+    {
+      Finished?.Invoke();
+      await CloseAsync();
+    }
   }
 
   private async void OnCancelClicked(object sender, EventArgs e)

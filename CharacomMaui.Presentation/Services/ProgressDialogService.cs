@@ -8,30 +8,26 @@ namespace CharacomMaui.Presentation.Services;
 public class ProgressDialogService : IProgressDialogService
 {
   private ProgressDialog? _dialog;
-  private Page? _hostPage;
   private bool _isShowing;
-
-  public void SetHost(Page page)
-  {
-    _hostPage = page;
-  }
 
   public async Task ShowAsync(string title, string message)
   {
-    if (_hostPage == null) return;
+    var currentPage = Shell.Current?.CurrentPage;
+    if (currentPage == null) return;
     if (_isShowing) return;
 
 
-    _isShowing = true;
     if (_dialog != null)
     {
       System.Diagnostics.Debug.WriteLine("すでにダイアログが存在するため終了");
       await CloseAsync();
     }
+    _isShowing = true;
+
     await MainThread.InvokeOnMainThreadAsync(async () =>
     {
       _dialog = new ProgressDialog(title, message);
-      _hostPage.ShowPopup(_dialog);
+      currentPage.ShowPopup(_dialog);
     });
   }
 
