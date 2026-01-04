@@ -41,7 +41,6 @@ public class ProgressDialogService : IProgressDialogService
     System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
     if (_dialog == null)
     {
-      _isShowing = false;
       return;
     }
 
