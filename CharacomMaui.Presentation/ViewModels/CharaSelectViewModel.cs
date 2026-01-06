@@ -39,6 +39,7 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly UpdateCharaSelectedUseCase _updateCharaSelectUseCase;
   readonly IAppTokenStorageService _tokenStorage;
   readonly IProgressDialogService _progressDialog;
+  readonly ICharaImageOverlayUseCase _overlayUseCase;
   AppStatus _appStatus;
 
   private List<CharaData> allCharaData = new();
@@ -61,7 +62,8 @@ public partial class CharaSelectViewModel : ObservableObject
                               UpdateCharaSelectedUseCase updateCharaSelectedUseCase,
                               IDialogService dialogService,
                               IAppTokenStorageService tokenStorage,
-                              IProgressDialogService progressDialog)
+                              IProgressDialogService progressDialog,
+                              ICharaImageOverlayUseCase overlayUseCase)
   {
     _useCase = useCase;
     _appStatus = appStatus;
@@ -72,6 +74,7 @@ public partial class CharaSelectViewModel : ObservableObject
     _dialogService = dialogService;
     _tokenStorage = tokenStorage;
     _progressDialog = progressDialog;
+    _overlayUseCase = overlayUseCase;
     // CharaButtonCommand = new AsyncRelayCommand<string>(OnCharaTapped);
   }
 
@@ -95,7 +98,7 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  private async Task LoadCharaItemsCoreAsync()
+  private async Task LoadCharaItemsCoreAsync()/****リファクタリング対象*****/
   {
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
@@ -104,7 +107,7 @@ public partial class CharaSelectViewModel : ObservableObject
     try
     {
       // 1. ダイアログの表示を開始 
-      await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
+      await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
       // Projectデータ読み込み
       await LoadProjectItems(accessToken);
       // 画像総数カウント
@@ -113,12 +116,12 @@ public partial class CharaSelectViewModel : ObservableObject
       var currentValue = increaseAmount;
       System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {increaseAmount} Characount: {charaCount}");
       // Standard画像
-      await _progressDialog.UpdateAsync("標準画像を読み込んでいます", currentValue);
+      await progress.UpdateAsync("標準画像を読み込んでいます", currentValue);
       await StandardImageUpdateAsync(accessToken);
       currentValue += increaseAmount;
 
       // Stroke画像
-      await _progressDialog.UpdateAsync("筆順画像を読み込んでいます", currentValue);
+      await progress.UpdateAsync("筆順画像を読み込んでいます", currentValue);
       await StrokeImageUpdateAsync(accessToken);
       currentValue += increaseAmount;
 
@@ -128,11 +131,6 @@ public partial class CharaSelectViewModel : ObservableObject
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-    }
-    finally
-    {
-      await Task.Delay(100);
-      await _progressDialog.CloseAsync();
     }
   }
 
@@ -242,7 +240,7 @@ public partial class CharaSelectViewModel : ObservableObject
         continue;
       }
       System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
-      await _progressDialog.UpdateAsync(message, value);
+      //await _progressDialog.UpdateAsync(message, value);
       var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
       if (image.Length > 0)
       {
@@ -337,7 +335,7 @@ public partial class CharaSelectViewModel : ObservableObject
     if (accessToken == null) return;
     _appStatus.CharaName = charaName;
     _appStatus.MaterialName = materialName;
-    await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
+    await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
     try
     {
       var charaCount = GetCharaCount();
@@ -357,12 +355,12 @@ public partial class CharaSelectViewModel : ObservableObject
       if (previousCharaName != charaName)
       {
         // Standard画像
-        await _progressDialog.UpdateAsync("標準画像を読み込んでいます", value);
+        await progress.UpdateAsync("標準画像を読み込んでいます", value);
         await StandardImageUpdateAsync(accessToken);
         value += amount;
 
         // Stroke画像
-        await _progressDialog.UpdateAsync("筆順画像を読み込んでいます", value);
+        await progress.UpdateAsync("筆順画像を読み込んでいます", value);
         await StrokeImageUpdateAsync(accessToken);
         value += amount;
       }
@@ -372,7 +370,6 @@ public partial class CharaSelectViewModel : ObservableObject
     finally
     {
       await Task.Delay(100);
-      await _progressDialog.CloseAsync();
     }
   }
 
@@ -424,51 +421,24 @@ public partial class CharaSelectViewModel : ObservableObject
     return await LoadImageAsync(accessToken, fileId);
   }
 
-  private async Task<SKBitmap> CreateWhiteBitmap(int width, int height)
-  {
-    var bitmap = new SKBitmap(width, height);
-    using var canvas = new SKCanvas(bitmap);
-    canvas.Clear(SKColors.White);
-    return bitmap;
-  }
-
   public async Task CharaImageUpdateAsync()
   {
-    CharaImageBitmap = await CreateWhiteBitmap(320, 320);
-    int count = CurrentCharaItems.Count(x => x.IsSelected == true);
-    if (count == 0) return;
-    int num = 1;
-    await _progressDialog.ShowAsync("画像処理中...", "画像を準備しています。");
-    foreach (var item in CurrentCharaItems)
-    {
-      if (item == null) continue;
-      if (item.IsSelected == true)
-      {
-        double value = (double)num / (double)count;
-        await _progressDialog.UpdateAsync($"画像処理中...({num} / {count})", value);
-        SKBitmap src = SKBitmap.Decode(item.RawImageData);
-        await UpdateCharaImageAsync(src);
-        num++;
-      }
-    }
-    await _progressDialog.CloseAsync();
-  }
+    var selectedImages = CurrentCharaItems
+      .Where(x => x.IsSelected == true)
+      .Select(x => x.RawImageData)
+      .ToList();
 
-  private async Task UpdateCharaImageAsync(SKBitmap src)
-  {
-    var result = await Task.Run(() =>
+    if (!selectedImages.Any()) return;
+
+    await using var session = await _progressDialog.ShowAsync("処理中", "個別画像作成中...");
+
+    var progress = new Progress<ImageProgress>(async p =>
     {
-      var resized = ResizeProcess.Resize(src, 320, 320);
-      var gray = GrayscaleProcess.ToGrayscale(resized);
-      var binary = BinaryProcess.ToBinaryOtsu(gray);
-      var denoise = NoiseCancelingProcess.Opening(binary);
-      var thin = ThinningProcess.Thinning(denoise);
-      var dilated = NoiseCancelingProcess.Dilate(thin, 3);
-      return dilated;
+      var value = (double)p.Current / (double)p.Total;
+      await session.UpdateAsync(p.Message, value);
     });
 
-    CharaImageBitmap ??= await CreateWhiteBitmap(320, 320);
-
-    CharaImageBitmap = OverlayProcess.Overlay(CharaImageBitmap, result);
+    CharaImageBitmap = await Task.Run(async () =>
+       _overlayUseCase.Execute(selectedImages, progress));
   }
 }

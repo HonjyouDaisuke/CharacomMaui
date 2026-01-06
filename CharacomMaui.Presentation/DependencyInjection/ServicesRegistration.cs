@@ -39,6 +39,7 @@ public static class ServicesRegistration
     services.AddTransient<GetProjectDetailsUseCase>();
     services.AddTransient<GetAvatarsUrlUseCase>();
     services.AddTransient<UpdateUserInfoUseCase>();
+    services.AddTransient<ICharaImageOverlayUseCase, CharaImageOverlayUseCase>();
 
     // Repository
     services.AddSingleton<IAppStatusRepository, AppStatusRepository>();
