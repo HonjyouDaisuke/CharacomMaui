@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Coodinators;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,6 +14,7 @@ using MauiControls = Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.Interfaces;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -40,6 +42,8 @@ public partial class CharaSelectViewModel : ObservableObject
   readonly IAppTokenStorageService _tokenStorage;
   readonly IProgressDialogService _progressDialog;
   readonly ICharaImageOverlayUseCase _overlayUseCase;
+  readonly ICharaLoadCoordinator _charaLoadCoordinator;
+  readonly IProjectItemsLoadCoordinator _projectItemsLoadCoordinator;
   AppStatus _appStatus;
 
   private List<CharaData> allCharaData = new();
@@ -63,7 +67,9 @@ public partial class CharaSelectViewModel : ObservableObject
                               IDialogService dialogService,
                               IAppTokenStorageService tokenStorage,
                               IProgressDialogService progressDialog,
-                              ICharaImageOverlayUseCase overlayUseCase)
+                              ICharaImageOverlayUseCase overlayUseCase,
+                              ICharaLoadCoordinator charaLoadCoordinator,
+                              IProjectItemsLoadCoordinator projectItemsLoadCoordinator)
   {
     _useCase = useCase;
     _appStatus = appStatus;
@@ -75,7 +81,8 @@ public partial class CharaSelectViewModel : ObservableObject
     _tokenStorage = tokenStorage;
     _progressDialog = progressDialog;
     _overlayUseCase = overlayUseCase;
-    // CharaButtonCommand = new AsyncRelayCommand<string>(OnCharaTapped);
+    _charaLoadCoordinator = charaLoadCoordinator;
+    _projectItemsLoadCoordinator = projectItemsLoadCoordinator;
   }
 
   public async Task GetCharaItemAsync()
@@ -98,40 +105,59 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  private async Task LoadCharaItemsCoreAsync()/****リファクタリング対象*****/
+  private async Task LoadCharaItemsCoreAsync()
   {
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     if (accessToken == null) return;
 
-    try
+    await using var session = await _progressDialog.ShowAsync("画面準備中", "データを読み込んでいます...");
+    await LoadProjectItemsAsync(accessToken);
+    // progressの報告を受領したときの処理
+    var progress = new Progress<ImageProgress>(async p =>
     {
-      // 1. ダイアログの表示を開始 
-      await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
-      // Projectデータ読み込み
-      await LoadProjectItems(accessToken);
-      // 画像総数カウント
-      var charaCount = GetCharaCount() + 2;
-      double increaseAmount = 1.0 / charaCount;
-      var currentValue = increaseAmount;
-      System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {increaseAmount} Characount: {charaCount}");
-      // Standard画像
-      await progress.UpdateAsync("標準画像を読み込んでいます", currentValue);
-      await StandardImageUpdateAsync(accessToken);
-      currentValue += increaseAmount;
+      var value = (double)p.Current / (double)p.Total;
+      await session.UpdateAsync($"{p.Message} ({p.Current}/{p.Total})", value);
+    });
 
-      // Stroke画像
-      await progress.UpdateAsync("筆順画像を読み込んでいます", currentValue);
-      await StrokeImageUpdateAsync(accessToken);
-      currentValue += increaseAmount;
+    var result = await _charaLoadCoordinator.LoadAsync(_appStatus, accessToken, progress);
 
-      // Chara選択画像群
-      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", currentValue, increaseAmount);
-    }
-    catch (Exception ex)
-    {
-      System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-    }
+    standardBitmap = result.StandardBitmap;
+    strokeBitmap = result.StrokeBitmap;
+
+    CurrentCharaItems.Clear();
+    foreach (var item in result.CharaItems)
+      CurrentCharaItems.Add(item);
+    /**
+        try
+        {
+          // 1. ダイアログの表示を開始 
+          await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
+          // Projectデータ読み込み
+          await LoadProjectItems(accessToken);
+          // 画像総数カウント
+          var charaCount = GetCharaCount() + 2;
+          double increaseAmount = 1.0 / charaCount;
+          var currentValue = increaseAmount;
+          System.Diagnostics.Debug.WriteLine($"value: {currentValue}, amout: {increaseAmount} Characount: {charaCount}");
+          // Standard画像
+          await progress.UpdateAsync("標準画像を読み込んでいます", currentValue);
+          await StandardImageUpdateAsync(accessToken);
+          currentValue += increaseAmount;
+
+          // Stroke画像
+          await progress.UpdateAsync("筆順画像を読み込んでいます", currentValue);
+          await StrokeImageUpdateAsync(accessToken);
+          currentValue += increaseAmount;
+
+          // Chara選択画像群
+          await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", currentValue, increaseAmount);
+        }
+        catch (Exception ex)
+        {
+          System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+        }
+      ***/
   }
 
   private void UpdateMaterialNames()
@@ -156,69 +182,102 @@ public partial class CharaSelectViewModel : ObservableObject
     }
   }
 
-  private async Task<bool> LoadProjectItems(string accessToken)
+  private async Task<bool> LoadProjectItemsAsync(string accessToken)
   {
-    try
+    var result = await _projectItemsLoadCoordinator.LoadProjectItemsAsync(accessToken);
+
+    if (result == null) return false;
+
+    allCharaData = result.AllCharaData;
+
+    CharaNames.Clear();
+    foreach (var charaItem in result.CharaNames)
     {
-      var Items = await _useCase.ExecuteAsync(accessToken, _appStatus.ProjectId);
-      var CharaItems = Items
-        .Select(x => x.CharaName)
-        .Distinct()
-        .ToList();
-
-      var MaterialItems = Items
-        .Select(x => x.MaterialName)
-        .Distinct()
-        .ToList();
-
-      var CurrentItems = Items
-        .Select(x => new
-        {
-          x.FileId,
-          x.CharaName,
-          x.MaterialName,
-          x.TimesName
-        })
-        .Distinct()
-        .ToList();
-
-      allCharaData = Items;
-
-      CharaNames.Clear();
-      foreach (var charaItem in CharaItems)
+      CharaNames.Add(new SelectBarContents
       {
-        var count = CurrentItems.Count(x => x.CharaName == charaItem);
-        CharaNames.Add(new SelectBarContents
-        {
-          Name = charaItem,
-          Count = count,
-          Title = $"{charaItem} ({count})",
-          IsDisabled = count <= 0,
-        });
-      }
-
-      MaterialNames.Clear();
-      foreach (var materialItem in MaterialItems)
-      {
-        var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
-        MaterialNames.Add(new SelectBarContents
-        {
-          Name = materialItem,
-          Count = count,
-          Title = $"{materialItem} ({count})",
-          IsDisabled = count <= 0,
-        });
-
-      }
-      InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
-      InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
-      return true;
+        Name = charaItem.Name,
+        Count = charaItem.Count,
+        Title = charaItem.Title,
+        IsDisabled = charaItem.Count <= 0
+      });
     }
-    catch (Exception ex)
+
+    MaterialNames.Clear();
+    foreach (var materialItem in result.MaterialNames)
     {
-      System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-      return false;
+      MaterialNames.Add(new SelectBarContents
+      {
+        Name = materialItem.Name,
+        Count = materialItem.Count,
+        Title = materialItem.Title,
+        IsDisabled = materialItem.Count <= 0
+      });
     }
+    InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
+    InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
+    return true;
+
+    // try
+    // {
+    //   var Items = await _useCase.ExecuteAsync(accessToken, _appStatus.ProjectId);
+    //   var CharaItems = Items
+    //     .Select(x => x.CharaName)
+    //     .Distinct()
+    //     .ToList();
+
+    //   var MaterialItems = Items
+    //     .Select(x => x.MaterialName)
+    //     .Distinct()
+    //     .ToList();
+
+    //   var CurrentItems = Items
+    //     .Select(x => new
+    //     {
+    //       x.FileId,
+    //       x.CharaName,
+    //       x.MaterialName,
+    //       x.TimesName
+    //     })
+    //     .Distinct()
+    //     .ToList();
+
+    //   allCharaData = Items;
+
+    //   CharaNames.Clear();
+    //   foreach (var charaItem in CharaItems)
+    //   {
+    //     var count = CurrentItems.Count(x => x.CharaName == charaItem);
+    //     CharaNames.Add(new SelectBarContents
+    //     {
+    //       Name = charaItem,
+    //       Count = count,
+    //       Title = $"{charaItem} ({count})",
+    //       IsDisabled = count <= 0,
+    //     });
+    //   }
+
+    //   MaterialNames.Clear();
+    //   foreach (var materialItem in MaterialItems)
+    //   {
+    //     var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
+    //     MaterialNames.Add(new SelectBarContents
+    //     {
+    //       Name = materialItem,
+    //       Count = count,
+    //       Title = $"{materialItem} ({count})",
+    //       IsDisabled = count <= 0,
+    //     });
+
+    //   }
+    //   InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
+    //   InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
+    //   return true;
+    // }
+    // catch (Exception ex)
+    // {
+    //   System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+    //   return false;
+    // }
 
   }
   private int GetCharaCount()
