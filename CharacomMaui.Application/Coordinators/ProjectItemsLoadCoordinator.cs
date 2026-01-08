@@ -45,6 +45,7 @@ public class ProjectItemsLoadCoordinator : IProjectItemsLoadCoordinator
         .ToList();
 
       var charaNames = new List<ProjectItems>();
+
       foreach (var charaItem in charaItems)
       {
         var count = currentItems.Count(x => x.CharaName == charaItem);
@@ -55,7 +56,9 @@ public class ProjectItemsLoadCoordinator : IProjectItemsLoadCoordinator
         ));
       }
 
+
       var materialNames = new List<ProjectItems>();
+
       foreach (var materialItem in materialItems)
       {
         var count = items.Count(x =>

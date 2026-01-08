@@ -6,6 +6,7 @@ using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Coodinators;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
+using CharacomMaui.Presentation.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SkiaSharp;
@@ -122,8 +123,8 @@ public partial class CharaSelectViewModel : ObservableObject
 
     var result = await _charaLoadCoordinator.LoadAsync(_appStatus, accessToken, progress);
 
-    standardBitmap = result.StandardBitmap;
-    strokeBitmap = result.StrokeBitmap;
+    StandardBitmap = result.StandardBitmap;
+    StrokeBitmap = result.StrokeBitmap;
 
     CurrentCharaItems.Clear();
     foreach (var item in result.CharaItems)
@@ -160,27 +161,27 @@ public partial class CharaSelectViewModel : ObservableObject
       ***/
   }
 
-  private void UpdateMaterialNames()
-  {
-    MaterialNames.Clear();
-    var Items = allCharaData
-      .Where(x => x.CharaName == _appStatus.CharaName)
-      .Select(x => x.MaterialName)
-      .Distinct()
-      .ToList();
+  // private void UpdateMaterialNames()
+  // {
+  //   MaterialNames.Clear();
+  //   var Items = allCharaData
+  //     .Where(x => x.CharaName == _appStatus.CharaName)
+  //     .Select(x => x.MaterialName)
+  //     .Distinct()
+  //     .ToList();
 
-    foreach (var materialItem in Items)
-    {
-      var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
-      MaterialNames.Add(new SelectBarContents
-      {
-        Name = materialItem,
-        Count = count,
-        Title = $"{materialItem} ({count})",
-        IsDisabled = count <= 0,
-      });
-    }
-  }
+  //   foreach (var materialItem in Items)
+  //   {
+  //     var count = allCharaData.Count(x => x.MaterialName == materialItem && x.CharaName == _appStatus.CharaName);
+  //     MaterialNames.Add(new SelectBarContents
+  //     {
+  //       Name = materialItem,
+  //       Count = count,
+  //       Title = $"{materialItem} ({count})",
+  //       IsDisabled = count <= 0,
+  //     });
+  //   }
+  // }
 
   private async Task<bool> LoadProjectItemsAsync(string accessToken)
   {
@@ -192,27 +193,12 @@ public partial class CharaSelectViewModel : ObservableObject
 
     CharaNames.Clear();
     foreach (var charaItem in result.CharaNames)
-    {
-      CharaNames.Add(new SelectBarContents
-      {
-        Name = charaItem.Name,
-        Count = charaItem.Count,
-        Title = charaItem.Title,
-        IsDisabled = charaItem.Count <= 0
-      });
-    }
+      CharaNames.Add(SelectBarContentsConverter.ToSelectedBarContents(charaItem));
 
     MaterialNames.Clear();
     foreach (var materialItem in result.MaterialNames)
-    {
-      MaterialNames.Add(new SelectBarContents
-      {
-        Name = materialItem.Name,
-        Count = materialItem.Count,
-        Title = materialItem.Title,
-        IsDisabled = materialItem.Count <= 0
-      });
-    }
+      MaterialNames.Add(SelectBarContentsConverter.ToSelectedBarContents(materialItem));
+
     InitialMaterialName = _appStatus.MaterialName ?? MaterialNames.FirstOrDefault()?.Name ?? string.Empty;
     InitialCharaName = _appStatus.CharaName ?? CharaNames.FirstOrDefault()?.Name ?? string.Empty;
     return true;
@@ -280,98 +266,98 @@ public partial class CharaSelectViewModel : ObservableObject
     // }
 
   }
-  private int GetCharaCount()
-  {
-    return allCharaData
-        .Count(x => x.CharaName == _appStatus.CharaName
-                 && x.MaterialName == _appStatus.MaterialName);
-  }
-  private async Task UpdateCurrentCharaItemsAsync(string accessToken, string message, double value, double amount)
-  {
-    var sw = System.Diagnostics.Stopwatch.StartNew();
-    var tempList = new List<CharaSelectCardData>();
+  // private int GetCharaCount()
+  // {
+  //   return allCharaData
+  //       .Count(x => x.CharaName == _appStatus.CharaName
+  //                && x.MaterialName == _appStatus.MaterialName);
+  // }
+  // private async Task UpdateCurrentCharaItemsAsync(string accessToken, string message, double value, double amount)
+  // {
+  //   var sw = System.Diagnostics.Stopwatch.StartNew();
+  //   var tempList = new List<CharaSelectCardData>();
 
-    foreach (var currentItem in allCharaData)
-    {
-      if (currentItem.CharaName != _appStatus.CharaName ||
-          currentItem.MaterialName != _appStatus.MaterialName)
-      {
-        continue;
-      }
-      System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
-      //await _progressDialog.UpdateAsync(message, value);
-      var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
-      if (image.Length > 0)
-      {
-        tempList.Add(new CharaSelectCardData
-        {
-          CharaId = currentItem.Id,
-          FileId = currentItem.FileId,
-          CharaName = currentItem.CharaName,
-          MaterialName = currentItem.MaterialName,
-          IsSelected = currentItem.IsSelected,
-          RawImageData = image
-        });
-      }
-      value += amount;
-    }
+  //   foreach (var currentItem in allCharaData)
+  //   {
+  //     if (currentItem.CharaName != _appStatus.CharaName ||
+  //         currentItem.MaterialName != _appStatus.MaterialName)
+  //     {
+  //       continue;
+  //     }
+  //     System.Diagnostics.Debug.WriteLine($"Loading Image for FileId: {currentItem.FileId}");
+  //     //await _progressDialog.UpdateAsync(message, value);
+  //     var image = await LoadImageAsync(accessToken, currentItem.FileId) ?? [];
+  //     if (image.Length > 0)
+  //     {
+  //       tempList.Add(new CharaSelectCardData
+  //       {
+  //         CharaId = currentItem.Id,
+  //         FileId = currentItem.FileId,
+  //         CharaName = currentItem.CharaName,
+  //         MaterialName = currentItem.MaterialName,
+  //         IsSelected = currentItem.IsSelected,
+  //         RawImageData = image
+  //       });
+  //     }
+  //     value += amount;
+  //   }
 
-    await MainThread.InvokeOnMainThreadAsync(() =>
-    {
-      CurrentCharaItems.Clear();
-      foreach (var item in tempList)
-      {
-        CurrentCharaItems.Add(item);
-      }
-    });
+  //   await MainThread.InvokeOnMainThreadAsync(() =>
+  //   {
+  //     CurrentCharaItems.Clear();
+  //     foreach (var item in tempList)
+  //     {
+  //       CurrentCharaItems.Add(item);
+  //     }
+  //   });
 
-    sw.Stop();
-    System.Diagnostics.Debug.WriteLine($"UpdateCurrentCharaItemsAsync completed in {sw.ElapsedMilliseconds} ms");
-  }
+  //   sw.Stop();
+  //   System.Diagnostics.Debug.WriteLine($"UpdateCurrentCharaItemsAsync completed in {sw.ElapsedMilliseconds} ms");
+  // }
 
-  private async Task StandardImageUpdateAsync(string accessToken)
-  {
-    if (string.IsNullOrEmpty(_appStatus.CharaName))
-    {
-      System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping standard image update.");
-      return;
-    }
-    var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
-    var standardBytes = await LoadImageAsync(accessToken, standardFileId);
-    if (standardBytes != null)
-    {
-      await MainThread.InvokeOnMainThreadAsync(() =>
-      {
-        using (var ms = new MemoryStream(standardBytes))
-        {
-          StandardBitmap = SKBitmap.Decode(ms);
-        }
-      });
-    }
+  // private async Task StandardImageUpdateAsync(string accessToken)
+  // {
+  //   if (string.IsNullOrEmpty(_appStatus.CharaName))
+  //   {
+  //     System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping standard image update.");
+  //     return;
+  //   }
+  //   var standardFileId = await _getStandardFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
+  //   var standardBytes = await LoadImageAsync(accessToken, standardFileId);
+  //   if (standardBytes != null)
+  //   {
+  //     await MainThread.InvokeOnMainThreadAsync(() =>
+  //     {
+  //       using (var ms = new MemoryStream(standardBytes))
+  //       {
+  //         StandardBitmap = SKBitmap.Decode(ms);
+  //       }
+  //     });
+  //   }
 
-  }
+  // }
 
-  private async Task StrokeImageUpdateAsync(string accessToken)
-  {
-    if (string.IsNullOrEmpty(_appStatus.CharaName))
-    {
-      System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping stroke image update.");
-      return;
-    }
-    var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
-    var strokeBytes = await LoadImageAsync(accessToken, strokeFileId);
-    if (strokeBytes != null)
-    {
-      await MainThread.InvokeOnMainThreadAsync(() =>
-      {
-        using (var ms = new MemoryStream(strokeBytes))
-        {
-          StrokeBitmap = SKBitmap.Decode(ms);
-        }
-      });
-    }
+  // private async Task StrokeImageUpdateAsync(string accessToken)
+  // {
+  //   if (string.IsNullOrEmpty(_appStatus.CharaName))
+  //   {
+  //     System.Diagnostics.Debug.WriteLine("CharaName is null or empty, skipping stroke image update.");
+  //     return;
+  //   }
+  //   var strokeFileId = await _getStrokeFileIdUseCase.ExecuteAsync(accessToken, _appStatus.CharaName);
+  //   var strokeBytes = await LoadImageAsync(accessToken, strokeFileId);
+  //   if (strokeBytes != null)
+  //   {
+  //     await MainThread.InvokeOnMainThreadAsync(() =>
+  //     {
+  //       using (var ms = new MemoryStream(strokeBytes))
+  //       {
+  //         StrokeBitmap = SKBitmap.Decode(ms);
+  //       }
+  //     });
+  //   }
 
-  }
+  // }
 
 
   public async Task OnChangeSelect(string charaName, string materialName)
@@ -380,56 +366,87 @@ public partial class CharaSelectViewModel : ObservableObject
   }
   public async Task UpdateMasters(string charaName, string materialName)
   {
+    System.Diagnostics.Debug.WriteLine($"UpdateMasters: Chara={charaName}, Material={materialName}");
     if (_appStatus.CharaName == charaName && _appStatus.MaterialName == materialName)
     {
-      System.Diagnostics.Debug.WriteLine($"同じです。");
+      await SnackBarService.Info("同じ文字種と資料名が選択されました。");
       return;
     }
-
-    var previousCharaName = _appStatus.CharaName;
-
-    System.Diagnostics.Debug.WriteLine($"OnChangeSelect: Chara={charaName}, Material={materialName} -- 前回 Chara={_appStatus.CharaName}, Material={_appStatus.MaterialName}  ");
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return;
     _appStatus.CharaName = charaName;
     _appStatus.MaterialName = materialName;
-    await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
-    try
-    {
-      var charaCount = GetCharaCount();
-      if (previousCharaName != charaName)
-      {
-        // 資料名の数え直し
-        UpdateMaterialNames();
-        charaCount = GetCharaCount() + 2;
-      }
-      if (charaCount <= 0)
-      {
-        await SnackBarService.Error("文字が見つかりませんでした");
-        return;
-      }
-      double amount = 1.0 / charaCount;
-      double value = amount;
-      if (previousCharaName != charaName)
-      {
-        // Standard画像
-        await progress.UpdateAsync("標準画像を読み込んでいます", value);
-        await StandardImageUpdateAsync(accessToken);
-        value += amount;
+    await GetCharaItemAsync();
+    // var tokens = await _tokenStorage.GetTokensAsync();
+    // var accessToken = tokens?.AccessToken;
+    // if (accessToken == null) return;
 
-        // Stroke画像
-        await progress.UpdateAsync("筆順画像を読み込んでいます", value);
-        await StrokeImageUpdateAsync(accessToken);
-        value += amount;
-      }
-      // Chara選択画像群
-      await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", value, amount);
-    }
-    finally
-    {
-      await Task.Delay(100);
-    }
+    // await using var session = await _progressDialog.ShowAsync("画面準備中", "データを読み込んでいます...");
+    // await LoadProjectItemsAsync(accessToken);
+    // // progressの報告を受領したときの処理
+    // var progress = new Progress<ImageProgress>(async p =>
+    // {
+    //   var value = (double)p.Current / (double)p.Total;
+    //   await session.UpdateAsync($"{p.Message} ({p.Current}/{p.Total})", value);
+    // });
+
+    // var result = await _charaLoadCoordinator.LoadAsync(_appStatus, accessToken, progress);
+
+    // standardBitmap = result.StandardBitmap;
+    // strokeBitmap = result.StrokeBitmap;
+
+    // CurrentCharaItems.Clear();
+    // foreach (var item in result.CharaItems)
+    //   CurrentCharaItems.Add(item);
+
+    // if (_appStatus.CharaName == charaName && _appStatus.MaterialName == materialName)
+    // {
+    //   System.Diagnostics.Debug.WriteLine($"同じです。");
+    //   return;
+    // }
+
+    // var previousCharaName = _appStatus.CharaName;
+
+    // System.Diagnostics.Debug.WriteLine($"OnChangeSelect: Chara={charaName}, Material={materialName} -- 前回 Chara={_appStatus.CharaName}, Material={_appStatus.MaterialName}  ");
+    // var tokens = await _tokenStorage.GetTokensAsync();
+    // var accessToken = tokens?.AccessToken;
+    // if (accessToken == null) return;
+    // _appStatus.CharaName = charaName;
+    // _appStatus.MaterialName = materialName;
+    // await using var progress = await _progressDialog.ShowAsync("画面準備中", "開始します。。。");
+    // try
+    // {
+    //   var charaCount = GetCharaCount();
+    //   if (previousCharaName != charaName)
+    //   {
+    //     // 資料名の数え直し
+    //     UpdateMaterialNames();
+    //     charaCount = GetCharaCount() + 2;
+    //   }
+    //   if (charaCount <= 0)
+    //   {
+    //     await SnackBarService.Error("文字が見つかりませんでした");
+    //     return;
+    //   }
+    //   double amount = 1.0 / charaCount;
+    //   double value = amount;
+    //   if (previousCharaName != charaName)
+    //   {
+    //     // Standard画像
+    //     await progress.UpdateAsync("標準画像を読み込んでいます", value);
+    //     await StandardImageUpdateAsync(accessToken);
+    //     value += amount;
+
+    //     // Stroke画像
+    //     await progress.UpdateAsync("筆順画像を読み込んでいます", value);
+    //     await StrokeImageUpdateAsync(accessToken);
+    //     value += amount;
+    //   }
+    //   // Chara選択画像群
+    //   await UpdateCurrentCharaItemsAsync(accessToken, "個別画像を読み込んでいます。", value, amount);
+    // }
+    // finally
+    // {
+    //   await Task.Delay(100);
+    // }
   }
 
   public async Task<byte[]?> LoadImageAsync(string accessToken, string fileId)

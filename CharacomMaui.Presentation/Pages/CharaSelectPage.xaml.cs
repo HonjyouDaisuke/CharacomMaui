@@ -54,7 +54,7 @@ public partial class CharaSelectPage : ContentPage
     {
       try
       {
-        await _viewModel.GetCharaItemAsync();
+        if (!_isFirstLoaded) await _viewModel.GetCharaItemAsync();
         _pageCharaName = _appStatus.CharaName!;
         _pageMaterialName = _appStatus.MaterialName;
       }

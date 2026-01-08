@@ -72,26 +72,27 @@ public sealed class CharaLoadCoordinator : ICharaLoadCoordinator
       using var ms = new MemoryStream(strokeBytes);
       strokeBitmap = SKBitmap.Decode(ms);
     }
-
     // 個別画像
     var charaItems = new List<CharaSelectCardData>();
-
-    foreach (var item in targetItems)
+    if (targetItems.Count > 0)
     {
-      Report("個別画像を読み込んでいます");
-
-      var bytes = await LoadBinaryAsync(accessToken, item.FileId);
-      if (bytes == null) continue;
-
-      charaItems.Add(new CharaSelectCardData
+      foreach (var item in targetItems)
       {
-        CharaId = item.Id,
-        FileId = item.FileId,
-        CharaName = item.CharaName,
-        MaterialName = item.MaterialName,
-        IsSelected = item.IsSelected,
-        RawImageData = bytes
-      });
+        Report("個別画像を読み込んでいます");
+
+        var bytes = await LoadBinaryAsync(accessToken, item.FileId);
+        if (bytes == null) continue;
+
+        charaItems.Add(new CharaSelectCardData
+        {
+          CharaId = item.Id,
+          FileId = item.FileId,
+          CharaName = item.CharaName,
+          MaterialName = item.MaterialName,
+          IsSelected = item.IsSelected,
+          RawImageData = bytes
+        });
+      }
     }
 
     return new CharaLoadResult(
