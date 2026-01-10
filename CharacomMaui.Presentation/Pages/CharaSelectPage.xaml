@@ -49,6 +49,7 @@
         Bitmap="{Binding CharaImageBitmap}"
         Grid.Row="0"
         Grid.Column="2"
+        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
         VerticalOptions="Center"
         HorizontalOptions="Center"/>
 

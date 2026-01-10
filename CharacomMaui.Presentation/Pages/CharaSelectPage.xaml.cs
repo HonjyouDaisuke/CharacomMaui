@@ -12,6 +12,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using System.Xml;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -21,16 +22,24 @@ public partial class CharaSelectPage : ContentPage
   private readonly AppStatus _appStatus;
   private readonly AppStatusNotifier _notifier;
   private readonly CharaSelectViewModel _viewModel;
+  readonly IProgressDialogService _progressDialog;
   private string _pageMaterialName = string.Empty;
   private string _pageCharaName = string.Empty;
   private bool _isFirstLoaded = false;
+  private IProgressDialogSession? _currentSession = null;
+  private IProgressPublisher ProgressPublisher
+    => (IProgressPublisher)_viewModel;
   public SKBitmap? LoadedBitmap { get; set; }
-  public CharaSelectPage(AppStatus appStatus, CharaSelectViewModel viewModel, AppStatusNotifier notifier, IProgressDialogService progressDialog)
+  public CharaSelectPage(AppStatus appStatus,
+    CharaSelectViewModel viewModel,
+    AppStatusNotifier notifier,
+    IProgressDialogService progressDialog)
   {
     InitializeComponent();
     _appStatus = appStatus;
     _viewModel = viewModel;
     _notifier = notifier;
+    _progressDialog = progressDialog;
 
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += OnAppStatusChanged;
@@ -54,7 +63,7 @@ public partial class CharaSelectPage : ContentPage
     {
       try
       {
-        if (!_isFirstLoaded) await _viewModel.GetCharaItemAsync();
+        if (!_isFirstLoaded) await CreatePageViewAsync();
         _pageCharaName = _appStatus.CharaName!;
         _pageMaterialName = _appStatus.MaterialName;
       }
@@ -71,8 +80,39 @@ public partial class CharaSelectPage : ContentPage
       BindingContext = _viewModel;
       _isFirstLoaded = true;
     }
-
     System.Diagnostics.Debug.WriteLine($"ViewModel Items Count: {_viewModel.CurrentCharaItems.Count}");
+  }
+  private async Task RunWithProgressAsync(string title, string message, Func<Task> action)
+  {
+    if (_currentSession != null)
+      return; // or throw
+
+    await using var session = await _progressDialog.ShowAsync(title, message);
+    _currentSession = session;
+    ProgressPublisher.ProgressChanged += OnProgressChanged;
+
+    try
+    {
+      await action();
+    }
+    finally
+    {
+      ProgressPublisher.ProgressChanged -= OnProgressChanged;
+      _currentSession = null;
+    }
+  }
+
+  private async Task CreatePageViewAsync()
+  {
+    _viewModel.RunBusyAsync(async () =>
+    {
+      await RunWithProgressAsync(
+        "画面を準備",
+        "ページ表示準備中...",
+        () => _viewModel.GetCharaItemAsync()
+      );
+    });
+
   }
 
   private async void OnAppStatusChanged(object sender, PropertyChangedEventArgs e)
@@ -110,7 +150,15 @@ public partial class CharaSelectPage : ContentPage
     // TODO: エラーメッセージを出す
     if (_isChanging) return;
     _isChanging = true;
-    await _viewModel.OnChangeSelect(_appStatus.CharaName, item.SelectedName);
+    _viewModel.RunBusyAsync(async () =>
+    {
+      await RunWithProgressAsync(
+        "資料変更",
+        "ページ表示準備中...",
+        () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
+      );
+    });
+    //await _viewModel.OnChangeSelect(_appStatus.CharaName, item.SelectedName);
     _pageMaterialName = _appStatus.MaterialName;
     _isChanging = false;
   }
@@ -118,24 +166,22 @@ public partial class CharaSelectPage : ContentPage
   private async void OnCharaSelectBarItemSelected(object? sender, SelectBarEventArgs item)
   {
     if (_viewModel.IsLoading) return;
-    LogEditor.Text += "押されたぞ！\n";
-    System.Diagnostics.Debug.WriteLine($"OnCharaSelectBarItemSelected isChanging = {_isChanging}");
-    LogEditor.Text += $"選択された文字種: {item.SelectedName} pageCharaName={_pageCharaName}\n";
     if (string.IsNullOrEmpty(item.SelectedName)) return;
     if (string.IsNullOrEmpty(_appStatus.MaterialName)) return;
-    if (_appStatus.CharaName == item.SelectedName)
-    {
-      System.Diagnostics.Debug.WriteLine($"同じ文字種が選択されました: {_appStatus.CharaName}");
-      return;
-    }
-    else
-    {
-      System.Diagnostics.Debug.WriteLine($"異なる文字種が選択されました: {_appStatus.CharaName} -> {item.SelectedName}");
-    }
-    // TODO: エラーメッセージを出す
+    if (_appStatus.CharaName == item.SelectedName) return;
+
     if (_isChanging) return;
     _isChanging = true;
-    await _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName);
+
+    _viewModel.RunBusyAsync(async () =>
+    {
+      await RunWithProgressAsync(
+        "個別文字変更",
+        "ページ表示準備中...",
+        () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
+      );
+    });
+    //await _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName);
     _pageCharaName = _appStatus.CharaName!;
     _isChanging = false;
   }
@@ -153,9 +199,17 @@ public partial class CharaSelectPage : ContentPage
     OpenImageDialog(e.Title);
   }
 
-  private void OnDrawCanvas(object sender, EventArgs e)
+
+  private async void OnDrawCanvas(object sender, EventArgs e)
   {
-    _ = _viewModel.CharaImageUpdateAsync();
+    _viewModel.RunBusyAsync(async () =>
+    {
+      await RunWithProgressAsync(
+        "処理中",
+        "個別画像作成中...",
+        () => _viewModel.CharaImageUpdateAsync()
+      );
+    });
   }
   private async void OpenImageDialog(string fileId)
   {
@@ -169,4 +223,22 @@ public partial class CharaSelectPage : ContentPage
     await this.ShowPopupAsync(dialog, options);
   }
 
+  private async void OnProgressChanged(object sender, ImageProgress e)
+  {
+    try
+    {
+      if (_currentSession == null) return;
+      if (e.Total == 0) return;
+
+      var value = (double)e.Current / (double)e.Total;
+      await _currentSession.UpdateAsync(
+          $"{e.Message} ({e.Current}/{e.Total})",
+          value
+      );
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine(ex);
+    }
+  }
 }

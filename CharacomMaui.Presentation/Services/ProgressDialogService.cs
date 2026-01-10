@@ -42,23 +42,16 @@ public class ProgressDialogService : IProgressDialogService
   internal async Task CloseAsync()
   {
     System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
-    if (_dialog == null) return;
 
-    await MainThread.InvokeOnMainThreadAsync(async () =>
+    var dialog = _dialog;
+    if (dialog == null) return;
+
+    _dialog = null;
+    _isShowing = false;
+
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
-      try
-      {
-        await _dialog.CloseAsync();
-      }
-      catch (Exception ex)
-      {
-        System.Diagnostics.Debug.WriteLine($"[ProgressDialog] Close error: {ex.Message}");
-      }
-      finally
-      {
-        _dialog = null;
-        _isShowing = false;
-      }
+      _ = dialog.CloseAsync();
     });
   }
 }

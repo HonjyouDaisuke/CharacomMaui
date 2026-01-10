@@ -20,7 +20,7 @@ public class CharaImageOverlayUseCase : ICharaImageOverlayUseCase
     foreach (var image in images)
     {
       System.Diagnostics.Debug.WriteLine($"画像処理中。。。({i + 1}/{total})");
-      progress?.Report(new ImageProgress(i + 1, total, $"画像処理中... ({i + 1}/{total})"));
+      progress?.Report(new ImageProgress(i + 1, total, $"画像処理中... "));
       baseBitmap = CharaImageOverlayProcess.CreateOverlayImage(baseBitmap, image, 320, 320);
       i++;
     }
