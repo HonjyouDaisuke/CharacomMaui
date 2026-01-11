@@ -86,9 +86,18 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
   public async ValueTask DisposeAsync()
   {
     // 進行中の操作が完了するまで待機
-    while (IsBusy || IsLoading)
+    var timeout = TimeSpan.FromSeconds(30);
+    var elapsed = TimeSpan.Zero;
+    var delay = TimeSpan.FromMilliseconds(100);
+    while ((IsBusy || IsLoading) && elapsed < timeout)
     {
-      await Task.Delay(100);
+      await Task.Delay(delay);
+      elapsed += delay;
+    }
+
+    if (elapsed >= timeout)
+    {
+      System.Diagnostics.Debug.WriteLine("[DisposeAsync] Timeout waiting for operations to complete.");
     }
 
     if (_currentResult != null)
