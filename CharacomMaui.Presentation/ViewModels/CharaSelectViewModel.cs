@@ -103,7 +103,11 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
 
   public async Task RunBusyAsync(Func<Task> action)
   {
-    if (IsBusy) return;
+    if (IsBusy)
+    {
+      System.Diagnostics.Debug.WriteLine("[RunBusyAsync] Already busy, skipping operation.");
+      return;
+    }
 
     try
     {

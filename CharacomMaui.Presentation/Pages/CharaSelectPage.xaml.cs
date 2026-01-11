@@ -13,7 +13,6 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using System.Xml;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -53,6 +52,9 @@ public partial class CharaSelectPage : ContentPage
     base.OnDisappearing();
     _isFirstLoaded = false;
     _notifier.PropertyChanged -= OnAppStatusChanged;
+    // クリーンアップ処理中のセッション
+    _currentSession?.DisposeAsync();
+    _currentSession = null;
   }
   protected override async void OnAppearing()
   {
