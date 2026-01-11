@@ -93,25 +93,35 @@ public partial class CharaSelectPage : ContentPage
     }
     System.Diagnostics.Debug.WriteLine($"ViewModel Items Count: {_viewModel.CurrentCharaItems.Count}");
   }
+  private readonly SemaphoreSlim _sessionLock = new(1, 1);
+
   private async Task RunWithProgressAsync(string title, string message, Func<Task> action)
   {
     LogEditor.Text += $"RunWithProgressAsync: {title} - {message} _currentSession?={_currentSession != null}\n";
 
-    if (_currentSession != null)
-      throw new InvalidOperationException("Progress session is already running.");
-
-    await using var session = await _progressDialog.ShowAsync(title, message);
-    _currentSession = session;
-    ProgressPublisher.ProgressChanged += OnProgressChanged;
-
+    await _sessionLock.WaitAsync();
     try
     {
-      await action();
+      if (_currentSession != null)
+        throw new InvalidOperationException("Progress session is already running.");
+
+      await using var session = await _progressDialog.ShowAsync(title, message);
+      _currentSession = session;
+      ProgressPublisher.ProgressChanged += OnProgressChanged;
+
+      try
+      {
+        await action();
+      }
+      finally
+      {
+        ProgressPublisher.ProgressChanged -= OnProgressChanged;
+        _currentSession = null;
+      }
     }
     finally
     {
-      ProgressPublisher.ProgressChanged -= OnProgressChanged;
-      _currentSession = null;
+      _sessionLock.Release();
     }
   }
 
