@@ -16,7 +16,6 @@ using MauiControls = Microsoft.Maui.Controls;
 using CharacomMaui.Presentation.Dialogs;
 using CharacomMaui.Presentation.Services;
 using CharacomMaui.Presentation.Interfaces;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -132,6 +131,7 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
     });
 
     var result = await _charaLoadCoordinator.LoadAsync(_appStatus, accessToken, progress);
+    _currentResult = result;
 
     StandardBitmap = result.StandardBitmap;
     StrokeBitmap = result.StrokeBitmap;
@@ -224,7 +224,7 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
       ProgressChanged?.Invoke(this, p);
     });
 
-    CharaImageBitmap = await Task.Run(async () =>
+    CharaImageBitmap = await Task.Run(() =>
        _overlayUseCase.Execute(selectedImages, progress));
   }
 }

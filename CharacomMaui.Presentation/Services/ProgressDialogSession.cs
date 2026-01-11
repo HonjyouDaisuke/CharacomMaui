@@ -13,7 +13,10 @@ internal sealed class ProgressDialogSession : IProgressDialogSession
   }
 
   public Task UpdateAsync(string message, double progress)
-      => _service.UpdateAsync(message, progress);
+  {
+    if (_disposed) return Task.CompletedTask; // or throw new ObjectDisposedException(nameof(ProgressDialogSession));
+    return _service.UpdateAsync(message, progress);
+  }
 
   public async ValueTask DisposeAsync()
   {

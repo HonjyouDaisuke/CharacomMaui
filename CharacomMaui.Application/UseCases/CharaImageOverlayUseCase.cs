@@ -1,6 +1,6 @@
 using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.Interfaces;
-
+using CharacomMaui.Application.Models;
 using SkiaSharp;
 
 namespace CharacomMaui.Application.UseCases;

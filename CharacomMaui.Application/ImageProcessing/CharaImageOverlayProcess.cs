@@ -1,5 +1,3 @@
-using CharacomMaui.Application.Interfaces;
-using CharacomMaui.Domain.Entities;
 using SkiaSharp;
 
 namespace CharacomMaui.Application.ImageProcessing;
@@ -13,7 +11,7 @@ public static class CharaImageOverlayProcess
       throw new ArgumentException("Invalid image data", nameof(image));
     }
     using var src = SKBitmap.Decode(image);
-    var processed = Process(src, width, height);
+    using var processed = Process(src, width, height);
     baseBitmap = OverlayProcess.Overlay(baseBitmap, processed);
     return baseBitmap;
   }

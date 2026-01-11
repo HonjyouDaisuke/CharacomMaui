@@ -7,6 +7,7 @@ public static class SelectBarContentsConverter
 {
   public static SelectBarContents ToSelectedBarContents(ProjectItems source)
   {
+    ArgumentNullException.ThrowIfNull(source);
     return new SelectBarContents
     {
       Name = source.Name,

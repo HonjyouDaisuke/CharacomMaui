@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Dialogs;
@@ -165,7 +166,7 @@ public partial class CharaSelectPage : ContentPage
         await RunWithProgressAsync(
           "資料変更",
           "ページ表示準備中...",
-          () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
+          () => _viewModel.OnChangeSelect(_appStatus.CharaName!, item.SelectedName)
         );
       });
       _pageMaterialName = _appStatus.MaterialName;
@@ -220,7 +221,7 @@ public partial class CharaSelectPage : ContentPage
 
   private async void OnDrawCanvas(object sender, EventArgs e)
   {
-    _viewModel.RunBusyAsync(async () =>
+    await _viewModel.RunBusyAsync(async () =>
     {
       await RunWithProgressAsync(
         "処理中",
