@@ -85,6 +85,12 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
   }
   public async ValueTask DisposeAsync()
   {
+    // 進行中の操作が完了するまで待機
+    while (IsBusy || IsLoading)
+    {
+      await Task.Delay(100);
+    }
+
     if (_currentResult != null)
     {
       await _currentResult.DisposeAsync();
