@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
-using CharacomMaui.Application.Coodinators;
+using CharacomMaui.Application.Coordinators;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Helpers;

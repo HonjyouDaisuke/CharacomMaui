@@ -1,4 +1,4 @@
-namespace CharacomMaui.Application.Coodinators;
+namespace CharacomMaui.Application.Coordinators;
 
 using CharacomMaui.Application.Models;
 using CharacomMaui.Application.UseCases;
@@ -83,7 +83,7 @@ public class ProjectItemsLoadCoordinator : IProjectItemsLoadCoordinator
     catch (Exception ex)
     {
       System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-      throw new Exception(ex.Message, ex);
+      throw;
     }
 
   }

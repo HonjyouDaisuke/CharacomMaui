@@ -7,7 +7,7 @@ using CharacomMaui.Domain.Entities;
 using SkiaSharp;
 using System.Runtime.CompilerServices;
 
-namespace CharacomMaui.Application.Coodinators;
+namespace CharacomMaui.Application.Coordinators;
 
 public sealed class CharaLoadCoordinator : ICharaLoadCoordinator
 {

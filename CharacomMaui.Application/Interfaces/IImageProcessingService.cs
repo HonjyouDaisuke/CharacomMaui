@@ -37,5 +37,4 @@ public interface IImageProcessingService
   /// <returns>合成後の画像ストリーム。</returns>
   Task<Stream> OverlayAsync(Stream baseImage, Stream overlayImage);
 
-  byte[] ApplyFilter(byte[] imageData, string str);
 }

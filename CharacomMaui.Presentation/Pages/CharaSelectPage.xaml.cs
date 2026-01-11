@@ -46,6 +46,11 @@ public partial class CharaSelectPage : ContentPage
 
     BindingContext = _viewModel;
   }
+  protected override async void OnDisappearing()
+  {
+    base.OnDisappearing();
+    _isFirstLoaded = false;
+  }
   protected override async void OnAppearing()
   {
     base.OnAppearing();
@@ -53,6 +58,7 @@ public partial class CharaSelectPage : ContentPage
     LogEditor.Text += "--------------------------\n";
     LogEditor.Text += $"_pageCharaName: {_pageCharaName} vs _appStatus.CharaNam: {_appStatus.CharaName} \n";
     LogEditor.Text += $"_pageMaterialName: {_pageMaterialName} vs _appStatus.MaterialName: {_appStatus.MaterialName} \n";
+    LogEditor.Text += $"IsFirstLoaded: {_isFirstLoaded}\n";
     LogEditor.Text += "--------------------------\n";
 
     //LogEditor.Text += $"ProjectName = {_appStatus.ProjectName} id:{_appStatus.ProjectId}\n";
@@ -84,6 +90,8 @@ public partial class CharaSelectPage : ContentPage
   }
   private async Task RunWithProgressAsync(string title, string message, Func<Task> action)
   {
+    LogEditor.Text += $"RunWithProgressAsync: {title} - {message} _currentSession?={_currentSession != null}\n";
+
     if (_currentSession != null)
       return; // or throw
 
@@ -104,7 +112,7 @@ public partial class CharaSelectPage : ContentPage
 
   private async Task CreatePageViewAsync()
   {
-    _viewModel.RunBusyAsync(async () =>
+    await _viewModel.RunBusyAsync(async () =>
     {
       await RunWithProgressAsync(
         "画面を準備",
@@ -150,17 +158,22 @@ public partial class CharaSelectPage : ContentPage
     // TODO: エラーメッセージを出す
     if (_isChanging) return;
     _isChanging = true;
-    _viewModel.RunBusyAsync(async () =>
+    try
     {
-      await RunWithProgressAsync(
-        "資料変更",
-        "ページ表示準備中...",
-        () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
-      );
-    });
-    //await _viewModel.OnChangeSelect(_appStatus.CharaName, item.SelectedName);
-    _pageMaterialName = _appStatus.MaterialName;
-    _isChanging = false;
+      await _viewModel.RunBusyAsync(async () =>
+      {
+        await RunWithProgressAsync(
+          "資料変更",
+          "ページ表示準備中...",
+          () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
+        );
+      });
+      _pageMaterialName = _appStatus.MaterialName;
+    }
+    finally
+    {
+      _isChanging = false;
+    }
   }
 
   private async void OnCharaSelectBarItemSelected(object? sender, SelectBarEventArgs item)
@@ -173,17 +186,22 @@ public partial class CharaSelectPage : ContentPage
     if (_isChanging) return;
     _isChanging = true;
 
-    _viewModel.RunBusyAsync(async () =>
+    try
     {
-      await RunWithProgressAsync(
-        "個別文字変更",
-        "ページ表示準備中...",
-        () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
-      );
-    });
-    //await _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName);
-    _pageCharaName = _appStatus.CharaName!;
-    _isChanging = false;
+      await _viewModel.RunBusyAsync(async () =>
+      {
+        await RunWithProgressAsync(
+          "個別文字変更",
+          "ページ表示準備中...",
+          () => _viewModel.OnChangeSelect(item.SelectedName, _appStatus.MaterialName)
+        );
+      });
+      _pageCharaName = _appStatus.CharaName!;
+    }
+    finally
+    {
+      _isChanging = false;
+    }
   }
 
   // Clickedイベントハンドラ

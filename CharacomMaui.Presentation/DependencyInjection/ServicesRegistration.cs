@@ -1,6 +1,6 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
-using CharacomMaui.Application.Coodinators;
+using CharacomMaui.Application.Coordinators;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Models;

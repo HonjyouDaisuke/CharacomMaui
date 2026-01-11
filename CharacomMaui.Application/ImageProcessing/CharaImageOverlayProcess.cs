@@ -8,7 +8,10 @@ public static class CharaImageOverlayProcess
 {
   public static SKBitmap CreateOverlayImage(SKBitmap baseBitmap, byte[] image, int width, int height)
   {
-
+    if (image == null)
+    {
+      throw new ArgumentException("Invalid image data", nameof(image));
+    }
     using var src = SKBitmap.Decode(image);
     var processed = Process(src, width, height);
     baseBitmap = OverlayProcess.Overlay(baseBitmap, processed);
@@ -25,11 +28,11 @@ public static class CharaImageOverlayProcess
 
   private static SKBitmap Process(SKBitmap src, int width, int height)
   {
-    var resized = ResizeProcess.Resize(src, 320, 320);
-    var gray = GrayscaleProcess.ToGrayscale(resized);
-    var binary = BinaryProcess.ToBinaryOtsu(gray);
-    var denoise = NoiseCancelingProcess.Opening(binary);
-    var thin = ThinningProcess.Thinning(denoise);
+    using var resized = ResizeProcess.Resize(src, 320, 320);
+    using var gray = GrayscaleProcess.ToGrayscale(resized);
+    using var binary = BinaryProcess.ToBinaryOtsu(gray);
+    using var denoise = NoiseCancelingProcess.Opening(binary);
+    using var thin = ThinningProcess.Thinning(denoise);
     var dilated = NoiseCancelingProcess.Dilate(thin, 3);
     return dilated;
   }

@@ -15,7 +15,7 @@ public class OverlayProcess
     canvas.DrawBitmap(bottom, 0, 0);
 
     // 白→透明にした上の画像
-    var transparentTop = TransparentProcess.WhiteTransparent(top);
+    using var transparentTop = TransparentProcess.WhiteTransparent(top);
 
     // 上の画像を描画
     canvas.DrawBitmap(transparentTop, 0, 0);
