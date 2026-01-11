@@ -4,6 +4,7 @@ using CharacomMaui.Application.ImageProcessing;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Coordinators;
+using CharacomMaui.Application.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Helpers;
@@ -63,7 +64,7 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
     private set => SetProperty(ref _isBusy, value);
   }
 
-
+  private CharaLoadResult? _currentResult;
 
   public CharaSelectViewModel(AppStatus appStatus,
                               FetchBoxItemUseCase fetchBoxItemUseCase,
@@ -101,6 +102,8 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
   {
 
     if (IsLoading) return;
+    if (_currentResult != null)
+      await _currentResult.DisposeAsync();
     try
     {
       IsLoading = true;
