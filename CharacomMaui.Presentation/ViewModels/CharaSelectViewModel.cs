@@ -44,6 +44,7 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
   readonly ICharaLoadCoordinator _charaLoadCoordinator;
   readonly IProjectItemsLoadCoordinator _projectItemsLoadCoordinator;
   public event EventHandler<ImageProgress>? ProgressChanged;
+  private readonly SemaphoreSlim _busyLock = new(1, 1);
   AppStatus _appStatus;
 
   private List<CharaData> allCharaData = new();
@@ -102,7 +103,6 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
 
     if (_currentResult != null)
     {
-      await _currentResult.DisposeAsync();
       _currentResult = null;
     }
     StandardBitmap?.Dispose();
@@ -110,12 +110,12 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
     CharaImageBitmap?.Dispose();
   }
 
-  public async Task RunBusyAsync(Func<Task> action)
+  public async Task<bool> RunBusyAsync(Func<Task> action)
   {
     if (IsBusy)
     {
       System.Diagnostics.Debug.WriteLine("[RunBusyAsync] Already busy, skipping operation.");
-      return;
+      return false;
     }
 
     try
@@ -127,10 +127,10 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
     {
       IsBusy = false;
     }
+    return true;
   }
   public async Task GetCharaItemAsync()
   {
-
     if (IsLoading) return;
     if (_currentResult != null)
       await _currentResult.DisposeAsync();

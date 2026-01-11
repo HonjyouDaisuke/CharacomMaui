@@ -47,13 +47,17 @@ public partial class CharaSelectPage : ContentPage
 
     BindingContext = _viewModel;
   }
-  protected override void OnDisappearing()
+  protected override async void OnDisappearing()
   {
     base.OnDisappearing();
     _isFirstLoaded = false;
     _notifier.PropertyChanged -= OnAppStatusChanged;
     // クリーンアップ処理中のセッション
-    _currentSession?.DisposeAsync();
+    if (_currentSession != null)
+    {
+      await _currentSession.DisposeAsync();
+    }
+
     _currentSession = null;
   }
   protected override async void OnAppearing()
