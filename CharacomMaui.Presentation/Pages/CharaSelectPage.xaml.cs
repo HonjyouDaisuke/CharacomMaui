@@ -27,6 +27,7 @@ public partial class CharaSelectPage : ContentPage
   private string _pageMaterialName = string.Empty;
   private string _pageCharaName = string.Empty;
   private bool _isFirstLoaded = false;
+  private readonly SemaphoreSlim _progressUpdateLock = new(1, 1);
   private IProgressDialogSession? _currentSession = null;
   private IProgressPublisher ProgressPublisher
     => (IProgressPublisher)_viewModel;
@@ -47,10 +48,11 @@ public partial class CharaSelectPage : ContentPage
 
     BindingContext = _viewModel;
   }
-  protected override async void OnDisappearing()
+  protected override void OnDisappearing()
   {
     base.OnDisappearing();
     _isFirstLoaded = false;
+    _notifier.PropertyChanged -= OnAppStatusChanged;
   }
   protected override async void OnAppearing()
   {
@@ -94,7 +96,7 @@ public partial class CharaSelectPage : ContentPage
     LogEditor.Text += $"RunWithProgressAsync: {title} - {message} _currentSession?={_currentSession != null}\n";
 
     if (_currentSession != null)
-      return; // or throw
+      throw new InvalidOperationException("Progress session is already running.");
 
     await using var session = await _progressDialog.ShowAsync(title, message);
     _currentSession = session;
@@ -249,11 +251,21 @@ public partial class CharaSelectPage : ContentPage
       if (_currentSession == null) return;
       if (e.Total == 0) return;
 
-      var value = (double)e.Current / (double)e.Total;
-      await _currentSession.UpdateAsync(
+      var raw = (double)e.Current / (double)e.Total;
+      var value = Math.Clamp(raw, 0d, 1d);
+
+      await _progressUpdateLock.WaitAsync();
+      try
+      {
+        await _currentSession.UpdateAsync(
           $"{e.Message} ({e.Current}/{e.Total})",
           value
-      );
+        );
+      }
+      finally
+      {
+        _progressUpdateLock.Release();
+      }
     }
     catch (Exception ex)
     {

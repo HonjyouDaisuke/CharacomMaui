@@ -6,14 +6,17 @@ public static class CharaImageOverlayProcess
 {
   public static SKBitmap CreateOverlayImage(SKBitmap baseBitmap, byte[] image, int width, int height)
   {
-    if (image == null)
-    {
+    if (image == null || image.Length == 0)
       throw new ArgumentException("Invalid image data", nameof(image));
-    }
-    using var src = SKBitmap.Decode(image);
+
+    using var src = SKBitmap.Decode(image)
+        ?? throw new InvalidOperationException("Failed to decode image");
+
     using var processed = Process(src, width, height);
-    baseBitmap = OverlayProcess.Overlay(baseBitmap, processed);
-    return baseBitmap;
+    var result = OverlayProcess.Overlay(baseBitmap, processed);
+    baseBitmap.Dispose();
+
+    return result;
   }
 
   public static SKBitmap CreateWhiteBitmap(int width, int height)
@@ -26,7 +29,7 @@ public static class CharaImageOverlayProcess
 
   private static SKBitmap Process(SKBitmap src, int width, int height)
   {
-    using var resized = ResizeProcess.Resize(src, 320, 320);
+    using var resized = ResizeProcess.Resize(src, width, height);
     using var gray = GrayscaleProcess.ToGrayscale(resized);
     using var binary = BinaryProcess.ToBinaryOtsu(gray);
     using var denoise = NoiseCancelingProcess.Opening(binary);

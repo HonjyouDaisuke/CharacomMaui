@@ -224,7 +224,9 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
       ProgressChanged?.Invoke(this, p);
     });
 
+    var old = CharaImageBitmap;
     CharaImageBitmap = await Task.Run(() =>
        _overlayUseCase.Execute(selectedImages, progress));
+    old?.Dispose();
   }
 }
