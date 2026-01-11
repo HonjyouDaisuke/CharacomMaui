@@ -19,7 +19,7 @@ using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
-public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
+public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher, IAsyncDisposable
 {
   [ObservableProperty]
   private SKBitmap? strokeBitmap;
@@ -83,6 +83,18 @@ public partial class CharaSelectViewModel : ObservableObject, IProgressPublisher
     _charaLoadCoordinator = charaLoadCoordinator;
     _projectItemsLoadCoordinator = projectItemsLoadCoordinator;
   }
+  public async ValueTask DisposeAsync()
+  {
+    if (_currentResult != null)
+    {
+      await _currentResult.DisposeAsync();
+      _currentResult = null;
+    }
+    StandardBitmap?.Dispose();
+    StrokeBitmap?.Dispose();
+    CharaImageBitmap?.Dispose();
+  }
+
   public async Task RunBusyAsync(Func<Task> action)
   {
     if (IsBusy) return;
