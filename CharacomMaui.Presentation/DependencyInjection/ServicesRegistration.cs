@@ -1,5 +1,6 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Coordinators;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Models;
@@ -39,6 +40,11 @@ public static class ServicesRegistration
     services.AddTransient<GetProjectDetailsUseCase>();
     services.AddTransient<GetAvatarsUrlUseCase>();
     services.AddTransient<UpdateUserInfoUseCase>();
+    services.AddTransient<ICharaImageOverlayUseCase, CharaImageOverlayUseCase>();
+
+    // Coordinator
+    services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();
+    services.AddTransient<IProjectItemsLoadCoordinator, ProjectItemsLoadCoordinator>();
 
     // Repository
     services.AddSingleton<IAppStatusRepository, AppStatusRepository>();

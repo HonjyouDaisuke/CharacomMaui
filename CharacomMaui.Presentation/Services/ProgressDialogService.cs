@@ -10,11 +10,13 @@ public class ProgressDialogService : IProgressDialogService
   private ProgressDialog? _dialog;
   private bool _isShowing;
 
-  public async Task ShowAsync(string title, string message)
+  public async Task<IProgressDialogSession> ShowAsync(string title, string message)
   {
     var currentPage = Shell.Current?.CurrentPage;
-    if (currentPage == null) return;
-    if (_isShowing && _dialog != null) return;
+    if (currentPage == null)
+      throw new InvalidOperationException("ページを取得できません");
+    if (_isShowing && _dialog != null)
+      throw new InvalidOperationException("ProgressDialogはすでに表示中です");
 
     _isShowing = true;
 
@@ -23,9 +25,10 @@ public class ProgressDialogService : IProgressDialogService
       _dialog = new ProgressDialog(title, message);
       currentPage.ShowPopup(_dialog);
     });
+    return new ProgressDialogSession(this);
   }
 
-  public async Task UpdateAsync(string message, double progress)
+  internal async Task UpdateAsync(string message, double progress)
   {
     if (_dialog == null) return;
 
@@ -36,29 +39,19 @@ public class ProgressDialogService : IProgressDialogService
     });
   }
 
-  public async Task CloseAsync()
+  internal async Task CloseAsync()
   {
     System.Diagnostics.Debug.WriteLine("[ProgressDialog]クローズ呼びました。");
-    if (_dialog == null)
-    {
-      return;
-    }
 
-    await MainThread.InvokeOnMainThreadAsync(async () =>
+    var dialog = _dialog;
+    if (dialog == null) return;
+
+    _dialog = null;
+    _isShowing = false;
+
+    await MainThread.InvokeOnMainThreadAsync(() =>
     {
-      try
-      {
-        await _dialog.CloseAsync();
-      }
-      catch (Exception ex)
-      {
-        System.Diagnostics.Debug.WriteLine($"[ProgressDialog] Close error: {ex.Message}");
-      }
-      finally
-      {
-        _dialog = null;
-        _isShowing = false; // ここでフラグを false に戻す
-      }
+      _ = dialog.CloseAsync();
     });
   }
 }
