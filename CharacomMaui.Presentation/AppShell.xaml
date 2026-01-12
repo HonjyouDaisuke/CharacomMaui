@@ -27,9 +27,9 @@
       </ControlTemplate>
 
       <Style TargetType="ContentPage"
-          ApplyToDerivedTypes="True">
+             ApplyToDerivedTypes="True">
         <Setter Property="ControlTemplate"
-            Value="{StaticResource PageOverlayTemplate}"/>
+                Value="{StaticResource PageOverlayTemplate}"/>
       </Style>
     </ResourceDictionary>
   </Shell.Resources>
@@ -80,8 +80,8 @@
   <FlyoutItem Title="ユーザー情報"
               Icon="{AppThemeBinding Light=users_icon_light.png, Dark=users_icon_dark.png}">
     <ShellContent
-      ContentTemplate="{DataTemplate pages:ChartPage}"
-      Route="ChartPage"/>
+      ContentTemplate="{DataTemplate pages:UserListPage}"
+      Route="UserListPage"/>
   </FlyoutItem>
   <FlyoutItem Title="グラフ"
               Icon="{AppThemeBinding Light=chart_icon_light.png, Dark=chart_icon_dark.png}">

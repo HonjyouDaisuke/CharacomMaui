@@ -80,6 +80,42 @@ public class ApiUserRepository : IUserRepository
     }
   }
 
+  public async Task<List<AppUser>> GetUserListAsync(string accessToken)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync(ApiEndpoints.GetUserList, content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("---------- User List server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+
+    var response = JsonDocument.Parse(responseBody).RootElement;
+    var success = response.GetProperty("success").GetBoolean();
+    if (!success)
+    {
+      System.Diagnostics.Debug.WriteLine("success = Falseだよ");
+      return null;
+    }
+
+    var users = new List<AppUser>();
+    foreach (var item in response.GetProperty("users").EnumerateArray())
+    {
+      users.Add(new AppUser
+      {
+        Id = item.GetProperty("id").GetString(),
+        Name = item.GetProperty("name").GetString(),
+        Email = item.GetProperty("email").GetString(),
+        PictureUrl = item.GetProperty("picture_url").GetString(),
+        RoleId = item.GetProperty("role_id").GetString(),
+      });
+    }
+    return users;
+  }
+
   public async Task<AppUser> GetUserInfoAsync(string accessToken)
   {
     var json = JsonSerializer.Serialize(new

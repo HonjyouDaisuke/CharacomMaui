@@ -63,6 +63,7 @@ public static class ServicesRegistration
     services.AddSingleton<BoxImageItemViewModel>();
     services.AddSingleton<TitleBarViewModel>();
     services.AddSingleton<CharaSelectViewModel>();
+    services.AddSingleton<UserListViewModel>();
 
     // Domain Service
     services.AddSingleton<AppStatus>();
@@ -75,6 +76,7 @@ public static class ServicesRegistration
     // PageのDI
     services.AddSingleton<MainPage>();
     services.AddSingleton<ProjectDetailPage>();
+    services.AddSingleton<UserListPage>();
 
     // その他
     services.AddSingleton<IDialogService, MopupsDialogService>();

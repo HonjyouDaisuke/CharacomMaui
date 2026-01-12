@@ -23,6 +23,8 @@ public partial class TitleBarView : ContentView
   public TitleBarView()
   {
     InitializeComponent();
+    this.BindingContext = Handler?.MauiContext?.Services.GetService<TitleBarViewModel>()
+                          ?? IPlatformApplication.Current.Services.GetService<TitleBarViewModel>();
     this.Loaded += OnLoaded;
 
   }
@@ -41,15 +43,7 @@ public partial class TitleBarView : ContentView
     _getAvatarsUrlUseCase = services.GetService<GetAvatarsUrlUseCase>();
     _userInfoUseCase = services.GetService<UpdateUserInfoUseCase>();
     _tokenStorage = services.GetService<IAppTokenStorageService>();
-    var vm = services.GetService<TitleBarViewModel>();
 
-    if (vm == null)
-    {
-      System.Diagnostics.Debug.WriteLine("DI に TitleBarViewModel が登録されていません！");
-      return;
-    }
-
-    BindingContext = vm;
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)
   {

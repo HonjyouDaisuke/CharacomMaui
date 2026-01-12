@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CharacomMaui.Presentation.Pages.UserListPage"
+             x:Name="thisPage"
+             xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+             Title="UserList">
+  <Shell.TitleView>
+    <components:TitleBarView/>
+  </Shell.TitleView>
+  <Grid RowDefinitions="Auto,*,Auto,Auto"
+        Padding="10">
+    <Label
+      Grid.Row="0"
+      Text="Welcome to .NET MAUI!"
+      VerticalOptions="Center"
+      HorizontalOptions="Center"/>
+    <CollectionView
+      Grid.Row="1"
+      x:Name="UserInfoCollection"
+      ItemsSource="{Binding BindingContext.Users, Source={x:Reference Name=thisPage}}"
+      SelectionMode="None">
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <components:UserInfoRow
+            UserId="{Binding Id}"
+            UserName="{Binding Name}"
+            UserEmail="{Binding Email}"
+            UserRole="{Binding RoleId}"
+            UserAvatarUrl="{Binding PictureUrl}"/>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
+    <Label
+      Grid.Row="2"
+      Text="{Binding UserList.Count, StringFormat='List Count: {0}'}"
+      TextColor="Red"
+      FontSize="20"/>
+    <Editor
+      Grid.Row="3"
+      x:Name="LogEditor"
+      HeightRequest="300"/>
+
+  </Grid>
+</ContentPage>
