@@ -15,7 +15,7 @@
 
       <conv:OddConverter x:Key="OddConverter"/>
 
-      <Style x:Key="ProgressRowBackgroundStyle"
+      <Style x:Key="UserRowBackgroundStyle"
              TargetType="Grid">
 
         <Setter Property="VisualStateManager.VisualStateGroups">
@@ -67,6 +67,7 @@
         IsEnabled="True">
 
     <Grid x:Name="BackgroundBorder"
+          Style="{StaticResource UserRowBackgroundStyle}"
           Margin="20,5,20,5"
           Padding="5"
           Grid.Row="0"
@@ -88,16 +89,19 @@
       <Label Grid.Column="1"
              HorizontalTextAlignment="Start"
              x:Name="UserNameLabel"
+             VerticalTextAlignment="Center"
              Text="{Binding UserName, Source={x:Reference This}}"/>
 
       <Label Grid.Column="2"
              HorizontalTextAlignment="Start"
              x:Name="UserEmailLabel"
+             VerticalTextAlignment="Center"
              Text="{Binding UserEmail, Source={x:Reference This}}"/>
 
       <Label Grid.Column="3"
              HorizontalTextAlignment="End"
              x:Name="UserRoleLabel"
+             VerticalTextAlignment="Center"
              Text="{Binding UserRole, Source={x:Reference This}}"/>
     </Grid>
 
@@ -105,7 +109,7 @@
     <BoxView Grid.Row="1"
              Margin="20,0,20,0"
              HeightRequest="1"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource OnSurface}, Dark={StaticResource OnSurfaceDark}}"
              HorizontalOptions="Fill"/>
   </Grid>
 
