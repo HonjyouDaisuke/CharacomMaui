@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json;
 
+namespace CharacomMaui.Infrastructure.Helpers;
+
 public static class DateTimeHelper
 {
   public static DateTime ParseDateTime(JsonElement element)
