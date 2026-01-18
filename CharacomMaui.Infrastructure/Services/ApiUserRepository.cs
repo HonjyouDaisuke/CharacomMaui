@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Api;
-using Org.BouncyCastle.Asn1.Misc;
-using Org.BouncyCastle.Math.EC.Rfc7748;
+
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -80,6 +79,51 @@ public class ApiUserRepository : IUserRepository
     }
   }
 
+  public async Task<List<AppUser>> GetUserListAsync(string accessToken)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+    });
+
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    try
+    {
+      var res = await _http.PostAsync(ApiEndpoints.GetUserList, content);
+      var responseBody = await res.Content.ReadAsStringAsync();
+      System.Diagnostics.Debug.WriteLine("---------- User List server res--------------");
+      System.Diagnostics.Debug.WriteLine(responseBody);
+
+      var response = JsonDocument.Parse(responseBody).RootElement;
+      var success = response.GetProperty("success").GetBoolean();
+      if (!success)
+      {
+        System.Diagnostics.Debug.WriteLine("success = Falseだよ");
+        return null;
+      }
+
+      var users = new List<AppUser>();
+      foreach (var item in response.GetProperty("users").EnumerateArray())
+      {
+        users.Add(new AppUser
+        {
+          Id = item.GetProperty("id").GetString(),
+          Name = item.GetProperty("name").GetString(),
+          Email = item.GetProperty("email").GetString(),
+          PictureUrl = item.GetProperty("picture_url").GetString(),
+          RoleId = item.GetProperty("role_id").GetString(),
+        });
+      }
+      return users;
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"想定外のエラー: {ex.Message}");
+      return new List<AppUser>();
+    }
+
+  }
+
   public async Task<AppUser> GetUserInfoAsync(string accessToken)
   {
     var json = JsonSerializer.Serialize(new
@@ -136,6 +180,53 @@ public class ApiUserRepository : IUserRepository
         {
           Success = true,
           Message = "Success Update User Info...",
+        };
+      }
+
+
+      var message = root.GetProperty("message").GetString();
+      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"サーバーエラー: {message}",
+      };
+    }
+    catch (Exception ex)
+    {
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"想定外のエラーが発生しました。。。{ex.Message}",
+      };
+    }
+  }
+
+  public async Task<SimpleApiResult> UpdateUserRoleAsync(string accessToken, string userId, string userRoleId)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      user_id = userId,
+      user_role_id = userRoleId,
+    });
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync(ApiEndpoints.UpdateUserRole, content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------Update UserRole server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+
+    try
+    {
+      var root = JsonDocument.Parse(responseBody).RootElement;
+
+      if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
+      {
+        System.Diagnostics.Debug.WriteLine("こっち");
+        return new SimpleApiResult
+        {
+          Success = true,
+          Message = "Success Update User Role...",
         };
       }
 

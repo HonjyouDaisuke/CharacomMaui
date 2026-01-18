@@ -16,4 +16,9 @@ public class GetUserInfoUseCase : IGetUserInfoUseCase
   {
     return await _repository.GetUserInfoAsync(accessToken);
   }
+
+  public async Task<List<AppUser>> GetUserListAsync(string accessToken)
+  {
+    return await _repository.GetUserListAsync(accessToken);
+  }
 }

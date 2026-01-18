@@ -20,6 +20,9 @@ public static class ApiEndpoints
   public const string GetStandardFileId = "get_standard_file_id.php";
   public const string CreateStrokeMaster = "create_stroke_master.php";
   public const string GetStrokeFileId = "get_stroke_file_id.php";
+  public const string GetUserList = "get_user_list.php";
   public const string BoxOAuth2 = "https://api.box.com/oauth2/token";
+  public const string GetUserRoles = "get_user_roles.php";
+  public const string UpdateUserRole = "update_user_userrole.php";
 
 }

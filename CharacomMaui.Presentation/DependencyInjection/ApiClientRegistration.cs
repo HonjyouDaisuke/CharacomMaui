@@ -19,6 +19,7 @@ public static class ApiClientRegistration
     services.AddHttpClient<ITokenValidationService, ApiTokenValidationService>(ConfigureClient);
     services.AddHttpClient<IBoxFolderRepository, ApiBoxFolderRepository>(ConfigureClient);
     services.AddHttpClient<IAvatarRepository, AvatarRepository>(ConfigureClient);
+    services.AddHttpClient<IUserRolesRepository, UserRolesRepository>(ConfigureClient);
     return services;
   }
 

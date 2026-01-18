@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.Sessions;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -131,7 +132,8 @@ public partial class UserProfileDialog : Popup
                            AppStatus appStatus,
                            GetAvatarsUrlUseCase avatarsUrlUseCase,
                            UpdateUserInfoUseCase userInfoUseCase,
-                           IAppTokenStorageService tokenStorage)
+                           IAppTokenStorageService tokenStorage,
+                           UserRolesSession userRolesSession)
   {
     InitializeComponent();
 
@@ -146,7 +148,7 @@ public partial class UserProfileDialog : Popup
     AvatarUrl = _notifier.AvatarUrl ?? string.Empty;
     AppUserName = _notifier.UserName ?? string.Empty;
     AppEmailAddress = _notifier.UserEmail ?? string.Empty;
-    UserRole = _appStatus.UserRole;
+    UserRole = userRolesSession.GetRoleNameFromRoleId(_appStatus.UserRole) ?? string.Empty;
     UserId = _appStatus.UserId;
     IsAvatarSelectMode = false;
     IsEditMode = true;

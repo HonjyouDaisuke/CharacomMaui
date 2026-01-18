@@ -1,6 +1,7 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Coordinators;
+using CharacomMaui.Application.Sessions;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Models;
@@ -41,6 +42,8 @@ public static class ServicesRegistration
     services.AddTransient<GetAvatarsUrlUseCase>();
     services.AddTransient<UpdateUserInfoUseCase>();
     services.AddTransient<ICharaImageOverlayUseCase, CharaImageOverlayUseCase>();
+    services.AddTransient<FetchUserRolesUseCase>();
+    services.AddTransient<UpdateUserRoleUseCase>();
 
     // Coordinator
     services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();
@@ -53,6 +56,9 @@ public static class ServicesRegistration
     services.AddHttpClient<IBoxConfigRepository, BoxConfigRepository>();
     services.AddHttpClient<IBoxApiRepository, BoxApiRepository>();
 
+    // Sessions
+    services.AddSingleton<UserRolesSession>();
+
     // ViewModel
     services.AddSingleton<BoxLoginViewModel>();
     services.AddSingleton<CreateAppUserViewModel>();
@@ -63,6 +69,7 @@ public static class ServicesRegistration
     services.AddSingleton<BoxImageItemViewModel>();
     services.AddSingleton<TitleBarViewModel>();
     services.AddSingleton<CharaSelectViewModel>();
+    services.AddSingleton<UserListViewModel>();
 
     // Domain Service
     services.AddSingleton<AppStatus>();
@@ -75,6 +82,7 @@ public static class ServicesRegistration
     // PageのDI
     services.AddSingleton<MainPage>();
     services.AddSingleton<ProjectDetailPage>();
+    services.AddSingleton<UserListPage>();
 
     // その他
     services.AddSingleton<IDialogService, MopupsDialogService>();

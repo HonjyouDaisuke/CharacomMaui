@@ -11,6 +11,7 @@ using CharacomMaui.Presentation.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.Sessions;
 
 public partial class TitleBarView : ContentView
 {
@@ -20,9 +21,12 @@ public partial class TitleBarView : ContentView
   private GetAvatarsUrlUseCase? _getAvatarsUrlUseCase;
   private UpdateUserInfoUseCase? _userInfoUseCase;
   private IAppTokenStorageService? _tokenStorage;
+  private UserRolesSession _userRolesSession;
   public TitleBarView()
   {
     InitializeComponent();
+    this.BindingContext = Handler?.MauiContext?.Services.GetService<TitleBarViewModel>()
+                          ?? IPlatformApplication.Current.Services.GetService<TitleBarViewModel>();
     this.Loaded += OnLoaded;
 
   }
@@ -41,22 +45,21 @@ public partial class TitleBarView : ContentView
     _getAvatarsUrlUseCase = services.GetService<GetAvatarsUrlUseCase>();
     _userInfoUseCase = services.GetService<UpdateUserInfoUseCase>();
     _tokenStorage = services.GetService<IAppTokenStorageService>();
-    var vm = services.GetService<TitleBarViewModel>();
+    _userRolesSession = services.GetService<UserRolesSession>();
 
-    if (vm == null)
-    {
-      System.Diagnostics.Debug.WriteLine("DI に TitleBarViewModel が登録されていません！");
-      return;
-    }
-
-    BindingContext = vm;
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)
   {
-    if (_dialogService == null || _notifier == null || _appStatus == null || _getAvatarsUrlUseCase == null || _userInfoUseCase == null || _tokenStorage == null)
+    if (_dialogService == null ||
+        _notifier == null ||
+        _appStatus == null ||
+        _getAvatarsUrlUseCase == null ||
+        _userInfoUseCase == null ||
+        _tokenStorage == null ||
+        _userRolesSession == null)
       return;
 
-    var dialog = new UserProfileDialog("ユーザー情報の更新", _dialogService, _notifier, _appStatus, _getAvatarsUrlUseCase, _userInfoUseCase, _tokenStorage);
+    var dialog = new UserProfileDialog("ユーザー情報の更新", _dialogService, _notifier, _appStatus, _getAvatarsUrlUseCase, _userInfoUseCase, _tokenStorage, _userRolesSession);
 
     await Shell.Current.ShowPopupAsync(dialog);
   }
