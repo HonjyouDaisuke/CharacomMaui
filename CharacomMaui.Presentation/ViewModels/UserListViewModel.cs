@@ -66,6 +66,11 @@ public partial class UserListViewModel : ObservableObject
 
     // 1. 新しいコレクションを作成してデータを詰め込む
     var res = await _userInfoUseCase.GetUserListAsync(accessToken);
+    if (res == null)
+    {
+      System.Diagnostics.Debug.WriteLine("ユーザーリストの取得に失敗しました");
+      return;
+    }
     var tempCollection = new ObservableCollection<UserInfoSummary>();
     int _count = 0;
     System.Diagnostics.Debug.WriteLine($"Rolse count = {_userRolesSession.Roles.Count}");
