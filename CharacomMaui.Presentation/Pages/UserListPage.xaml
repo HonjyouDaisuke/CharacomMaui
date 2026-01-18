@@ -38,7 +38,7 @@
     </CollectionView>
     <Label
       Grid.Row="2"
-      Text="{Binding UserList.Count, StringFormat='List Count: {0}'}"
+      Text="{Binding Users.Count, StringFormat='List Count: {0}'}"
       TextColor="Red"
       FontSize="20"/>
     <Editor
