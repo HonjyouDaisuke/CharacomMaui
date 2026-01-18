@@ -17,16 +17,14 @@ public partial class UserListPage : ContentPage
   private readonly UserListViewModel _viewModel;
   private readonly IDialogService _dialogService;
   private readonly UserRolesSession _userRolesSession;
-  private readonly UpdateUserRoleUseCase _updateUserRoleUseCase;
   private UserInfoRow? _selectedRow;
-  private bool _isInitailized = false;
-  public UserListPage(UserListViewModel viewModel, IDialogService dialogService, UserRolesSession userRolesSession, UpdateUserRoleUseCase updateUserRoleUseCase)
+  private bool _isInitialized = false;
+  public UserListPage(UserListViewModel viewModel, IDialogService dialogService, UserRolesSession userRolesSession)
   {
     InitializeComponent();
     _viewModel = viewModel;
     _dialogService = dialogService;
     _userRolesSession = userRolesSession;
-    _updateUserRoleUseCase = updateUserRoleUseCase;
     BindingContext = _viewModel;
     // デバッグ用：セットされたか確認
     System.Diagnostics.Debug.WriteLine($"BindingContext is set: {BindingContext != null}");
@@ -35,9 +33,9 @@ public partial class UserListPage : ContentPage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    if (_isInitailized) return;
+    if (_isInitialized) return;
 
-    _isInitailized = true;
+    _isInitialized = true;
 
     if (_viewModel == null)
     {
