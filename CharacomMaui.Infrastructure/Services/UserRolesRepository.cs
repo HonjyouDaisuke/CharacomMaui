@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Api;
+using CharacomMaui.Infrastructure.Helpers;
 
 namespace CharacomMaui.Infrastructure.Services;
 
