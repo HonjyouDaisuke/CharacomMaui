@@ -30,7 +30,7 @@ public class UserRolesRepository : IUserRolesRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
-      var res = await _http.PostAsync(ApiEndpoints.GetUserRoles, content);
+      using var res = await _http.PostAsync(ApiEndpoints.GetUserRoles, content);
       var responseBody = await res.Content.ReadAsStringAsync();
       System.Diagnostics.Debug.WriteLine("----------User Roles server res--------------");
       System.Diagnostics.Debug.WriteLine(responseBody);
