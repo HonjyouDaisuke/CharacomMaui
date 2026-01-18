@@ -90,7 +90,7 @@
                 TextColor="{AppThemeBinding Light={DynamicResource OnBackground}, Dark={DynamicResource OnBackgroundDark}}"/>
               <Label
                 TextColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledTextDark}}"
-                Text="{Binding UserRole}"/>
+                Text="{Binding SelectedRole}"/>
             </HorizontalStackLayout>
           </Grid>
         </Border>
