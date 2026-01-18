@@ -226,7 +226,7 @@ public class ApiUserRepository : IUserRepository
         return new SimpleApiResult
         {
           Success = true,
-          Message = "Success Update User Info...",
+          Message = "Success Update User Role...",
         };
       }
 
