@@ -13,10 +13,10 @@ public partial class MainPage : ContentPage
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly AppStatusUseCase _statusUseCase;
-
+  private readonly FetchUserRolesUseCase _userRolesUseCase;
   private bool _isLoginProcessing = false;
 
-  public MainPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
+  public MainPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
   {
     try
     {
@@ -27,6 +27,7 @@ public partial class MainPage : ContentPage
                              .GetRequiredService<CreateAppUserViewModel>();
       BindingContext = _boxLoginViewModel;
       _userUseCase = userUseCase;
+      _userRolesUseCase = userRolesUseCase;
       _statusUseCase = statusUseCase;
       _tokenStorage = tokenStorage;
     }
@@ -85,6 +86,9 @@ public partial class MainPage : ContentPage
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
       LogEditor.Text += $"app AccessToken = {accessToken}\n";
+      // ユーザー権限一覧を取得
+      await _userRolesUseCase.ExecuteAsync(accessToken!);
+
       var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
       _statusUseCase.SetUserInfo(userInfo);
 

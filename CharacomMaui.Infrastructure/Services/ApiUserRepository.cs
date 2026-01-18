@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Api;
-using Org.BouncyCastle.Asn1.Misc;
-using Org.BouncyCastle.Math.EC.Rfc7748;
+
 
 namespace CharacomMaui.Infrastructure.Services;
 
@@ -159,6 +158,53 @@ public class ApiUserRepository : IUserRepository
     var res = await _http.PostAsync(ApiEndpoints.UpdateUserInfo, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------Update User Info server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+
+    try
+    {
+      var root = JsonDocument.Parse(responseBody).RootElement;
+
+      if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
+      {
+        System.Diagnostics.Debug.WriteLine("こっち");
+        return new SimpleApiResult
+        {
+          Success = true,
+          Message = "Success Update User Info...",
+        };
+      }
+
+
+      var message = root.GetProperty("message").GetString();
+      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"サーバーエラー: {message}",
+      };
+    }
+    catch (Exception ex)
+    {
+      return new SimpleApiResult
+      {
+        Success = false,
+        Message = $"想定外のエラーが発生しました。。。{ex.Message}",
+      };
+    }
+  }
+
+  public async Task<SimpleApiResult> UpdateUserRoleAsync(string accessToken, string userId, string userRoleId)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      user_id = userId,
+      user_role_id = userRoleId,
+    });
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    var res = await _http.PostAsync(ApiEndpoints.UpdateUserRole, content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------Update UserRole server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
 
     try

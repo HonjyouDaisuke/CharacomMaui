@@ -4,6 +4,8 @@ using CharacomMaui.Presentation.ViewModels;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Presentation.Services;
+using CharacomMaui.Application.Sessions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using CommunityToolkit.Maui.Extensions;
@@ -14,12 +16,17 @@ public partial class UserListPage : ContentPage
 {
   private readonly UserListViewModel _viewModel;
   private readonly IDialogService _dialogService;
+  private readonly UserRolesSession _userRolesSession;
+  private readonly UpdateUserRoleUseCase _updateUserRoleUseCase;
   private UserInfoRow? _selectedRow;
-  public UserListPage(UserListViewModel viewModel, IDialogService dialogService)
+  private bool _isInitailized = false;
+  public UserListPage(UserListViewModel viewModel, IDialogService dialogService, UserRolesSession userRolesSession, UpdateUserRoleUseCase updateUserRoleUseCase)
   {
     InitializeComponent();
     _viewModel = viewModel;
     _dialogService = dialogService;
+    _userRolesSession = userRolesSession;
+    _updateUserRoleUseCase = updateUserRoleUseCase;
     BindingContext = _viewModel;
     // デバッグ用：セットされたか確認
     System.Diagnostics.Debug.WriteLine($"BindingContext is set: {BindingContext != null}");
@@ -28,6 +35,10 @@ public partial class UserListPage : ContentPage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
+    if (_isInitailized) return;
+
+    _isInitailized = true;
+
     if (_viewModel == null)
     {
       LogEditor.Text += "Error: ViewModel is null\n";
@@ -80,12 +91,24 @@ public partial class UserListPage : ContentPage
 
   private async void OnRowDoubleClicked(object sender, UserInfoRowEventArgs e)
   {
-    LogEditor.Text += "ダブルクリックされました\n";
-    var userInfo = _viewModel.GetUserInfoSummaryById(e.UserId);
+     var userInfo = _viewModel.GetUserInfoSummaryById(e.UserId);
     if (userInfo == null) return;
-    LogEditor.Text += $"ユーザー情報取得: {userInfo.Name} ({userInfo.Id})\n";
-    var dialog = new UserRoleEditDialog("ユーザーロールの編集", userInfo, _dialogService);
-    await this.ShowPopupAsync(dialog);
+    
+    var dialog = new UserRoleEditDialog("ユーザーロールの編集", userInfo, _dialogService, _userRolesSession);
+
+    var result = await this.ShowPopupAsync(dialog);
+    if (dialog.IsCanceled)
+    {
+      await SnackBarService.Warning("ユーザー権限の編集中をキャンセルしました。");
+      return;
+    }
+    var userRoleId = _userRolesSession.GetRoleIdFromRoleName(dialog.SelectedRole);
+    if (!await _viewModel.UpdateUserRoleAsync(dialog.UserId, userRoleId))
+    {
+      await SnackBarService.Error("ユーザー権限の編集中にエラーが発生しました。");
+      return;
+    }
+    await SnackBarService.Success("ユーザー権限の変更を保存しました。");
   }
 
 }

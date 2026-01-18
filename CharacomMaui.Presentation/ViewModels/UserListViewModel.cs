@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.Sessions;
 using CharacomMaui.Presentation.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -15,13 +16,47 @@ public partial class UserListViewModel : ObservableObject
   private ObservableCollection<UserInfoSummary> _users = new();
   private readonly IGetUserInfoUseCase _userInfoUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
-  public UserListViewModel(AppStatus appStatus, IGetUserInfoUseCase userInfoUseCase, IAppTokenStorageService tokenStorage)
+  private readonly UserRolesSession _userRolesSession;
+  private readonly UpdateUserRoleUseCase _updateUserRoleUseCase;
+  private readonly FetchUserRolesUseCase _fetchUserRolesUseCase;
+  public ObservableCollection<UserRole> UserRoles { get; } = new();
+
+  public UserListViewModel(
+    AppStatus appStatus,
+    IGetUserInfoUseCase userInfoUseCase,
+    IAppTokenStorageService tokenStorage,
+    UpdateUserRoleUseCase updateUserRoleUseCase,
+    FetchUserRolesUseCase fetchUserRolesUseCase,
+    UserRolesSession userRolesSession)
   {
     _appStatus = appStatus;
     _userInfoUseCase = userInfoUseCase;
     _tokenStorage = tokenStorage;
+    _updateUserRoleUseCase = updateUserRoleUseCase;
+    _fetchUserRolesUseCase = fetchUserRolesUseCase;
+    _userRolesSession = userRolesSession;
   }
 
+  public async Task<bool> UpdateUserRoleAsync(string userId, string userRoleId)
+  {
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return false;
+
+    System.Diagnostics.Debug.WriteLine($"userId : {userId} useRoleId {userRoleId}");
+
+    var result = await _updateUserRoleUseCase.ExecuteAsync(accessToken, userId, userRoleId);
+    if (result.Success == false) return false;
+
+    foreach (var user in Users)
+    {
+      if (user.Id != userId) continue;
+
+      user.RoleId = userRoleId;
+      user.RoleName = _userRolesSession.GetRoleNameFromRoleId(userRoleId);
+    }
+    return true;
+  }
   public async Task FetchUserListAsync()
   {
     var tokens = await _tokenStorage.GetTokensAsync();
@@ -34,8 +69,11 @@ public partial class UserListViewModel : ObservableObject
       var res = await _userInfoUseCase.GetUserListAsync(accessToken);
       var tempCollection = new ObservableCollection<UserInfoSummary>();
       int _count = 0;
+      System.Diagnostics.Debug.WriteLine($"Rolse count = {_userRolesSession.Roles.Count}");
       foreach (var user in res)
       {
+        System.Diagnostics.Debug.WriteLine($"roleId {user.RoleId} roleName={_userRolesSession.GetRoleNameFromRoleId(user.RoleId)}");
+
         var userInfo = new UserInfoSummary
         {
           Id = user.Id,
@@ -43,6 +81,7 @@ public partial class UserListViewModel : ObservableObject
           Email = user.Email,
           AvatarUrl = user.PictureUrl,
           RoleId = user.RoleId,
+          RoleName = _userRolesSession.GetRoleNameFromRoleId(user.RoleId),
           IsOdd = _count % 2 == 1
         };
         tempCollection.Add(userInfo);

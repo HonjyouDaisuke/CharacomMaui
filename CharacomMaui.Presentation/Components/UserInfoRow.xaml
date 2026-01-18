@@ -102,7 +102,7 @@
              HorizontalTextAlignment="End"
              x:Name="UserRoleLabel"
              VerticalTextAlignment="Center"
-             Text="{Binding UserRole, Source={x:Reference This}}"/>
+             Text="{Binding UserRoleName, Source={x:Reference This}}"/>
     </Grid>
 
     <!-- 下線 -->

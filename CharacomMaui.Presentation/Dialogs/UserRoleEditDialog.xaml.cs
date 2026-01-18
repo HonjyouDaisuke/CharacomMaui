@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using CharacomMaui.Presentation.ViewModels;
 using CharacomMaui.Presentation.Services;
+using CharacomMaui.Presentation.Components;
 using System.Threading.Tasks;
 using Mopups.Pages;
 using Mopups.Services;
@@ -13,18 +14,20 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.Sessions;
+using System.Dynamic;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
-public partial class UserRoleEditDialog : Popup
+public partial class UserRoleEditDialog : Popup<UserInfoRowEventArgs>
 {
 
   private readonly IDialogService _dialogService;
-  private readonly AppStatusNotifier _notifier;
-  private readonly AppStatus _appStatus;
-  private readonly GetAvatarsUrlUseCase _avatarsUrlUseCase;
-  private readonly UpdateUserInfoUseCase _userInfoUseCase;
-  private readonly IAppTokenStorageService _tokenStorage;
+  // private readonly AppStatusNotifier _notifier;
+  // private readonly AppStatus _appStatus;
+  // private readonly GetAvatarsUrlUseCase _avatarsUrlUseCase;
+  // private readonly UpdateUserInfoUseCase _userInfoUseCase;
+  // private readonly IAppTokenStorageService _tokenStorage;
 
   public ObservableCollection<string> Avatars { get; } = new();
   // ========== Title ==========
@@ -32,7 +35,7 @@ public partial class UserRoleEditDialog : Popup
       BindableProperty.Create(
         nameof(Title),
         typeof(string),
-        typeof(UserProfileDialog),
+        typeof(UserRoleEditDialog),
         string.Empty);
   public string Title
   {
@@ -87,17 +90,18 @@ public partial class UserRoleEditDialog : Popup
     get => (string)GetValue(UserIdProperty);
     set => SetValue(UserIdProperty, value);
   }
-  // ========== UserRole ==========
-  public static readonly BindableProperty UserRoleProperty =
-      BindableProperty.Create(
-        nameof(UserRole),
-        typeof(string),
-        typeof(UserRoleEditDialog),
-        string.Empty);
-  public string UserRole
+  // ========== SelectedRoleId ==========
+  public static readonly BindableProperty SelectedRoleIdProperty =
+    BindableProperty.Create(
+      nameof(SelectedRoleId),
+      typeof(string),
+      typeof(UserRoleEditDialog),
+      string.Empty);
+
+  public string SelectedRoleId
   {
-    get => (string)GetValue(UserRoleProperty);
-    set => SetValue(UserRoleProperty, value);
+    get => (string)GetValue(SelectedRoleIdProperty);
+    set => SetValue(SelectedRoleIdProperty, value);
   }
   // ========== IsEditMode ==========
   public static readonly BindableProperty IsEditModeProperty =
@@ -125,31 +129,73 @@ public partial class UserRoleEditDialog : Popup
     set => SetValue(IsAvatarSelectModeProperty, value);
   }
 
-  public UserRoleEditDialog(string title, UserInfoSummary userInfo,
-                           IDialogService dialogService)
-  {
-    InitializeComponent();
+  private readonly UserRolesSession _userRolesSession;
+  public ObservableCollection<string> UserRoles { get; private set; } = new() { "管理者", "デビルマン", "スーパーマン" };
 
+  private string? _selectedRole;
+  public string? SelectedRole
+  {
+    get => _selectedRole;
+    set
+    {
+      _selectedRole = value;
+      OnPropertyChanged();
+    }
+  }
+
+  public bool IsCanceled { get; private set; } = true;
+  public UserRoleEditDialog(string title, UserInfoSummary userInfo, IDialogService dialogService, UserRolesSession userRolesSession)
+  {
+
+    _userRolesSession = userRolesSession;
+    UserRolesInit(userInfo.RoleId);                  // ← ③ 最後に Roles & SelectedRole
+
+    InitializeComponent();        // ← ① 先に UI を作る
     BindingContext = this;
+
     Title = title;
     AppUserName = userInfo.Name;
     AppEmailAddress = userInfo.Email;
     AvatarUrl = userInfo.AvatarUrl;
     UserId = userInfo.Id;
-    UserRole = userInfo.RoleId;
+
+    //SelectedRoleId = userInfo.RoleId; // ← ② Id を先に入れる
+    System.Diagnostics.Debug.WriteLine($"UserRoleId = {userInfo.RoleId} Name = {_userRolesSession.GetRoleNameFromRoleId(userInfo.RoleId)}");
+    SelectedRole = _userRolesSession.GetRoleNameFromRoleId(userInfo.RoleId);
+
     _dialogService = dialogService;
   }
 
+  private void UserRolesInit(string initialRoleId)
+  {
+
+    var roles = _userRolesSession.Roles;
+    var list = roles.Select(r => r.Name).ToList();
+    UserRoles = new ObservableCollection<string>(list);
+  }
 
   private async void OnOkClicked(object sender, EventArgs e)
   {
-    await CloseAsync();
-    await SnackBarService.Success("ユーザーロールが更新されました。");
+    IsCanceled = false;
+
+    var result = new UserInfoRowEventArgs
+    {
+      UserId = this.UserId,
+      UserName = this.AppUserName,
+      UserRole = SelectedRoleId
+    };
+    System.Diagnostics.Debug.WriteLine($"OnOkClicked: {result.UserName} ({result.UserId}) Role: {result.UserRole}");
+    // await SnackBarService.Success("ユーザーロールが更新されました。");
+    await CloseAsync(result);
+
   }
 
   private async void OnCancelClicked(object sender, EventArgs e)
   {
-    await CloseAsync();
-    await SnackBarService.Warning("キャンセルされました。");
+    IsCanceled = true;
+    System.Diagnostics.Debug.WriteLine("OnCancelClicked");
+    // await SnackBarService.Warning("キャンセルされました。");
+    await CloseAsync(null);
+
   }
 }

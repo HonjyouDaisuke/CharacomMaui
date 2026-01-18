@@ -17,6 +17,7 @@ public partial class UserInfoRow : ContentView
   public string UserEmail { get => (string)GetValue(UserEmailProperty); set => SetValue(UserEmailProperty, value); }
   public string UserAvatarUrl { get => (string)GetValue(UserAvatarUrlProperty); set => SetValue(UserAvatarUrlProperty, value); }
   public string UserRole { get => (string)GetValue(UserRoleProperty); set => SetValue(UserRoleProperty, value); }
+  public string UserRoleName { get => (string)GetValue(UserRoleNameProperty); set => SetValue(UserRoleNameProperty, value); }
 
   public static readonly BindableProperty UserIdProperty =
     BindableProperty.Create(nameof(UserId), typeof(string), typeof(UserInfoRow), string.Empty);
@@ -28,6 +29,9 @@ public partial class UserInfoRow : ContentView
     BindableProperty.Create(nameof(UserAvatarUrl), typeof(string), typeof(UserInfoRow), string.Empty);
   public static readonly BindableProperty UserRoleProperty =
     BindableProperty.Create(nameof(UserRole), typeof(string), typeof(UserInfoRow), string.Empty);
+  public static readonly BindableProperty UserRoleNameProperty =
+    BindableProperty.Create(nameof(UserRoleName), typeof(string), typeof(UserInfoRow), string.Empty);
+
 
   public bool IsSelected
   {
@@ -71,20 +75,19 @@ public partial class UserInfoRow : ContentView
   private void OnCardTapped(object? sender, EventArgs e)
   {
     // すでに遅延処理がある場合 → ダブルクリック
-    System.Diagnostics.Debug.WriteLine($"TAP instance: {this.GetHashCode()}");
     if (_cts != null)
     {
-      System.Diagnostics.Debug.WriteLine("DoubleTap: Cancel called");
       _cts.Cancel();
       _cts.Dispose();
       _cts = null;
-
       RowDoubleClicked?.Invoke(this, new UserInfoRowEventArgs
       {
         UserId = UserId,
         UserName = UserName,
         UserRole = UserRole
       });
+      System.Diagnostics.Debug.WriteLine("ダブルクリック検出");
+
       return; // ここで早期リターン
     }
 
@@ -96,11 +99,8 @@ public partial class UserInfoRow : ContentView
     {
       if (t.IsCanceled)
       {
-        System.Diagnostics.Debug.WriteLine("SingleTap: CANCELED");
         return;
       }
-
-      System.Diagnostics.Debug.WriteLine("SingleTap: EXECUTED");
 
       MainThread.BeginInvokeOnMainThread(() =>
       {
@@ -132,7 +132,7 @@ public partial class UserInfoRow : ContentView
   protected override void OnPropertyChanged(string? propertyName = null)
   {
     base.OnPropertyChanged(propertyName);
-    System.Diagnostics.Debug.WriteLine($"UserInfoRow OnPropertyChanged: {propertyName}");
+
     if (propertyName == IsEnabledProperty.PropertyName)
     {
       if (IsEnabled)
@@ -150,7 +150,6 @@ public partial class UserInfoRow : ContentView
   protected override void OnBindingContextChanged()
   {
     base.OnBindingContextChanged();
-    System.Diagnostics.Debug.WriteLine($"UserInfoRow BindingContextChanged: UserName = {UserName}, UserId = {UserId}");
     UpdateVisualState();
   }
 
@@ -159,14 +158,12 @@ public partial class UserInfoRow : ContentView
     if (IsSelected)
     {
       VisualStateManager.GoToState(BackgroundBorder, "Selected");
-      System.Diagnostics.Debug.WriteLine($"UserName = {UserName} UserId = {UserId}  ★☆Selected!");
     }
     else
     {
       VisualStateManager.GoToState(
         BackgroundBorder,
         IsOdd ? "NormalOdd" : "NormalEven");
-      System.Diagnostics.Debug.WriteLine($"UserName = {UserName} UserId = {UserId}  ★☆Normal{IsOdd}");
     }
 
   }

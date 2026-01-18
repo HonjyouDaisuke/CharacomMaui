@@ -8,4 +8,5 @@ public interface IUserRepository
   Task<AppUser> GetUserInfoAsync(string accessToken);
   Task<List<AppUser>> GetUserListAsync(string accessToken);
   Task<SimpleApiResult> UpdateUserInfoAsync(string accessToken, string userId, string userName, string userEmail, string avatarUrl);
+  Task<SimpleApiResult> UpdateUserRoleAsync(string accessToken, string userId, string userRoleId);
 }

@@ -27,6 +27,7 @@
             UserName="{Binding Name}"
             UserEmail="{Binding Email}"
             UserRole="{Binding RoleId}"
+            UserRoleName="{Binding RoleName}"
             UserAvatarUrl="{Binding AvatarUrl}"
             IsSelected="{Binding IsSelected}"
             IsOdd="{Binding IsOdd}"

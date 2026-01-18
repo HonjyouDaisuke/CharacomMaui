@@ -12,13 +12,15 @@ public partial class LoadingPage : ContentPage
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
-  public LoadingPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage)
+  private readonly FetchUserRolesUseCase _userRolesUseCase;
+  public LoadingPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
   {
     InitializeComponent();
 
     _userUseCase = userUseCase;
     _statusUseCase = statusUseCase;
     _tokenStorage = tokenStorage;
+    _userRolesUseCase = userRolesUseCase;
   }
 
   protected override async void OnAppearing()
@@ -44,7 +46,7 @@ public partial class LoadingPage : ContentPage
         isValid = false;
         await SnackBarService.Error("AccessTokenが有効ではありません。");
         System.Diagnostics.Debug.WriteLine($"Error --tokenRes isValid = {isValid}");
-        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
         return;
       }
     }
@@ -52,12 +54,13 @@ public partial class LoadingPage : ContentPage
     if (!isValid)
     {
       System.Diagnostics.Debug.WriteLine($"TokenError = {isValid}");
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
       return;
     }
+    // ユーザー権限一覧を取得
+    await _userRolesUseCase.ExecuteAsync(accessToken!);
 
     var user = await _userUseCase.GetUserInfoAsync(accessToken!);
-
     if (user == null || user.Id == null)
     {
       isValid = false;
@@ -73,7 +76,7 @@ public partial class LoadingPage : ContentPage
     }
     else
     {
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage);
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
     }
   }
 }

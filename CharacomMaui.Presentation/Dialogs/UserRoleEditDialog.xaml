@@ -5,6 +5,8 @@
   xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
   xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
   xmlns:validation="clr-namespace:InputKit.Shared.Validations;assembly=InputKit.Maui"
+  xmlns:comp="clr-namespace:CharacomMaui.Presentation.Components"
+  x:TypeArguments="comp:UserInfoRowEventArgs"
   x:Class="CharacomMaui.Presentation.Dialogs.UserRoleEditDialog"
   x:Name="Root"
   Padding="0"
@@ -31,22 +33,16 @@
                HorizontalOptions="Fill"
                Grid.Row="0"/>
         <!-- アバター -->
-        <Border Grid.Row="1"
-                BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
-                Padding="10"
-                Margin="10"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 10">
-          <views:AvatarView
-            Text="{Binding AvatarText}"
-            WidthRequest="200"
-            HeightRequest="200"
-            BorderWidth="0"
-            Padding="0"
-            Grid.Row="0"
-            HorizontalOptions="Center"
-            ImageSource="{Binding AvatarUrl}"/>
-        </Border>
+
+        <views:AvatarView
+          WidthRequest="200"
+          HeightRequest="200"
+          BorderWidth="0"
+          Padding="0"
+          Grid.Row="1"
+          HorizontalOptions="Center"
+          ImageSource="{Binding AvatarUrl}"/>
+
         <!-- ユーザー情報 -->
         <Border Grid.Row="2"
                 BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
@@ -86,6 +82,12 @@
               <Label
                 TextColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledTextDark}}"
                 Text="ユーザー権限 : "/>
+              <uranium:Dropdown
+                ItemsSource="{Binding UserRoles}"
+                SelectedItem="{Binding SelectedRole, Mode=TwoWay}"
+                Placeholder="選択してください"
+                WidthRequest="300"
+                TextColor="{AppThemeBinding Light={DynamicResource OnBackground}, Dark={DynamicResource OnBackgroundDark}}"/>
               <Label
                 TextColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledTextDark}}"
                 Text="{Binding UserRole}"/>
