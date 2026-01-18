@@ -63,33 +63,34 @@ public partial class UserListViewModel : ObservableObject
     var accessToken = tokens?.AccessToken;
     if (accessToken == null) return;
 
-    await MainThread.InvokeOnMainThreadAsync(async () =>
-    {
-      // 1. 新しいコレクションを作成してデータを詰め込む
-      var res = await _userInfoUseCase.GetUserListAsync(accessToken);
-      var tempCollection = new ObservableCollection<UserInfoSummary>();
-      int _count = 0;
-      System.Diagnostics.Debug.WriteLine($"Rolse count = {_userRolesSession.Roles.Count}");
-      foreach (var user in res)
-      {
-        System.Diagnostics.Debug.WriteLine($"roleId {user.RoleId} roleName={_userRolesSession.GetRoleNameFromRoleId(user.RoleId)}");
 
-        var userInfo = new UserInfoSummary
-        {
-          Id = user.Id,
-          Name = user.Name,
-          Email = user.Email,
-          AvatarUrl = user.PictureUrl,
-          RoleId = user.RoleId,
-          RoleName = _userRolesSession.GetRoleNameFromRoleId(user.RoleId),
-          IsOdd = _count % 2 == 1
-        };
-        tempCollection.Add(userInfo);
-        _count++;
-      }
-      // 2. プロパティごと差し替える（これで View に「全部変わった」と通知が飛ぶ）
-      Users = tempCollection;
-    });
+    // 1. 新しいコレクションを作成してデータを詰め込む
+    var res = await _userInfoUseCase.GetUserListAsync(accessToken);
+    var tempCollection = new ObservableCollection<UserInfoSummary>();
+    int _count = 0;
+    System.Diagnostics.Debug.WriteLine($"Rolse count = {_userRolesSession.Roles.Count}");
+    foreach (var user in res)
+    {
+      System.Diagnostics.Debug.WriteLine($"roleId {user.RoleId} roleName={_userRolesSession.GetRoleNameFromRoleId(user.RoleId)}");
+
+      var userInfo = new UserInfoSummary
+      {
+        Id = user.Id,
+        Name = user.Name,
+        Email = user.Email,
+        AvatarUrl = user.PictureUrl,
+        RoleId = user.RoleId,
+        RoleName = _userRolesSession.GetRoleNameFromRoleId(user.RoleId),
+        IsOdd = _count % 2 == 1
+      };
+      tempCollection.Add(userInfo);
+      _count++;
+    }
+    await MainThread.InvokeOnMainThreadAsync(() =>
+ {
+   // 2. プロパティごと差し替える（これで View に「全部変わった」と通知が飛ぶ）
+   Users = tempCollection;
+ });
 
     foreach (var user in Users)
       System.Diagnostics.Debug.WriteLine($"userName= {user.Name} userId= {user.Id} email= {user.Email}");

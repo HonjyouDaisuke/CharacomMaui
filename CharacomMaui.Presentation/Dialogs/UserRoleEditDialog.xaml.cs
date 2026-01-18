@@ -139,6 +139,7 @@ public partial class UserRoleEditDialog : Popup<UserInfoRowEventArgs>
     set
     {
       _selectedRole = value;
+      SelectedRoleId = _userRolesSession.GetRoleIdFromRoleName(value ?? string.Empty);
       OnPropertyChanged();
     }
   }

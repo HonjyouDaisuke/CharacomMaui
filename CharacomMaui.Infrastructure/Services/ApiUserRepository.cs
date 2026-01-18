@@ -87,32 +87,41 @@ public class ApiUserRepository : IUserRepository
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
-    var res = await _http.PostAsync(ApiEndpoints.GetUserList, content);
-    var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("---------- User List server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
-
-    var response = JsonDocument.Parse(responseBody).RootElement;
-    var success = response.GetProperty("success").GetBoolean();
-    if (!success)
+    try
     {
-      System.Diagnostics.Debug.WriteLine("success = Falseだよ");
-      return null;
-    }
+      var res = await _http.PostAsync(ApiEndpoints.GetUserList, content);
+      var responseBody = await res.Content.ReadAsStringAsync();
+      System.Diagnostics.Debug.WriteLine("---------- User List server res--------------");
+      System.Diagnostics.Debug.WriteLine(responseBody);
 
-    var users = new List<AppUser>();
-    foreach (var item in response.GetProperty("users").EnumerateArray())
-    {
-      users.Add(new AppUser
+      var response = JsonDocument.Parse(responseBody).RootElement;
+      var success = response.GetProperty("success").GetBoolean();
+      if (!success)
       {
-        Id = item.GetProperty("id").GetString(),
-        Name = item.GetProperty("name").GetString(),
-        Email = item.GetProperty("email").GetString(),
-        PictureUrl = item.GetProperty("picture_url").GetString(),
-        RoleId = item.GetProperty("role_id").GetString(),
-      });
+        System.Diagnostics.Debug.WriteLine("success = Falseだよ");
+        return null;
+      }
+
+      var users = new List<AppUser>();
+      foreach (var item in response.GetProperty("users").EnumerateArray())
+      {
+        users.Add(new AppUser
+        {
+          Id = item.GetProperty("id").GetString(),
+          Name = item.GetProperty("name").GetString(),
+          Email = item.GetProperty("email").GetString(),
+          PictureUrl = item.GetProperty("picture_url").GetString(),
+          RoleId = item.GetProperty("role_id").GetString(),
+        });
+      }
+      return users;
     }
-    return users;
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"想定外のエラー: {ex.Message}");
+      return new List<AppUser>();
+    }
+
   }
 
   public async Task<AppUser> GetUserInfoAsync(string accessToken)

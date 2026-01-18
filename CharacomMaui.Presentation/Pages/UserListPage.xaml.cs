@@ -91,9 +91,9 @@ public partial class UserListPage : ContentPage
 
   private async void OnRowDoubleClicked(object sender, UserInfoRowEventArgs e)
   {
-     var userInfo = _viewModel.GetUserInfoSummaryById(e.UserId);
+    var userInfo = _viewModel.GetUserInfoSummaryById(e.UserId);
     if (userInfo == null) return;
-    
+
     var dialog = new UserRoleEditDialog("ユーザーロールの編集", userInfo, _dialogService, _userRolesSession);
 
     var result = await this.ShowPopupAsync(dialog);
@@ -103,6 +103,11 @@ public partial class UserListPage : ContentPage
       return;
     }
     var userRoleId = _userRolesSession.GetRoleIdFromRoleName(dialog.SelectedRole);
+    if (string.IsNullOrEmpty(userRoleId))
+    {
+      await SnackBarService.Error("選択したロールが見つかりませんでした。");
+      return;
+    }
     if (!await _viewModel.UpdateUserRoleAsync(dialog.UserId, userRoleId))
     {
       await SnackBarService.Error("ユーザー権限の編集中にエラーが発生しました。");
