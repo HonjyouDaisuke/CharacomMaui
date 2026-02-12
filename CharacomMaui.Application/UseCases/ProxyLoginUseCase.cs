@@ -12,9 +12,9 @@ public class ProxyLoginUseCase
     _proxyLoginService = proxyLoginService;
   }
 
-  public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId)
+  public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, string toUserId)
   {
-    return await _proxyLoginService.ProxyLoginAsync(accessToken, user, toUserId, toUserName, toUserEmail, toBoxUserId);
+    return await _proxyLoginService.ProxyLoginAsync(accessToken, toUserId);
   }
 
 }

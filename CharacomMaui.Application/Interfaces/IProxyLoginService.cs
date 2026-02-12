@@ -4,5 +4,5 @@ using CharacomMaui.Domain.Entities;
 
 public interface IProxyLoginService
 {
-  Task<AppTokenResult> ProxyLoginAsync(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId);
+  Task<AppTokenResult> ProxyLoginAsync(string accessToken, string toUserId);
 }

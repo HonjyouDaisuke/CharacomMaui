@@ -20,20 +20,12 @@ public class ProxyLoginService : IProxyLoginService
       throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
-  public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId)
+  public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, string toUserId)
   {
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
-      user_name = user.Name,
-      user_email = user.Email,
-      user_role_id = user.RoleId,
       to_user_id = toUserId,
-      to_user_name = toUserName,
-      to_user_email = toUserEmail,
-      to_box_user_id = toBoxUserId,
-      to_box_access_token = user.BoxAccessToken,
-      to_box_refresh_token = user.BoxRefreshToken,
     });
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");

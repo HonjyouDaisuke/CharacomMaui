@@ -54,6 +54,7 @@ public partial class LoadingPage : ContentPage
         if (isProxy)
         {
           System.Diagnostics.Debug.WriteLine("前回代理ログインで終了したので、ログインし直してください");
+          await _tokenStorage.ClearTokensAsync();
           isValid = false;
         }
       }

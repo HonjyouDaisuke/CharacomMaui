@@ -153,6 +153,19 @@ public class AppStatusNotifier : INotifyPropertyChanged
       }
     }
   }
+
+  public string? FromUserName
+  {
+    get => _status.FromUserName;
+    set
+    {
+      if (_status.FromUserName != value)
+      {
+        _status.FromUserName = value ?? string.Empty;
+        OnPropertyChanged();
+      }
+    }
+  }
   public event PropertyChangedEventHandler? PropertyChanged;
 
   private void OnPropertyChanged([CallerMemberName] string? name = null)

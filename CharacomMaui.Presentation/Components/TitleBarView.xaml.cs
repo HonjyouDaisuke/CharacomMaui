@@ -60,6 +60,7 @@ public partial class TitleBarView : ContentView
         _getAvatarsUrlUseCase == null ||
         _userInfoUseCase == null ||
         _tokenStorage == null ||
+        _viewModel == null ||
         _userRolesSession == null;
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)

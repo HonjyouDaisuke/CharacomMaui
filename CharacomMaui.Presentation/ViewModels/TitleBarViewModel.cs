@@ -100,6 +100,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     {
       if (e.PropertyName == nameof(AppStatusNotifier.ProjectName)
           || e.PropertyName == nameof(AppStatusNotifier.IsProxy)
+          || e.PropertyName == nameof(AppStatusNotifier.FromUserName)
           || e.PropertyName == nameof(AppStatusNotifier.UserName))
       {
         TitleString = MakeTitleString();
@@ -141,7 +142,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
   private string MakeTitleString()
   {
     System.Diagnostics.Debug.WriteLine($"Make String !!{_notifier.ProjectName}");
-    var proxyMessage = _notifier.IsProxy ? $" 代理ログイン中({_notifier.UserName})" : "";
+    var proxyMessage = _notifier.IsProxy ? $" 代理ログイン中({_notifier.FromUserName})" : "";
     string projectTitle = string.IsNullOrEmpty(_notifier.ProjectName)
         ? ""
         : " - " + _notifier.ProjectName;
@@ -176,15 +177,17 @@ public class TitleBarViewModel : INotifyPropertyChanged
     var accessToken = tokens?.AccessToken;
     if (accessToken == null) return;
 
-    var thisUser = new AppUser
-    {
-      Id = _appStatus.UserId,
-      Name = _appStatus.UserName,
-      Email = _appStatus.UserEmail,
-      RoleId = _appStatus.UserRole,
+    // 元のユーザー名を保存
+    var fromUserName = _appStatus.UserName ?? string.Empty;
 
-    };
-    var res = await _proxyLoginUseCase.ProxyLoginAsync(accessToken, thisUser, proxyUserId, _appStatus.UserName, _appStatus.UserEmail, _appStatus.UserId);
+    var res = await _proxyLoginUseCase.ProxyLoginAsync(accessToken, proxyUserId);
+    if (!res.Success)
+    {
+      System.Diagnostics.Debug.WriteLine($"ProxyLogin失敗: {res.Message}");
+      await SnackBarService.Error($"代理ログインに失敗しました: {res.Message}");
+      return;
+    }
+
     var newUser = await _getUserInfoUseCase.GetUserInfoAsync(res.AccessToken);
     if (newUser == null) return;
 
@@ -192,6 +195,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
 
     SetNotifier(newUser);
     _notifier.IsProxy = true;
+    _notifier.FromUserName = fromUserName;
     await SnackBarService.Success($"Proxy Login {newUser.Name} に代理ログインしました。", 500);
     MauiApp.Current!.Windows[0].Page = new AppShell();
   }
