@@ -169,7 +169,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     });
   }
 
-  public async Task ProxyLogin(string proxyUserId)
+  public async Task ProxyLoginAsync(string proxyUserId)
   {
     System.Diagnostics.Debug.WriteLine($"ProxyLogin: {proxyUserId}");
     var tokens = await _tokenStorage.GetTokensAsync();
@@ -190,13 +190,13 @@ public class TitleBarViewModel : INotifyPropertyChanged
 
     await SetTokenStorageAsync(res);
 
-    _notifier.IsProxy = true;
     SetNotifier(newUser);
+    _notifier.IsProxy = true;
     await SnackBarService.Success($"Proxy Login {newUser.Name} に代理ログインしました。", 500);
     MauiApp.Current!.Windows[0].Page = new AppShell();
   }
 
-  public async Task ProxyLogout()
+  public async Task ProxyLogoutAsync()
   {
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;

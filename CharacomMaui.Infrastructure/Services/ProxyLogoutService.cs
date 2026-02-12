@@ -20,7 +20,7 @@ public class ProxyLogoutService : IProxyLogoutService
       throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
-  public async Task<AppTokenResult> ProxyLogout(string accessToken)
+  public async Task<AppTokenResult> ProxyLogoutAsync(string accessToken)
   {
     var json = JsonSerializer.Serialize(new
     {

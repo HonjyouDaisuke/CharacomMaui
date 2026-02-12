@@ -4,5 +4,5 @@ using CharacomMaui.Domain.Entities;
 
 public interface IProxyLogoutService
 {
-  Task<AppTokenResult> ProxyLogout(string accessToken);
+  Task<AppTokenResult> ProxyLogoutAsync(string accessToken);
 }

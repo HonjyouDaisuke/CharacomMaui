@@ -45,7 +45,9 @@ public partial class LoadingPage : ContentPage
         if (result.Payload.ValueKind == JsonValueKind.Object &&
             result.Payload.TryGetProperty("is_proxy", out var isProxyProp))
         {
-          isProxy = isProxyProp.GetBoolean();
+          isProxy = isProxyProp.ValueKind == JsonValueKind.True
+                 || (isProxyProp.ValueKind == JsonValueKind.String &&
+                     bool.TryParse(isProxyProp.GetString(), out var b) && b);
         }
 
         isValid = result.Success;

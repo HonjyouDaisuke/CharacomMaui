@@ -14,9 +14,7 @@ public class ProxyLoginUseCase
 
   public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId)
   {
-    var result = await _proxyLoginService.ProxyLogin(accessToken, user, toUserId, toUserName, toUserEmail, toBoxUserId);
-    System.Diagnostics.Debug.WriteLine($"ProxyLoginAsync accessToken = {result.AccessToken}");
-    return result;
+    return await _proxyLoginService.ProxyLoginAsync(accessToken, user, toUserId, toUserName, toUserEmail, toBoxUserId);
   }
 
 }

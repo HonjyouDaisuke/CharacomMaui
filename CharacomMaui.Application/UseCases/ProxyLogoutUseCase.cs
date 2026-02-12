@@ -14,9 +14,7 @@ public class ProxyLogoutUseCase
 
   public async Task<AppTokenResult> ProxyLogoutAsync(string accessToken)
   {
-    var result = await _proxyLogoutService.ProxyLogout(accessToken);
-    System.Diagnostics.Debug.WriteLine($"ProxyLogoutAsync accessToken = {result.AccessToken}");
-    return result;
+    return await _proxyLogoutService.ProxyLogoutAsync(accessToken);
   }
 
 }

@@ -20,7 +20,7 @@ public class ProxyLoginService : IProxyLoginService
       throw new InvalidOperationException("HttpClient.BaseAddress is NULL");
   }
 
-  public async Task<AppTokenResult> ProxyLogin(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId)
+  public async Task<AppTokenResult> ProxyLoginAsync(string accessToken, AppUser user, string toUserId, string toUserName, string toUserEmail, string toBoxUserId)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -42,11 +42,12 @@ public class ProxyLoginService : IProxyLoginService
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("---------- ProxyLogin server res--------------");
-    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken} userRoleId = {user.RoleId} toUserId = {toUserId} toUserName = {toUserName} toUserEmail = {toUserEmail} toBoxUserId = {toBoxUserId} ");
     System.Diagnostics.Debug.WriteLine(responseBody);
     try
     {
       var result = JsonSerializer.Deserialize<AppTokenResult>(responseBody);
+      if (result == null)
+        throw new InvalidOperationException("ProxyLogin response deserialized to null");
       return result;
     }
     catch (Exception ex)

@@ -76,29 +76,35 @@ public partial class TitleBarView : ContentView
     if (isNullInstance()) return;
     if (_tokenStorage == null) return;
     if (_getUserInfoUseCase == null) return;
-
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return;
-
-    if (_notifier!.IsProxy)
+    try
     {
-      await _viewModel.ProxyLogout();
-      return;
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return;
+
+      if (_notifier!.IsProxy)
+      {
+        await _viewModel.ProxyLogoutAsync();
+        return;
+      }
+      var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
+      var dialog = new SelectUserDialog("代理ログインのユーザー", _dialogService, users);
+
+      await Shell.Current.ShowPopupAsync(dialog);
+      if (dialog.IsCanceled)
+      {
+        System.Diagnostics.Debug.WriteLine("キャンセルされました");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"選択された user_id:{dialog.SelectedUserId}");
+
+        await _viewModel.ProxyLoginAsync(dialog.SelectedUserId);
+      }
     }
-    var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
-    var dialog = new SelectUserDialog("代理ログインのユーザー", _dialogService, users);
-
-    await Shell.Current.ShowPopupAsync(dialog);
-    if (dialog.IsCanceled)
+    catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine("キャンセルされました");
-    }
-    else
-    {
-      System.Diagnostics.Debug.WriteLine($"選択された user_id:{dialog.SelectedUserId}");
-
-      await _viewModel.ProxyLogin(dialog.SelectedUserId);
+      System.Diagnostics.Debug.WriteLine($"代理ログインの処理中にエラーが発生: {ex.Message}");
     }
   }
 }
