@@ -39,7 +39,7 @@ public partial class SelectUserDialog : Popup
     set => SetValue(TitleProperty, value);
   }
 
-  public ObservableCollection<string> UserNames { get; private set; } = new() { "管理者", "デビルマン", "スーパーマン" };
+  public ObservableCollection<string> UserNames { get; private set; } = new();
 
   public bool IsCanceled { get; private set; } = true;
   public string SelectedUserId { get; private set; } = string.Empty;
