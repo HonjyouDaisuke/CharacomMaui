@@ -17,7 +17,7 @@
       VerticalOptions="Center"
       FontSize="24"/>
 
-    <!-- ▼ Prox User -->
+    <!-- ▼ Proxy User -->
     <Label
       FontFamily="{x:Static models:Icons.FontFamily}"
       Text="{Binding ProxyIcon}"
