@@ -95,7 +95,7 @@
               <HorizontalStackLayout Grid.Row="0">
                 <Label
                   TextColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledTextDark}}"
-                  Text="BoxユーザーID : "/>
+                  Text="ユーザーID : "/>
                 <Label
                   TextColor="{AppThemeBinding Light={DynamicResource DisabledText}, Dark={DynamicResource DisabledTextDark}}"
                   Text="{Binding UserId}"/>

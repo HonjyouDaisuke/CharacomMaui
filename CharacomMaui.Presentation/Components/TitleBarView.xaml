@@ -3,18 +3,31 @@
   x:Class="CharacomMaui.Presentation.Components.TitleBarView"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  xmlns:vm="clr-namespace:CharacomMaui.Presentation.ViewModels"
+  x:DataType="vm:TitleBarViewModel"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-  <Grid Padding="0,0,10,0">
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
-
+  <Grid Padding="0,0,10,0"
+        ColumnDefinitions="*,Auto,Auto">
     <!-- Binding は Page の BindingContext をそのまま参照する -->
-    <Label Text="{Binding TitleString}"
-           VerticalOptions="Center"
-           FontSize="24"/>
+    <Label
+      Text="{Binding TitleString}"
+      Grid.Column="0"
+      VerticalOptions="Center"
+      FontSize="24"/>
+
+    <!-- ▼ Proxy User -->
+    <Label
+      FontFamily="{x:Static models:Icons.FontFamily}"
+      Text="{Binding ProxyIcon}"
+      Grid.Column="1"
+      FontSize="26"
+      VerticalTextAlignment="Center">
+      <Label.GestureRecognizers>
+        <TapGestureRecognizer Tapped="OnProxyUserTapped"/>
+      </Label.GestureRecognizers>
+    </Label>
 
     <!-- ▼ Avatar -->
     <toolkit:AvatarView
@@ -23,6 +36,7 @@
       HeightRequest="40"
       BorderWidth="0"
       Padding="0"
+      Grid.Column="2"
       HorizontalOptions="End"
       ImageSource="{Binding AvatarUrl}">
       <toolkit:AvatarView.GestureRecognizers>

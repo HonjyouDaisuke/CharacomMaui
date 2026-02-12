@@ -1,7 +1,7 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CharacomMaui.Domain.Entities;
-
 
 public class TokenValidationResult
 {
@@ -12,7 +12,7 @@ public class TokenValidationResult
   public string? UserId { get; set; }
 
   [JsonPropertyName("payload")]
-  public object? Payload { get; set; }
+  public JsonElement Payload { get; set; }
 
   [JsonPropertyName("error")]
   public string? Error { get; set; }

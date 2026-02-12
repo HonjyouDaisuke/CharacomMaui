@@ -22,11 +22,15 @@ public partial class TitleBarView : ContentView
   private UpdateUserInfoUseCase? _userInfoUseCase;
   private IAppTokenStorageService? _tokenStorage;
   private UserRolesSession _userRolesSession;
+  private IGetUserInfoUseCase? _getUserInfoUseCase;
+  private TitleBarViewModel _viewModel;
   public TitleBarView()
   {
     InitializeComponent();
-    this.BindingContext = Handler?.MauiContext?.Services.GetService<TitleBarViewModel>()
-                          ?? IPlatformApplication.Current.Services.GetService<TitleBarViewModel>();
+    _viewModel = Handler?.MauiContext?.Services.GetService<TitleBarViewModel>()
+                  ?? IPlatformApplication.Current.Services.GetService<TitleBarViewModel>();
+
+    this.BindingContext = _viewModel;
     this.Loaded += OnLoaded;
 
   }
@@ -46,21 +50,62 @@ public partial class TitleBarView : ContentView
     _userInfoUseCase = services.GetService<UpdateUserInfoUseCase>();
     _tokenStorage = services.GetService<IAppTokenStorageService>();
     _userRolesSession = services.GetService<UserRolesSession>();
-
+    _getUserInfoUseCase = services.GetService<IGetUserInfoUseCase>();
   }
-  private async void OnAvatarViewTapped(object sender, EventArgs e)
+  private bool isNullInstance()
   {
-    if (_dialogService == null ||
+    return _dialogService == null ||
         _notifier == null ||
         _appStatus == null ||
         _getAvatarsUrlUseCase == null ||
         _userInfoUseCase == null ||
         _tokenStorage == null ||
-        _userRolesSession == null)
-      return;
+        _viewModel == null ||
+        _userRolesSession == null;
+  }
+  private async void OnAvatarViewTapped(object sender, EventArgs e)
+  {
+    if (isNullInstance()) return;
 
     var dialog = new UserProfileDialog("ユーザー情報の更新", _dialogService, _notifier, _appStatus, _getAvatarsUrlUseCase, _userInfoUseCase, _tokenStorage, _userRolesSession);
 
     await Shell.Current.ShowPopupAsync(dialog);
+  }
+
+  private async void OnProxyUserTapped(object sender, EventArgs e)
+  {
+    if (isNullInstance()) return;
+    if (_tokenStorage == null) return;
+    if (_getUserInfoUseCase == null) return;
+    try
+    {
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return;
+
+      if (_notifier!.IsProxy)
+      {
+        await _viewModel.ProxyLogoutAsync();
+        return;
+      }
+      var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
+      var dialog = new SelectUserDialog("代理ログインのユーザー", _dialogService, users);
+
+      await Shell.Current.ShowPopupAsync(dialog);
+      if (dialog.IsCanceled)
+      {
+        System.Diagnostics.Debug.WriteLine("キャンセルされました");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"選択された user_id:{dialog.SelectedUserId}");
+
+        await _viewModel.ProxyLoginAsync(dialog.SelectedUserId);
+      }
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"代理ログインの処理中にエラーが発生: {ex.Message}");
+    }
   }
 }

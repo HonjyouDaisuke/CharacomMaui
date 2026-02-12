@@ -20,6 +20,8 @@ public static class ApiClientRegistration
     services.AddHttpClient<IBoxFolderRepository, ApiBoxFolderRepository>(ConfigureClient);
     services.AddHttpClient<IAvatarRepository, AvatarRepository>(ConfigureClient);
     services.AddHttpClient<IUserRolesRepository, UserRolesRepository>(ConfigureClient);
+    services.AddHttpClient<IProxyLoginService, ProxyLoginService>(ConfigureClient);
+    services.AddHttpClient<IProxyLogoutService, ProxyLogoutService>(ConfigureClient);
     return services;
   }
 

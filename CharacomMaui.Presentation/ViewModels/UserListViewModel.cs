@@ -92,10 +92,10 @@ public partial class UserListViewModel : ObservableObject
       _count++;
     }
     await MainThread.InvokeOnMainThreadAsync(() =>
- {
-   // 2. プロパティごと差し替える（これで View に「全部変わった」と通知が飛ぶ）
-   Users = tempCollection;
- });
+    {
+      // 2. プロパティごと差し替える（これで View に「全部変わった」と通知が飛ぶ）
+      Users = tempCollection;
+    });
 
     foreach (var user in Users)
       System.Diagnostics.Debug.WriteLine($"userName= {user.Name} userId= {user.Id} email= {user.Email}");
