@@ -1,7 +1,11 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Models;
+using CharacomMaui.Presentation.Services;
+using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -9,6 +13,10 @@ public class TitleBarViewModel : INotifyPropertyChanged
 {
   private readonly AppStatusNotifier _notifier;
   private readonly AppStatus _appStatus;
+  private readonly ProxyLoginUseCase _proxyLoginUseCase;
+  private readonly ProxyLogoutUseCase _proxyLogoutUseCase;
+  private readonly IAppTokenStorageService _tokenStorage;
+  private readonly IGetUserInfoUseCase _getUserInfoUseCase;
 
   // バインディング用プロパティ
   private string titleString = string.Empty;
@@ -53,7 +61,10 @@ public class TitleBarViewModel : INotifyPropertyChanged
       }
     }
   }
-
+  public string ProxyIcon =>
+      IsProxy
+        ? "\ue9ba" // ← ログアウトアイコン（例）
+        : "\ue9ed"; // ← プロキシ（ログイン）アイコン
   private ImageSource? avatarImageSource;
   public ImageSource? AvatarImageSource
   {
@@ -69,28 +80,39 @@ public class TitleBarViewModel : INotifyPropertyChanged
   }
 
   public string ProjectName => _notifier.ProjectName;
-
-  public TitleBarViewModel(AppStatusNotifier notifier, AppStatus appStatus)
+  public bool IsProxy => _notifier.IsProxy;
+  public TitleBarViewModel(AppStatusNotifier notifier,
+                           AppStatus appStatus,
+                           ProxyLoginUseCase proxyLoginUseCase,
+                            ProxyLogoutUseCase proxyLogoutUseCase,
+                           IAppTokenStorageService tokenStorage,
+                           IGetUserInfoUseCase getUserInfoUseCase)
   {
     System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
     _notifier = notifier;
     _appStatus = appStatus;
-
+    _proxyLoginUseCase = proxyLoginUseCase;
+    _proxyLogoutUseCase = proxyLogoutUseCase;
+    _getUserInfoUseCase = getUserInfoUseCase;
+    _tokenStorage = tokenStorage;
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += (_, e) =>
     {
-      System.Diagnostics.Debug.WriteLine($"[VM] PropertyChanged name = '{e.PropertyName}'");
-      if (e.PropertyName == nameof(AppStatusNotifier.ProjectName))
+      if (e.PropertyName == nameof(AppStatusNotifier.ProjectName)
+          || e.PropertyName == nameof(AppStatusNotifier.IsProxy)
+          || e.PropertyName == nameof(AppStatusNotifier.UserName))
       {
         TitleString = MakeTitleString();
       }
 
       if (e.PropertyName == nameof(AppStatusNotifier.AvatarUrl))
       {
-        System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
-
-        System.Diagnostics.Debug.WriteLine($"[viewmodel] avatar changed = {_notifier.AvatarUrl}");
         AvatarUrl = _notifier.AvatarUrl;
+      }
+      if (e.PropertyName == nameof(AppStatusNotifier.IsProxy))
+      {
+        OnPropertyChanged(nameof(IsProxy));
+        OnPropertyChanged(nameof(ProxyIcon));
       }
     };
 
@@ -119,12 +141,92 @@ public class TitleBarViewModel : INotifyPropertyChanged
   private string MakeTitleString()
   {
     System.Diagnostics.Debug.WriteLine($"Make String !!{_notifier.ProjectName}");
+    var proxyMessage = _notifier.IsProxy ? $" 代理ログイン中({_notifier.UserName})" : "";
     string projectTitle = string.IsNullOrEmpty(_notifier.ProjectName)
         ? ""
         : " - " + _notifier.ProjectName;
+
+    projectTitle += proxyMessage;
     return "CharacomMaui" + projectTitle;
   }
 
+  private void SetNotifier(AppUser newUser)
+  {
+    _notifier.UserId = newUser.Id;
+    _notifier.UserName = newUser.Name;
+    _notifier.UserEmail = newUser.Email;
+    _notifier.AvatarUrl = newUser.PictureUrl;
+    _appStatus.UserRole = newUser.RoleId;
+  }
+
+  private async Task SetTokenStorageAsync(AppTokenResult tokens)
+  {
+    await _tokenStorage.SaveTokensAsync(new AppTokenResult
+    {
+      AccessToken = tokens.AccessToken,
+      RefreshToken = tokens.RefreshToken,
+      ExpiresAt = tokens.ExpiresAt,
+    });
+  }
+
+  public async Task ProxyLogin(string proxyUserId)
+  {
+    System.Diagnostics.Debug.WriteLine($"ProxyLogin: {proxyUserId}");
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
+
+    var thisUser = new AppUser
+    {
+      Id = _appStatus.UserId,
+      Name = _appStatus.UserName,
+      Email = _appStatus.UserEmail,
+      RoleId = _appStatus.UserRole,
+
+    };
+    var res = await _proxyLoginUseCase.ProxyLoginAsync(accessToken, thisUser, proxyUserId, _appStatus.UserName, _appStatus.UserEmail, _appStatus.UserId);
+    var newUser = await _getUserInfoUseCase.GetUserInfoAsync(res.AccessToken);
+    if (newUser == null) return;
+
+    await SetTokenStorageAsync(res);
+
+    _notifier.IsProxy = true;
+    SetNotifier(newUser);
+    await SnackBarService.Success($"Proxy Login {newUser.Name} に代理ログインしました。", 500);
+    MauiApp.Current!.Windows[0].Page = new AppShell();
+  }
+
+  public async Task ProxyLogout()
+  {
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
+
+    var result = await _proxyLogoutUseCase.ProxyLogoutAsync(accessToken);
+    if (result == null || !result.Success)
+    {
+      System.Diagnostics.Debug.WriteLine("Logout処理に失敗しました");
+      if (result != null)
+      {
+        System.Diagnostics.Debug.WriteLine($"Message: {result.Message}");
+      }
+      return;
+    }
+
+    await SetTokenStorageAsync(result);
+
+    var newUser = await _getUserInfoUseCase.GetUserInfoAsync(result.AccessToken);
+    if (newUser == null)
+    {
+      System.Diagnostics.Debug.WriteLine("元のユーザー情報の取得に失敗しました");
+      return;
+    }
+
+    SetNotifier(newUser);
+    _notifier.IsProxy = false;
+    await SnackBarService.Success($"Proxy Logout {newUser.Name} に戻りました。", 500);
+    MauiApp.Current!.Windows[0].Page = new AppShell();
+  }
   public event PropertyChangedEventHandler? PropertyChanged;
 
   protected void OnPropertyChanged([CallerMemberName] string? name = null)

@@ -14,6 +14,7 @@ public class AppStatus
   public string? CharaName { get; set; } = string.Empty;
   public string ProjectRole { get; set; } = string.Empty;
   public string AvatarUrl { get; set; } = string.Empty;
+  public bool IsProxy { get; set; } = false;
   public override string ToString()
   {
     return $"userId = {UserId} userName = {UserName} userRole = {UserRole} avatarUrl = {AvatarUrl} projectName = {ProjectName} CharaName = {CharaName} MaterialName={MaterialName}";

@@ -44,6 +44,8 @@ public static class ServicesRegistration
     services.AddTransient<ICharaImageOverlayUseCase, CharaImageOverlayUseCase>();
     services.AddTransient<FetchUserRolesUseCase>();
     services.AddTransient<UpdateUserRoleUseCase>();
+    services.AddTransient<ProxyLoginUseCase>();
+    services.AddTransient<ProxyLogoutUseCase>();
 
     // Coordinator
     services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();

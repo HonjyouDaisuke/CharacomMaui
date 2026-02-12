@@ -14,6 +14,18 @@ public class AppStatusNotifier : INotifyPropertyChanged
   {
     _status = status;
   }
+  public string UserId
+  {
+    get => _status.UserId;
+    set
+    {
+      if (_status.UserId != value)
+      {
+        _status.UserId = value;
+        OnPropertyChanged();
+      }
+    }
+  }
 
   public string ProjectName
   {
@@ -117,6 +129,18 @@ public class AppStatusNotifier : INotifyPropertyChanged
       }
     }
   }
+  public bool IsProxy
+  {
+    get => _status.IsProxy;
+    set
+    {
+      if (_status.IsProxy != value)
+      {
+        _status.IsProxy = value;
+        OnPropertyChanged();
+      }
+    }
+  }
   public string? UserName
   {
     get => _status.UserName;
@@ -138,7 +162,6 @@ public class AppStatusNotifier : INotifyPropertyChanged
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     });
   }
-
 }
 /**
 public string UserId { get; set; } = string.Empty;

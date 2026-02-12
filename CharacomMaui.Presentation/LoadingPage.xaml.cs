@@ -3,6 +3,8 @@ using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Helpers;
 using CharacomMaui.Presentation.Services;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation;
@@ -38,8 +40,20 @@ public partial class LoadingPage : ContentPage
       {
         var result = await tokenService.ValidateAsync(accessToken);
         System.Diagnostics.Debug.WriteLine($"tokenRes = {result}");
+        bool isProxy = false;
+
+        if (result.Payload.ValueKind == JsonValueKind.Object &&
+            result.Payload.TryGetProperty("is_proxy", out var isProxyProp))
+        {
+          isProxy = isProxyProp.GetBoolean();
+        }
 
         isValid = result.Success;
+        if (isProxy)
+        {
+          System.Diagnostics.Debug.WriteLine("前回代理ログインで終了したので、ログインし直してください");
+          isValid = false;
+        }
       }
       catch
       {
