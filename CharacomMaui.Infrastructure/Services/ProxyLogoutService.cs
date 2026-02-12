@@ -38,7 +38,7 @@ public class ProxyLogoutService : IProxyLogoutService
     try
     {
       var result = JsonSerializer.Deserialize<AppTokenResult>(responseBody);
-      return result;
+      return result ?? throw new JsonException("ProxyLogout response deserialized to null.");
     }
     catch (Exception ex)
     {
