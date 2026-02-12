@@ -16,7 +16,6 @@ using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.Sessions;
 using System.Dynamic;
-using UIKit;
 
 
 namespace CharacomMaui.Presentation.Dialogs;
