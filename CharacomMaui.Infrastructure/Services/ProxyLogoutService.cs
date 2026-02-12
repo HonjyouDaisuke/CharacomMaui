@@ -33,7 +33,7 @@ public class ProxyLogoutService : IProxyLogoutService
     var responseBody = await res.Content.ReadAsStringAsync();
 
     System.Diagnostics.Debug.WriteLine("---------- ProxyLogout server res--------------");
-    System.Diagnostics.Debug.WriteLine($"AccessToken = {accessToken}");
+    System.Diagnostics.Debug.WriteLine($"AccessToken = {(accessToken.Length > 8 ? accessToken[..4] + "****" + accessToken[^4..] : "****")}");
     System.Diagnostics.Debug.WriteLine(responseBody);
     try
     {
