@@ -53,6 +53,34 @@ public partial class ProjectListPage : ContentPage
     {
       System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
+    // メッセージを受け取ったらパネルを表示する
+    MessagingCenter.Subscribe<object>(this, "OpenNotifications", async (sender) =>
+    {
+      if (NotificationPanel.IsVisible) return; // すでに表示されている場合は何もしない
+      NotificationPanel.IsVisible = true;
+      NotificationPanel.TranslationX = 300; // 画面外からスタート
+      await Task.WhenAll(
+        NotificationPanel.TranslateTo(0, 0, 250, Easing.CubicOut), // スライドイン
+        MainArea.FadeTo(0.5, 250) // 背景を半透明に
+      );
+      //await NotificationPanel.TranslateTo(0, 0, 250, Easing.CubicOut); // スライドイン
+    });
+
+    MessagingCenter.Subscribe<object>(this, "CloseNotifications", async (sender) =>
+    {
+      if (!NotificationPanel.IsVisible) return; // すでに非表示の場合は何もしない
+      await Task.WhenAll(
+        NotificationPanel.TranslateTo(300, 0, 250, Easing.CubicIn), // スライドアウト
+        MainArea.FadeTo(1, 250) // 背景を元に戻す
+      );
+      NotificationPanel.IsVisible = false;
+    });
+  }
+  protected override void OnDisappearing()
+  {
+    base.OnDisappearing();
+    // ページを離れるときは解除（メモリリーク防止）
+    MessagingCenter.Unsubscribe<object>(this, "OpenNotifications");
   }
   private Project makeProjectFromEventArgs(ProjectInfoEventArgs e)
   {

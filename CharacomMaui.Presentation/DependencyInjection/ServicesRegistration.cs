@@ -46,6 +46,8 @@ public static class ServicesRegistration
     services.AddTransient<UpdateUserRoleUseCase>();
     services.AddTransient<ProxyLoginUseCase>();
     services.AddTransient<ProxyLogoutUseCase>();
+    services.AddTransient<FetchProjectRolesUseCase>();
+    services.AddTransient<InviteToProjectUseCase>();
 
     // Coordinator
     services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();

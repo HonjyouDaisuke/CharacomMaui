@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CharacomMaui.Presentation.Panels.NotificationsPanel"
+             x:Name="this">
+
+  <Grid RowDefinitions="Auto, *, Auto"
+        BackgroundColor="Pink"
+        WidthRequest="300"
+        HorizontalOptions="End">
+
+    <Grid Grid.Row="0"
+          Padding="10"
+          ColumnDefinitions="*, Auto">
+      <Label Text="通知"
+             FontSize="18"
+             FontAttributes="Bold"
+             TextColor="Black"
+             VerticalOptions="Center"/>
+      <Button Grid.Column="1"
+              Text="閉じる"
+              FontSize="16"
+              BackgroundColor="Transparent"
+              TextColor="Black"
+              Clicked="OnCloseClicked"
+              WidthRequest="60"
+              HeightRequest="40"/>
+    </Grid>
+
+    <ScrollView Grid.Row="1">
+      <CollectionView
+        ItemsSource="{Binding Notifications}"
+        SelectionMode="None">
+
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Border BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                    Stroke="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="10"
+                    Margin="10,5">
+
+              <Label Text="{Binding Title}"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+            </Border>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+      </CollectionView>
+    </ScrollView>
+
+    <VerticalStackLayout Grid.Row="2"
+                         Padding="10"
+                         BackgroundColor="Blue">
+      <Button Text="すべて既読にする"
+              FontSize="12"
+              HeightRequest="40"
+              BackgroundColor="#007ACC"
+              TextColor="White"/>
+    </VerticalStackLayout>
+
+  </Grid>
+
+</ContentView>

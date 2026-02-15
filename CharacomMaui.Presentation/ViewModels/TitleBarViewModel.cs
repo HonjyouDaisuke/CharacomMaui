@@ -79,6 +79,8 @@ public class TitleBarViewModel : INotifyPropertyChanged
     }
   }
 
+  public string NotificationIcon => "\ue7f4"; // ← 通知アイコン
+
   public string ProjectName => _notifier.ProjectName;
   public bool IsProxy => _notifier.IsProxy;
   public TitleBarViewModel(AppStatusNotifier notifier,
@@ -181,6 +183,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     var fromUserName = _appStatus.UserName ?? string.Empty;
 
     var res = await _proxyLoginUseCase.ProxyLoginAsync(accessToken, proxyUserId);
+
     if (!res.Success)
     {
       System.Diagnostics.Debug.WriteLine($"ProxyLogin失敗: {res.Message}");

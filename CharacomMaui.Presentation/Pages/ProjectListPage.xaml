@@ -5,73 +5,81 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
              xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+             xmlns:panel="clr-namespace:CharacomMaui.Presentation.Panels"
              x:Class="CharacomMaui.Presentation.Pages.ProjectListPage"
              Title="ProjectList">
   <Shell.TitleView>
     <components:TitleBarView/>
   </Shell.TitleView>
+  <Grid ColumnDefinitions="*,Auto">
+    <VerticalStackLayout Spacing="10"
+                         x:Name="MainArea"
+                         Grid.Column="0">
+      <Label
+        Text="Welcome to Project Page"
+        VerticalOptions="Center"
+        HorizontalOptions="Center"/>
 
-  <VerticalStackLayout Spacing="10">
-    <Label
-      Text="Welcome to Project Page"
-      VerticalOptions="Center"
-      HorizontalOptions="Center"/>
+      <Button
+        x:Name="CreateProjectBtn"
+        Clicked="OnCreateProjectBtn"
+        SemanticProperties.Hint="Counts the number of times you click"
+        Text="&#xE147; 新規作成"
+        FontFamily="{x:Static models:Icons.FontFamily}"/>
+      <Button
+        x:Name="StandardBtn"
+        Text="標準画像生成"
+        Clicked="OnStandardBtnClicked"/>
+      <Button
+        x:Name="StrokeBtn"
+        Text="筆順画像生成"
+        Clicked="OnStrokeBtnClicked"/>
+      <ScrollView
+        x:Name="ProjectsScrollView"
+        Orientation="Vertical"
+        HeightRequest="400">
 
-    <Button
-      x:Name="CreateProjectBtn"
-      Clicked="OnCreateProjectBtn"
-      SemanticProperties.Hint="Counts the number of times you click"
-      Text="&#xE147; 新規作成"
-      FontFamily="{x:Static models:Icons.FontFamily}"/>
-    <Button
-      x:Name="StandardBtn"
-      Text="標準画像生成"
-      Clicked="OnStandardBtnClicked"/>
-    <Button
-      x:Name="StrokeBtn"
-      Text="筆順画像生成"
-      Clicked="OnStrokeBtnClicked"/>
-    <ScrollView
-      x:Name="ProjectsScrollView"
-      Orientation="Vertical"
-      HeightRequest="400">
+        <FlexLayout
+          x:Name="ProjectsFlex"
+          Direction="Row"
+          Wrap="Wrap"
+          JustifyContent="Start"
+          AlignItems="Start">
 
-      <FlexLayout
-        x:Name="ProjectsFlex"
-        Direction="Row"
-        Wrap="Wrap"
-        JustifyContent="Start"
-        AlignItems="Start">
+          <BindableLayout.ItemTemplate>
+            <DataTemplate>
+              <components:ProjectInfoCard
+                EditRequested="OnEditRequested"
+                InviteRequested="OnInviteRequested"
+                DeleteRequested="OnDeleteRequested"
+                ProjectFolderId="{Binding FolderId}"
+                CharaFolderId="{Binding CharaFolderId}"
+                ProjectId="{Binding Id}"
+                ProjectName="{Binding Name}"
+                ProjectDescription="{Binding Description}"
+                CharaCount="{Binding CharaCount}"
+                UserCount="{Binding UserCount}"
+                CardClicked="OnCardClicked"
+                CardDoubleClicked="OnCardDoubleClicked"
+                Margin="5"/>
+            </DataTemplate>
+          </BindableLayout.ItemTemplate>
 
-        <BindableLayout.ItemTemplate>
-          <DataTemplate>
-            <components:ProjectInfoCard
-              EditRequested="OnEditRequested"
-              InviteRequested="OnInviteRequested"
-              DeleteRequested="OnDeleteRequested"
-              ProjectFolderId="{Binding FolderId}"
-              CharaFolderId="{Binding CharaFolderId}"
-              ProjectId="{Binding Id}"
-              ProjectName="{Binding Name}"
-              ProjectDescription="{Binding Description}"
-              CharaCount="{Binding CharaCount}"
-              UserCount="{Binding UserCount}"
-              CardClicked="OnCardClicked"
-              CardDoubleClicked="OnCardDoubleClicked"
-              Margin="5"/>
-          </DataTemplate>
-        </BindableLayout.ItemTemplate>
-
-      </FlexLayout>
-    </ScrollView>
-    <ScrollView x:Name="LogScrollView"
-                HeightRequest="300">
-      <Editor x:Name="LogEditor"
-              HeightRequest="300"
-              BackgroundColor="Black"
-              TextColor="White"
-              IsReadOnly="True"
-              AutoSize="TextChanges"/>
-    </ScrollView>
-  </VerticalStackLayout>
+        </FlexLayout>
+      </ScrollView>
+      <ScrollView x:Name="LogScrollView"
+                  HeightRequest="300">
+        <Editor x:Name="LogEditor"
+                HeightRequest="300"
+                BackgroundColor="Black"
+                TextColor="White"
+                IsReadOnly="True"
+                AutoSize="TextChanges"/>
+      </ScrollView>
+    </VerticalStackLayout>
+    <panel:NotificationsPanel
+      Grid.Column="1"
+      x:Name="NotificationPanel"
+      IsVisible="False"/>
+  </Grid>
 </ContentPage>

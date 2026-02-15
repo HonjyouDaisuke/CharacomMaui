@@ -14,6 +14,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   private readonly AppStatus _appStatus;
   GetProjectCharaItemsUseCase _useCase;
   GetProjectDetailsUseCase _getProjectDetailsUseCase;
+  private readonly InviteToProjectUseCase _inviteToProjectUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private string _projectId = string.Empty;
   public string ProjectId
@@ -72,12 +73,17 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     get => _participantsText;
     set => SetProperty(ref _participantsText, value);
   }
-  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase, AppStatus appStatus, GetProjectDetailsUseCase getProjectDetailsUseCase, IAppTokenStorageService tokenStorage)
+  public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase,
+                                AppStatus appStatus,
+                                 GetProjectDetailsUseCase getProjectDetailsUseCase,
+                                 IAppTokenStorageService tokenStorage,
+                                 InviteToProjectUseCase inviteToProjectUseCase)
   {
     _useCase = useCase;
     _appStatus = appStatus;
     _getProjectDetailsUseCase = getProjectDetailsUseCase;
     _tokenStorage = tokenStorage;
+    _inviteToProjectUseCase = inviteToProjectUseCase;
   }
   public event PropertyChangedEventHandler? PropertyChanged;
   protected bool SetProperty<T>(
@@ -171,4 +177,23 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       await SnackBarService.Error("プロジェクト詳細の読み込みに失敗しました。");
     }
   }
+
+  public async Task<SimpleApiResult> InviteToProjectAsync(string projectId, string toUserId, string toRoleId)
+  {
+    try
+    {
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました"); ;
+
+      return await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
+
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"Error inviting user to project: {ex}");
+      return new SimpleApiResult(false, "想定外のエラーが発生しました");
+    }
+  }
+
 }

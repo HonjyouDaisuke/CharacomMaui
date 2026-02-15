@@ -23,7 +23,9 @@ public static class ApiEndpoints
   public const string GetUserList = "get_user_list.php";
   public const string BoxOAuth2 = "https://api.box.com/oauth2/token";
   public const string GetUserRoles = "get_user_roles.php";
+  public const string GetProjectRoles = "get_project_roles.php";
   public const string UpdateUserRole = "update_user_userrole.php";
   public const string ProxyLogin = "proxy_login.php";
   public const string ProxyLogout = "proxy_logout.php";
+  public const string InviteToProject = "invite_to_project.php";
 }

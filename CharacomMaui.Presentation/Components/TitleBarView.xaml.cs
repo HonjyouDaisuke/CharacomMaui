@@ -7,6 +7,7 @@ using CommunityToolkit.Maui.Views;
 using MauiApp = Microsoft.Maui.Controls;
 using Mopups.Services;
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Mvvm.Messaging;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
@@ -107,5 +108,11 @@ public partial class TitleBarView : ContentView
     {
       System.Diagnostics.Debug.WriteLine($"代理ログインの処理中にエラーが発生: {ex.Message}");
     }
+  }
+
+  private async void OnNotificationTapped(object sender, EventArgs e)
+  {
+    if (isNullInstance()) return;
+    MessagingCenter.Send<object>(this, "OpenNotifications");
   }
 }
