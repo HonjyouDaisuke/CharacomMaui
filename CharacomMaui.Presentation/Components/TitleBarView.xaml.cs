@@ -110,7 +110,7 @@ public partial class TitleBarView : ContentView
     }
   }
 
-  private async void OnNotificationTapped(object sender, EventArgs e)
+  private void OnNotificationTapped(object sender, EventArgs e)
   {
     if (isNullInstance()) return;
     MessagingCenter.Send<object>(this, "OpenNotifications");

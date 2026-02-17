@@ -303,8 +303,8 @@ public partial class ProjectListPage : ContentPage
       _notifier.ProjectName = _selectedCard.ProjectName;
       _notifier.ProjectId = _selectedCard.ProjectId;
       _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
-      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
-      LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
+      _notifier.CharaFolderId = _selectedCard!.CharaFolderId;
+      LogEditor.Text += $"Project [{_selectedCard!.ProjectName}]が選択されました\n";
     }
 
   }

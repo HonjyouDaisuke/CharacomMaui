@@ -12,9 +12,12 @@ public partial class NotificationsPanel : ContentView
     BindingContext = new
     {
       Notifications = new[] {
-                new { Title = "システム更新", Message = "新しいバージョンが利用可能です。" },
-                new { Title = "メッセージ", Message = "田中さんから連絡があります。" },
-                new { Title = "アラート", Message = "ストレージの空き容量が少なくなっています。" }
+                new { Id = "aaaa", Title = "システム更新", Message = "新しいバージョンが利用可能です。", TypeId = "admin_message"},
+                new { Id = "bbbb", Title = "メッセージ", Message = "田中さんから連絡があります。", TypeId = "comment"},
+                new { Id = "cccc", Title = "プロジェクト招待", Message = "プロジェクトに参加するよう招待されました。", TypeId = "project_invite" },
+                new { Id = "dddd", Title = "プロジェクト更新", Message = "プロジェクトの状態が更新されました。", TypeId = "project_update" },
+                new { Id = "eeee", Title = "リマインダー", Message = "定期的な作業を確認してください。", TypeId = "reminder" },
+                new { Id = "ffff", Title = "システム通知", Message = "システムのメンテナンスが予定されています。", TypeId = "system" },
             }
     };
   }
