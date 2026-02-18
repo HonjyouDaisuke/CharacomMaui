@@ -92,6 +92,8 @@ public static class ServicesRegistration
     services.AddSingleton<IDialogService, MopupsDialogService>();
     services.AddSingleton<IProgressDialogService, ProgressDialogService>();
     services.AddSingleton<ISimpleProgressDialogService, SimpleProgressDialogService>();
+    services.AddSingleton<INotificationService, NotificationService>();
+    services.AddSingleton<INotificationPanelService, NotificationPanelService>();
 
     return services;
   }

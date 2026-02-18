@@ -9,15 +9,17 @@ using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using CharacomMaui.Domain.Entities;
 using System.Runtime.CompilerServices;
-using CharacomMaui.Presentation.Dialogs;
+using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Presentation.Interfaces;
 
 public partial class NotificationCard : ContentView
 {
-  private IDialogService _dialogService;
+  private readonly INotificationService _notificationService;
+
   public NotificationCard()
   {
     InitializeComponent();
-    _dialogService = IPlatformApplication.Current.Services.GetService<IDialogService>();
+    _notificationService = IPlatformApplication.Current.Services.GetService<INotificationService>();
   }
 
   private string SettingTypeToIcon(string typeId)
@@ -55,6 +57,12 @@ public partial class NotificationCard : ContentView
   {
     System.Diagnostics.Debug.WriteLine($"NotificationCard Tapped: Id={Id}");
     // ここで通知の詳細を表示するダイアログを開く
+    if (_notificationService == null)
+    {
+      System.Diagnostics.Debug.WriteLine("NotificationService が取得できません");
+      return;
+    }
+    _notificationService.RequestOpen(Id, Title, Message, Icon);
 
   }
 

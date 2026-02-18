@@ -24,11 +24,13 @@ public partial class ProjectListPage : ContentPage
   private readonly AppStatusUseCase _appStatusUseCase;
   private readonly AppStatusNotifier _notifier;
   private readonly ISimpleProgressDialogService _simpleDialog;
+  private readonly INotificationService _notificationService;
   public ProjectListPage(IBoxFolderRepository repository,
     IDialogService dialogService,
     CreateProjectViewModel viewModel,
     AppStatusUseCase appStatusUseCase,
     AppStatusNotifier notifier,
+    INotificationService notificationService,
     ISimpleProgressDialogService simpleDialog)
   {
     InitializeComponent();
@@ -37,10 +39,12 @@ public partial class ProjectListPage : ContentPage
     _appStatusUseCase = appStatusUseCase;
     _viewModel = viewModel;
     _notifier = notifier;
+    _notificationService = notificationService;
     _simpleDialog = simpleDialog;
     _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
     System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
     BindingContext = _viewModel;
+    _notificationService.NotificationRequested += OnNotificationRequested;
   }
 
   protected override async void OnAppearing()
@@ -93,7 +97,19 @@ public partial class ProjectListPage : ContentPage
       CharaFolderId = e.CharaFolderId,
     };
   }
+  private async void OnNotificationRequested(
+          object? sender,
+          NotificationRequest request)
+  {
+    var dialog = new NotificationDialog(
+            request.Id,
+            request.Title,
+            request.Message,
+            request.Icon);
 
+    await this.ShowPopupAsync(dialog);
+
+  }
   private async void OnEditRequested(object? sender, ProjectInfoEventArgs e)
   {
     System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription})\n");

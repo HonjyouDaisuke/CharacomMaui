@@ -25,8 +25,8 @@
              FontSize="20"
              FontAttributes="Bold"
              Padding="15"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource ErrorContainer}, Dark={DynamicResource ErrorContainerDark}}"
-             TextColor="{AppThemeBinding Light={DynamicResource OnErrorContainer}, Dark={DynamicResource OnErrorContainerDark}}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryContainer}, Dark={DynamicResource PrimaryContainerDark}}"
+             TextColor="{AppThemeBinding Light={DynamicResource OnPrimaryContainer}, Dark={DynamicResource OnPrimaryContainerDark}}"
              HorizontalTextAlignment="Center"
              HorizontalOptions="Fill"
              Grid.Row="0"/>
@@ -42,19 +42,17 @@
                BackgroundColor="{AppThemeBinding Light={DynamicResource Outline}, Dark={DynamicResource OutlineDark}}"/>
 
       <!-- ボタン -->
-      <Grid Grid.Row="3"
-            ColumnDefinitions="*,*"
-            BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
-            Padding="10"
-            ColumnSpacing="10">
-        <Button Text="&#xE872; OK"
-                FontFamily="{x:Static models:Icons.FontFamily}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource OnError}, Dark={StaticResource OnErrorDark}}"
-                Grid.Column="0"
-                HorizontalOptions="End"
-                Clicked="OnOkClicked"/>
-      </Grid>
+
+      <Button Text="閉じる"
+              Grid.Row="3"
+              Padding="10"
+              Margin="10"
+              HeightRequest="40"
+              FontFamily="{x:Static models:Icons.FontFamily}"
+              BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+              TextColor="{AppThemeBinding Light={StaticResource OnPrimary}, Dark={StaticResource OnPrimaryDark}}"
+              HorizontalOptions="Center"
+              Clicked="OnOkClicked"/>
     </Grid>
   </Border>
 </views:Popup>

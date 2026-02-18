@@ -1,12 +1,10 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
-using UraniumUI.Dialogs;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
 public partial class NotificationDialog : Popup
 {
-  private IDialogService _dialogService;
   public bool IsConfirmed { get; set; }
   // ========== Title ==========
   public static readonly BindableProperty TitleProperty =
@@ -35,14 +33,15 @@ public partial class NotificationDialog : Popup
   }
 
   private string _id;
+  private string _icon;
 
-  public NotificationDialog(string id, string title, string message, IDialogService dialogService)
+  public NotificationDialog(string id, string title, string message, string icon)
   {
     InitializeComponent();
-    _dialogService = dialogService;
 
     Title = title;
     Message = message;
+    _icon = icon;
     _id = id;
   }
 
