@@ -28,4 +28,6 @@ public static class ApiEndpoints
   public const string ProxyLogin = "proxy_login.php";
   public const string ProxyLogout = "proxy_logout.php";
   public const string InviteToProject = "invite_to_project.php";
+  public const string GetNotifications = "get_notifications.php";
+  public const string UpdateNotificationRead = "update_notification_read.php";
 }

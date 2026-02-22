@@ -14,7 +14,7 @@ using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class ProjectDetailPage : ContentPage
+public partial class ProjectDetailPage : BasePage
 {
   private CharaDataProgressRow? _selectedRow;
   private AppStatus _appStatus;
@@ -32,9 +32,11 @@ public partial class ProjectDetailPage : ContentPage
                             ProjectDetailViewModel viewModel,
                             IGetUserInfoUseCase getUserInfoUseCase,
                             FetchProjectRolesUseCase projectRolesUseCase,
-                            IAppTokenStorageService tokenStorage,
                             IDialogService dialogService,
-                            ISimpleProgressDialogService simpleDialog)
+                            ISimpleProgressDialogService simpleDialog,
+                            IAppTokenStorageService tokenStorage,
+                            INotificationService notificationService,
+                            INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _appStatus = appStatus;

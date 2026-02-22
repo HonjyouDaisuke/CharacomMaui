@@ -6,26 +6,19 @@
              x:Name="this">
 
   <Grid RowDefinitions="Auto, *, Auto"
-        BackgroundColor="Pink"
+        BackgroundColor="{AppThemeBinding Light={DynamicResource SurfaceContainer}, Dark={DynamicResource SurfaceContainerDark}}"
         WidthRequest="300"
         HorizontalOptions="End">
 
     <Grid Grid.Row="0"
           Padding="10"
-          ColumnDefinitions="*, Auto">
+          ColumnDefinitions="*">
       <Label Text="通知"
              FontSize="18"
              FontAttributes="Bold"
-             TextColor="Black"
+             TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"
              VerticalOptions="Center"/>
-      <Button Grid.Column="1"
-              Text="閉じる"
-              FontSize="16"
-              BackgroundColor="Transparent"
-              TextColor="Black"
-              Clicked="OnCloseClicked"
-              WidthRequest="60"
-              HeightRequest="40"/>
+
     </Grid>
 
     <ScrollView Grid.Row="1">
@@ -38,7 +31,8 @@
             <comp:NotificationCard Title="{Binding Title}"
                                    Id="{Binding Id}"
                                    Message="{Binding Message}"
-                                   TypeId="{Binding TypeId}"/>
+                                   TypeId="{Binding TypeId}"
+                                   IsRead="{Binding IsRead}"/>
           </DataTemplate>
         </CollectionView.ItemTemplate>
 
@@ -47,12 +41,13 @@
 
     <VerticalStackLayout Grid.Row="2"
                          Padding="10"
-                         BackgroundColor="Blue">
+                         BackgroundColor="{AppThemeBinding Light={DynamicResource SurfaceContainer}, Dark={DynamicResource SurfaceContainerDark}}">
       <Button Text="すべて既読にする"
               FontSize="12"
               HeightRequest="40"
-              BackgroundColor="#007ACC"
-              TextColor="White"/>
+              BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+              Clicked="OnAllReadClicked"
+              TextColor="{AppThemeBinding Light={DynamicResource OnPrimary}, Dark={DynamicResource OnPrimaryDark}}"/>
     </VerticalStackLayout>
 
   </Grid>

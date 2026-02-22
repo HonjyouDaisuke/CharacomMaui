@@ -19,6 +19,19 @@ public partial class NotificationDialog : Popup
     set => SetValue(TitleProperty, value);
   }
 
+  // ========== Icon ==========
+  public static readonly BindableProperty IconProperty =
+      BindableProperty.Create(
+        nameof(Icon),
+        typeof(string),
+        typeof(NotificationDialog),
+        string.Empty);
+  public string Icon
+  {
+    get => (string)GetValue(IconProperty);
+    set => SetValue(IconProperty, value);
+  }
+
   // ========== Message ==========
   public static readonly BindableProperty MessageProperty =
       BindableProperty.Create(
@@ -33,7 +46,7 @@ public partial class NotificationDialog : Popup
   }
 
   private string _id;
-  private string _icon;
+  public string SelectedId = string.Empty;
 
   public NotificationDialog(string id, string title, string message, string icon)
   {
@@ -41,12 +54,13 @@ public partial class NotificationDialog : Popup
 
     Title = title;
     Message = message;
-    _icon = icon;
+    Icon = icon;
     _id = id;
   }
 
   private async void OnOkClicked(object sender, EventArgs e)
   {
+    SelectedId = _id;
     System.Diagnostics.Debug.WriteLine($"id:{_id} の通知を既読にします");
     // ここで通知を既読にするAPIを呼び出す
     await CloseAsync();

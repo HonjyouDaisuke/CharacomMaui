@@ -48,6 +48,8 @@ public static class ServicesRegistration
     services.AddTransient<ProxyLogoutUseCase>();
     services.AddTransient<FetchProjectRolesUseCase>();
     services.AddTransient<InviteToProjectUseCase>();
+    services.AddTransient<FetchNotificationsUseCase>();
+    services.AddTransient<UpdateNotificationReadUseCase>();
 
     // Coordinator
     services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();

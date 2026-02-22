@@ -13,6 +13,7 @@ using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.Sessions;
+using CharacomMaui.Presentation.Interfaces;
 
 public partial class TitleBarView : ContentView
 {
@@ -25,6 +26,7 @@ public partial class TitleBarView : ContentView
   private UserRolesSession _userRolesSession;
   private IGetUserInfoUseCase? _getUserInfoUseCase;
   private TitleBarViewModel _viewModel;
+  private INotificationPanelService? _notificationPanelService;
   public TitleBarView()
   {
     InitializeComponent();
@@ -52,6 +54,7 @@ public partial class TitleBarView : ContentView
     _tokenStorage = services.GetService<IAppTokenStorageService>();
     _userRolesSession = services.GetService<UserRolesSession>();
     _getUserInfoUseCase = services.GetService<IGetUserInfoUseCase>();
+    _notificationPanelService = services.GetRequiredService<INotificationPanelService>();
   }
   private bool isNullInstance()
   {
@@ -62,6 +65,7 @@ public partial class TitleBarView : ContentView
         _userInfoUseCase == null ||
         _tokenStorage == null ||
         _viewModel == null ||
+        _notificationPanelService == null ||
         _userRolesSession == null;
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)
@@ -113,6 +117,6 @@ public partial class TitleBarView : ContentView
   private void OnNotificationTapped(object sender, EventArgs e)
   {
     if (isNullInstance()) return;
-    MessagingCenter.Send<object>(this, "OpenNotifications");
+    _notificationPanelService.Toggle();
   }
 }

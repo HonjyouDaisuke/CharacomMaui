@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CharacomMaui.Presentation.Pages.UserListPage"
-             x:Name="thisPage"
-             xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
-             Title="UserList">
+<page:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:page="clr-namespace:CharacomMaui.Presentation"
+               x:Class="CharacomMaui.Presentation.Pages.UserListPage"
+               x:Name="thisPage"
+               xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+               Title="UserList">
   <Shell.TitleView>
     <components:TitleBarView/>
   </Shell.TitleView>
@@ -47,4 +48,4 @@
       HeightRequest="300"/>
 
   </Grid>
-</ContentPage>
+</page:BasePage>

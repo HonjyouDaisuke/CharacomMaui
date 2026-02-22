@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CharacomMaui.Presentation.Pages.ProjectDetailPage"
-             xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
-             Title="ProjectDatail">
+<page:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:page="clr-namespace:CharacomMaui.Presentation"
+               x:Class="CharacomMaui.Presentation.Pages.ProjectDetailPage"
+               xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+               Title="ProjectDatail">
   <Shell.TitleView>
     <components:TitleBarView/>
   </Shell.TitleView>
@@ -64,4 +65,4 @@
               AutoSize="TextChanges"/>
     </ScrollView>
   </VerticalStackLayout>
-</ContentPage>
+</page:BasePage>

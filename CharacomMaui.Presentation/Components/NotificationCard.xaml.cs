@@ -45,12 +45,15 @@ public partial class NotificationCard : ContentView
       BindableProperty.Create(nameof(TypeId), typeof(string), typeof(NotificationCard), string.Empty, propertyChanged: OnTypeIdChanged);
   public static readonly BindableProperty IconProperty =
       BindableProperty.Create(nameof(Icon), typeof(string), typeof(NotificationCard), string.Empty);
+  public static readonly BindableProperty IsReadProperty =
+      BindableProperty.Create(nameof(IsRead), typeof(bool), typeof(NotificationCard), true, propertyChanged: OnIsReadChanged);
 
   public string Id { get => (string)GetValue(IdProperty); set => SetValue(IdProperty, value); }
   public string Title { get => (string)GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
   public string Message { get => (string)GetValue(MessageProperty); set => SetValue(MessageProperty, value); }
   public string TypeId { get => (string)GetValue(TypeIdProperty); set => SetValue(TypeIdProperty, value); }
   public string Icon { get => (string)GetValue(IconProperty); set => SetValue(IconProperty, value); }
+  public bool IsRead { get => (bool)GetValue(IsReadProperty); set => SetValue(IsReadProperty, value); }
 
   // クリック時の処理
   private async void OnCardTapped(object? sender, EventArgs e)
@@ -72,5 +75,10 @@ public partial class NotificationCard : ContentView
     var type = newValue as string ?? string.Empty;
 
     control.Icon = control.SettingTypeToIcon(type);
+  }
+
+  private static void OnIsReadChanged(BindableObject bindable, object oldValue, object newValue)
+  {
+    System.Diagnostics.Debug.WriteLine($"IsRead changed: {newValue}");
   }
 }

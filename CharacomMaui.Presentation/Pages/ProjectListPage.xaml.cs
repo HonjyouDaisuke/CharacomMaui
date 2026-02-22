@@ -14,7 +14,7 @@ using UraniumUI.Dialogs.Mopups;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class ProjectListPage : ContentPage
+public partial class ProjectListPage : BasePage
 {
   private ProjectInfoCard? _selectedCard;
 
@@ -24,14 +24,15 @@ public partial class ProjectListPage : ContentPage
   private readonly AppStatusUseCase _appStatusUseCase;
   private readonly AppStatusNotifier _notifier;
   private readonly ISimpleProgressDialogService _simpleDialog;
-  private readonly INotificationService _notificationService;
   public ProjectListPage(IBoxFolderRepository repository,
-    IDialogService dialogService,
-    CreateProjectViewModel viewModel,
-    AppStatusUseCase appStatusUseCase,
-    AppStatusNotifier notifier,
-    INotificationService notificationService,
-    ISimpleProgressDialogService simpleDialog)
+  IDialogService dialogService,
+  CreateProjectViewModel viewModel,
+  AppStatusUseCase appStatusUseCase,
+  AppStatusNotifier notifier,
+  ISimpleProgressDialogService simpleDialog,
+  IAppTokenStorageService tokenStorage,
+  INotificationService notificationService,
+  INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _repository = repository;
@@ -39,12 +40,10 @@ public partial class ProjectListPage : ContentPage
     _appStatusUseCase = appStatusUseCase;
     _viewModel = viewModel;
     _notifier = notifier;
-    _notificationService = notificationService;
     _simpleDialog = simpleDialog;
     _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
     System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
     BindingContext = _viewModel;
-    _notificationService.NotificationRequested += OnNotificationRequested;
   }
 
   protected override async void OnAppearing()
@@ -57,28 +56,7 @@ public partial class ProjectListPage : ContentPage
     {
       System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
-    // メッセージを受け取ったらパネルを表示する
-    MessagingCenter.Subscribe<object>(this, "OpenNotifications", async (sender) =>
-    {
-      if (NotificationPanel.IsVisible) return; // すでに表示されている場合は何もしない
-      NotificationPanel.IsVisible = true;
-      NotificationPanel.TranslationX = 300; // 画面外からスタート
-      await Task.WhenAll(
-        NotificationPanel.TranslateTo(0, 0, 250, Easing.CubicOut), // スライドイン
-        MainArea.FadeTo(0.5, 250) // 背景を半透明に
-      );
-      //await NotificationPanel.TranslateTo(0, 0, 250, Easing.CubicOut); // スライドイン
-    });
 
-    MessagingCenter.Subscribe<object>(this, "CloseNotifications", async (sender) =>
-    {
-      if (!NotificationPanel.IsVisible) return; // すでに非表示の場合は何もしない
-      await Task.WhenAll(
-        NotificationPanel.TranslateTo(300, 0, 250, Easing.CubicIn), // スライドアウト
-        MainArea.FadeTo(1, 250) // 背景を元に戻す
-      );
-      NotificationPanel.IsVisible = false;
-    });
   }
   protected override void OnDisappearing()
   {
@@ -96,19 +74,6 @@ public partial class ProjectListPage : ContentPage
       FolderId = e.ProjectFolderId,
       CharaFolderId = e.CharaFolderId,
     };
-  }
-  private async void OnNotificationRequested(
-          object? sender,
-          NotificationRequest request)
-  {
-    var dialog = new NotificationDialog(
-            request.Id,
-            request.Title,
-            request.Message,
-            request.Icon);
-
-    await this.ShowPopupAsync(dialog);
-
   }
   private async void OnEditRequested(object? sender, ProjectInfoEventArgs e)
   {

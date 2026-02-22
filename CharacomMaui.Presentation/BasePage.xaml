@@ -1,0 +1,32 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<ContentPage
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Class="CharacomMaui.Presentation.BasePage"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:panel="clr-namespace:CharacomMaui.Presentation.Panels">
+
+  <ContentPage.ControlTemplate>
+    <ControlTemplate>
+
+      <Grid>
+
+        <!-- ここに子ページの中身が入る -->
+        <ContentPresenter/>
+
+        <BoxView x:Name="Overlay"
+                 BackgroundColor="#80000000"
+                 IsVisible="False"
+                 Opacity="0"/>
+
+        <panel:NotificationsPanel
+          x:Name="NotificationPanel"
+          IsVisible="False"
+          HorizontalOptions="End"
+          WidthRequest="300"/>
+
+      </Grid>
+
+    </ControlTemplate>
+  </ContentPage.ControlTemplate>
+
+</ContentPage>
