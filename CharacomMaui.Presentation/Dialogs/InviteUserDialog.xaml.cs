@@ -96,7 +96,6 @@ public partial class InviteUserDialog : Popup
   private async void OnCancelClicked(object sender, EventArgs e)
   {
     IsCanceled = true;
-    System.Diagnostics.Debug.WriteLine("OnCancelClicked");
     await CloseAsync();
 
   }
