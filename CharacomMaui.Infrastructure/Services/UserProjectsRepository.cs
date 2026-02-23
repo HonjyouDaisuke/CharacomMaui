@@ -34,6 +34,8 @@ public class UserProjectsRepository : IUserProjectsRepository
     try
     {
       using var res = await _http.PostAsync(ApiEndpoints.InviteToProject, content);
+      if (!res.IsSuccessStatusCode)
+        return new SimpleApiResult(false, $"HTTP エラー: {(int)res.StatusCode}");
       var responseBody = await res.Content.ReadAsStringAsync();
       System.Diagnostics.Debug.WriteLine("----------Invite To Project server res--------------");
       System.Diagnostics.Debug.WriteLine(responseBody);
@@ -41,7 +43,7 @@ public class UserProjectsRepository : IUserProjectsRepository
       var success = response.RootElement.GetProperty("success").GetBoolean();
       if (!success)
       {
-        var message = response.RootElement.GetProperty("message").GetString() ?? string.Empty; ;
+        var message = response.RootElement.GetProperty("message").GetString() ?? string.Empty;
         System.Diagnostics.Debug.WriteLine($"プロジェクトへの招待に失敗しました: {message}");
         return new SimpleApiResult(false, message);
       }

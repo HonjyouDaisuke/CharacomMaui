@@ -54,7 +54,7 @@ public class NotificationsRepository : INotificationsRepository
     {
       System.Diagnostics.Debug.WriteLine("!!!! JSON Deserialize ERROR !!!!");
       System.Diagnostics.Debug.WriteLine(ex.Message);
-      throw; // ← ここで投げれば MAUI の output にも出る
+      return null;
     }
   }
 

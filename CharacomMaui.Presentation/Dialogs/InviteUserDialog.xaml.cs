@@ -72,6 +72,12 @@ public partial class InviteUserDialog : Popup
 
   private async void OnOkClicked(object sender, EventArgs e)
   {
+    if (string.IsNullOrEmpty(SelectUserName.Text) || string.IsNullOrEmpty(SelectProjectRoleName.Text))
+    {
+      // 選択されていなかったらキャンセル扱いにする
+      IsCanceled = true;
+      await CloseAsync();
+    }
     IsCanceled = false;
     foreach (var user in _users)
     {
