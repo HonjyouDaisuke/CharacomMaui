@@ -24,6 +24,8 @@
 
   <Color x:Key="Surface">#E0E0E0</Color>
   <Color x:Key="OnSurface">#222222</Color>
+  <Color x:Key="SurfaceContainer">#ECECEC</Color>
+  <Color x:Key="OnSurfaceContainer">#1C1C1C</Color>
   <Color x:Key="SurfaceVariant">#E7E0EC</Color>
   <Color x:Key="OnSurfaceVariant">#49454E</Color>
 
@@ -64,6 +66,8 @@
 
   <Color x:Key="SurfaceDark">#2c2c2c</Color>
   <Color x:Key="OnSurfaceDark">#f2f2f2</Color>
+  <Color x:Key="SurfaceContainerDark">#383838</Color>
+  <Color x:Key="OnSurfaceContainerDark">#F5F5F5</Color>
   <Color x:Key="SurfaceVariantDark">#49454F</Color>
   <Color x:Key="OnSurfaceVariantDark">#DCD7C9</Color>
 

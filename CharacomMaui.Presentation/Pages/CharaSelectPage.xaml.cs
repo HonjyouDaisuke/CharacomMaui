@@ -13,10 +13,11 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using CharacomMaui.Application.Interfaces;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class CharaSelectPage : ContentPage
+public partial class CharaSelectPage : BasePage
 {
   private bool _isChanging = false;
   private readonly AppStatus _appStatus;
@@ -34,7 +35,10 @@ public partial class CharaSelectPage : ContentPage
   public CharaSelectPage(AppStatus appStatus,
     CharaSelectViewModel viewModel,
     AppStatusNotifier notifier,
-    IProgressDialogService progressDialog)
+    IProgressDialogService progressDialog,
+    IAppTokenStorageService tokenStorage,
+    INotificationService notificationService,
+    INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _appStatus = appStatus;

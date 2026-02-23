@@ -7,11 +7,13 @@ using CommunityToolkit.Maui.Views;
 using MauiApp = Microsoft.Maui.Controls;
 using Mopups.Services;
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Mvvm.Messaging;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.Sessions;
+using CharacomMaui.Presentation.Interfaces;
 
 public partial class TitleBarView : ContentView
 {
@@ -24,6 +26,8 @@ public partial class TitleBarView : ContentView
   private UserRolesSession _userRolesSession;
   private IGetUserInfoUseCase? _getUserInfoUseCase;
   private TitleBarViewModel _viewModel;
+  private INotificationPanelService? _notificationPanelService;
+
   public TitleBarView()
   {
     InitializeComponent();
@@ -34,7 +38,7 @@ public partial class TitleBarView : ContentView
     this.Loaded += OnLoaded;
 
   }
-  private void OnLoaded(object? sender, EventArgs e)
+  private async void OnLoaded(object? sender, EventArgs e)
   {
     var services = Handler?.MauiContext?.Services;
     if (services == null)
@@ -51,6 +55,14 @@ public partial class TitleBarView : ContentView
     _tokenStorage = services.GetService<IAppTokenStorageService>();
     _userRolesSession = services.GetService<UserRolesSession>();
     _getUserInfoUseCase = services.GetService<IGetUserInfoUseCase>();
+    _notificationPanelService = services.GetRequiredService<INotificationPanelService>();
+
+    var notification = services.GetService<INotificationService>();
+    if (notification == null) return;
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
+    await notification.InitNotificationsAsync(accessToken);
   }
   private bool isNullInstance()
   {
@@ -61,6 +73,7 @@ public partial class TitleBarView : ContentView
         _userInfoUseCase == null ||
         _tokenStorage == null ||
         _viewModel == null ||
+        _notificationPanelService == null ||
         _userRolesSession == null;
   }
   private async void OnAvatarViewTapped(object sender, EventArgs e)
@@ -107,5 +120,11 @@ public partial class TitleBarView : ContentView
     {
       System.Diagnostics.Debug.WriteLine($"代理ログインの処理中にエラーが発生: {ex.Message}");
     }
+  }
+
+  private void OnNotificationTapped(object sender, EventArgs e)
+  {
+    if (isNullInstance()) return;
+    _notificationPanelService.Toggle();
   }
 }

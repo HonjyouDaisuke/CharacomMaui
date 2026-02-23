@@ -1,4 +1,5 @@
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Components;
 using CharacomMaui.Presentation.Models;
@@ -13,28 +14,38 @@ using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class ProjectDetailPage : ContentPage
+public partial class ProjectDetailPage : BasePage
 {
   private CharaDataProgressRow? _selectedRow;
   private AppStatus _appStatus;
   private GetProjectCharaItemsUseCase _useCase;
+  private IGetUserInfoUseCase _getUserInfoUseCase;
+  private FetchProjectRolesUseCase _projectRolesUseCase;
   private ProjectDetailViewModel _viewModel;
   private CreateProjectViewModel _createViewModel;
   private IDialogService _dialogService;
   private ISimpleProgressDialogService _simpleDialog;
-
+  private IAppTokenStorageService _tokenStorage;
   public ProjectDetailPage(AppStatus appStatus,
-  GetProjectCharaItemsUseCase useCase,
-  CreateProjectViewModel createProjectViewModel,
-  ProjectDetailViewModel viewModel,
-  IDialogService dialogService,
-  ISimpleProgressDialogService simpleDialog)
+                            GetProjectCharaItemsUseCase useCase,
+                            CreateProjectViewModel createProjectViewModel,
+                            ProjectDetailViewModel viewModel,
+                            IGetUserInfoUseCase getUserInfoUseCase,
+                            FetchProjectRolesUseCase projectRolesUseCase,
+                            IDialogService dialogService,
+                            ISimpleProgressDialogService simpleDialog,
+                            IAppTokenStorageService tokenStorage,
+                            INotificationService notificationService,
+                            INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _appStatus = appStatus;
     _useCase = useCase;
+    _tokenStorage = tokenStorage;
     _dialogService = dialogService;
     _viewModel = viewModel;
+    _getUserInfoUseCase = getUserInfoUseCase;
+    _projectRolesUseCase = projectRolesUseCase;
     _createViewModel = createProjectViewModel;
     _simpleDialog = simpleDialog;
     BindingContext = _viewModel;
@@ -248,6 +259,47 @@ public partial class ProjectDetailPage : ContentPage
   }
   private async Task OnInviteRequestedAsync(ProjectInfoEventArgs e)
   {
-    LogEditor.Text += $"招待します.{e.ProjectName}\n";
+    try
+    {
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return;
+      if (accessToken == null)
+      {
+        await SnackBarService.Error("アクセストークンが取得できませんでした。再ログインしてください。");
+        return;
+      }
+      LogEditor.Text += $"招待します.{e.ProjectName}\n";
+      var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
+      var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
+      var dialog = new InviteUserDialog("ユーザーの招待", _dialogService, users, roles);
+      await this.ShowPopupAsync(dialog);
+      if (dialog.IsCanceled)
+      {
+        LogEditor.Text += "キャンセルされました\n";
+        return;
+      }
+      // else
+      // {
+      //   LogEditor.Text += $"選択された user_id:{dialog.SelectedUserId}: role_id:{dialog.SelectedProjectRoleId}\n";
+      // }
+
+      var result = await _viewModel.InviteToProjectAsync(e.ProjectId, dialog.SelectedUserId, dialog.SelectedProjectRoleId);
+      if (result.Success)
+      {
+        LogEditor.Text += $"招待に成功しました。{dialog.SelectedUserId}, {dialog.SelectedProjectRoleId}\n";
+        await SnackBarService.Success("ユーザーをプロジェクトに招待しました。");
+      }
+      else
+      {
+        LogEditor.Text += $"招待に失敗しました: {result.Message}\n";
+        await SnackBarService.Error("ユーザーの招待に失敗しました。");
+      }
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"Invite error: {ex.Message}");
+      await SnackBarService.Error("ユーザーの招待中にエラーが発生しました。");
+    }
   }
 }

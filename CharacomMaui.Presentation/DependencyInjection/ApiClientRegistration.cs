@@ -22,6 +22,9 @@ public static class ApiClientRegistration
     services.AddHttpClient<IUserRolesRepository, UserRolesRepository>(ConfigureClient);
     services.AddHttpClient<IProxyLoginService, ProxyLoginService>(ConfigureClient);
     services.AddHttpClient<IProxyLogoutService, ProxyLogoutService>(ConfigureClient);
+    services.AddHttpClient<IProjectRolesRepository, ProjectRolesRepository>(ConfigureClient);
+    services.AddHttpClient<IUserProjectsRepository, UserProjectsRepository>(ConfigureClient);
+    services.AddHttpClient<INotificationsRepository, NotificationsRepository>(ConfigureClient);
     return services;
   }
 

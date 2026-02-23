@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+  x:Class="CharacomMaui.Presentation.Components.NotificationCard"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  WidthRequest="300"
+  x:Name="This">
+
+  <Border
+    x:Name="BackgroundBorder"
+    Margin="4"
+    Padding="8"
+    BackgroundColor="{AppThemeBinding Light={DynamicResource SurfaceContainer}, Dark={DynamicResource SurfaceContainerDark}}"
+    Stroke="{DynamicResource Gray200}"
+    StrokeShape="RoundRectangle 6"
+    StrokeThickness="1">
+    <Border.Shadow>
+      <Shadow
+        Brush="{AppThemeBinding Light={StaticResource Shadow},
+                                Dark={StaticResource ShadowDark}}"
+        Offset="5,5"
+        Radius="20"
+        Opacity="1"/>
+    </Border.Shadow>
+    <Border.Triggers>
+      <DataTrigger TargetType="Border"
+                   Binding="{Binding IsRead, Source={x:Reference This}}"
+                   Value="False">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={DynamicResource PrimaryContainer},
+                                            Dark={DynamicResource PrimaryContainerDark}}"/>
+      </DataTrigger>
+    </Border.Triggers>
+    <Border.GestureRecognizers>
+      <TapGestureRecognizer Tapped="OnCardTapped"/>
+    </Border.GestureRecognizers>
+    <VerticalStackLayout HorizontalOptions="Fill"
+                         Spacing="6">
+      <!-- 上段（アイコン・タイトル・削除） -->
+      <Grid ColumnDefinitions="Auto,*,Auto"
+            VerticalOptions="Center">
+
+        <!-- 左側 -->
+        <HorizontalStackLayout Grid.Column="0"
+                               Spacing="6">
+
+          <Label Text="{Binding Icon, Source={x:Reference This}}"
+                 FontSize="24"
+                 FontFamily="{x:Static models:Icons.FontFamily}"
+                 TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"/>
+
+          <Label x:Name="TitleLabel"
+                 VerticalOptions="Center"
+                 Text="{Binding Title, Source={x:Reference This}}"
+                 TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"/>
+        </HorizontalStackLayout>
+
+        <!-- Delete -->
+        <Label x:Name="DeleteIcon"
+               Grid.Column="2"
+               Text="&#xe872;"
+               FontSize="24"
+               HorizontalOptions="End"
+               FontFamily="{x:Static models:Icons.FontFamily}"
+               TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}">
+          <Label.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnDeleteTapped"/>
+          </Label.GestureRecognizers>
+        </Label>
+
+      </Grid>
+      <BoxView x:Name="BorderLine"
+               HeightRequest="1"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer},
+                                          Dark={DynamicResource OnSurfaceContainerDark}}"
+               HorizontalOptions="Fill"/>
+      <Label
+        x:Name="MessageLabel"
+        TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"
+        Text="{Binding Message, Source={x:Reference This}}"/>
+    </VerticalStackLayout>
+  </Border>
+</ContentView>

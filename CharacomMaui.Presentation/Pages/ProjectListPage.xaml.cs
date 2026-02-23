@@ -14,7 +14,7 @@ using UraniumUI.Dialogs.Mopups;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class ProjectListPage : ContentPage
+public partial class ProjectListPage : BasePage
 {
   private ProjectInfoCard? _selectedCard;
 
@@ -25,11 +25,14 @@ public partial class ProjectListPage : ContentPage
   private readonly AppStatusNotifier _notifier;
   private readonly ISimpleProgressDialogService _simpleDialog;
   public ProjectListPage(IBoxFolderRepository repository,
-    IDialogService dialogService,
-    CreateProjectViewModel viewModel,
-    AppStatusUseCase appStatusUseCase,
-    AppStatusNotifier notifier,
-    ISimpleProgressDialogService simpleDialog)
+  IDialogService dialogService,
+  CreateProjectViewModel viewModel,
+  AppStatusUseCase appStatusUseCase,
+  AppStatusNotifier notifier,
+  ISimpleProgressDialogService simpleDialog,
+  IAppTokenStorageService tokenStorage,
+  INotificationService notificationService,
+  INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _repository = repository;
@@ -53,6 +56,13 @@ public partial class ProjectListPage : ContentPage
     {
       System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
+
+  }
+  protected override void OnDisappearing()
+  {
+    base.OnDisappearing();
+    // ページを離れるときは解除（メモリリーク防止）
+    MessagingCenter.Unsubscribe<object>(this, "OpenNotifications");
   }
   private Project makeProjectFromEventArgs(ProjectInfoEventArgs e)
   {
@@ -65,7 +75,6 @@ public partial class ProjectListPage : ContentPage
       CharaFolderId = e.CharaFolderId,
     };
   }
-
   private async void OnEditRequested(object? sender, ProjectInfoEventArgs e)
   {
     System.Diagnostics.Debug.WriteLine($"編集要求: {e.ProjectName} (ID: {e.ProjectId}) 説明: {e.ProjectDescription})\n");
@@ -275,8 +284,8 @@ public partial class ProjectListPage : ContentPage
       _notifier.ProjectName = _selectedCard.ProjectName;
       _notifier.ProjectId = _selectedCard.ProjectId;
       _notifier.ProjectFolderId = _selectedCard.ProjectFolderId;
-      _notifier.CharaFolderId = _selectedCard?.CharaFolderId;
-      LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
+      _notifier.CharaFolderId = _selectedCard!.CharaFolderId;
+      LogEditor.Text += $"Project [{_selectedCard!.ProjectName}]が選択されました\n";
     }
 
   }

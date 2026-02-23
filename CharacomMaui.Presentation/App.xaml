@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:u="clr-namespace:UraniumUI.Material.Resources;assembly=UraniumUI.Material"
              xmlns:local="clr-namespace:CharacomMaui.Presentation"
+             xmlns:conv="clr-namespace:CharacomMaui.Presentation.Converters"
              xmlns:component="clr-namespace:CharacomMaui.Presentation.Components"
              x:Class="CharacomMaui.Presentation.App">
   <Application.Resources>
@@ -34,6 +35,8 @@
                 Value="{StaticResource AppPageTemplate}"/>
         <!-- The Setter for BackgroundColor with hardcoded Red has been removed -->
       </Style>
+      <conv:GreaterThanZeroConverter
+        x:Key="GreaterThanZeroConverter"/>
     </ResourceDictionary>
   </Application.Resources>
 </Application>

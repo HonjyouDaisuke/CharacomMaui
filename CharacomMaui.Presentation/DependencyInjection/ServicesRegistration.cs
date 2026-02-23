@@ -46,6 +46,10 @@ public static class ServicesRegistration
     services.AddTransient<UpdateUserRoleUseCase>();
     services.AddTransient<ProxyLoginUseCase>();
     services.AddTransient<ProxyLogoutUseCase>();
+    services.AddTransient<FetchProjectRolesUseCase>();
+    services.AddTransient<InviteToProjectUseCase>();
+    services.AddTransient<FetchNotificationsUseCase>();
+    services.AddTransient<UpdateNotificationReadUseCase>();
 
     // Coordinator
     services.AddTransient<ICharaLoadCoordinator, CharaLoadCoordinator>();
@@ -90,6 +94,8 @@ public static class ServicesRegistration
     services.AddSingleton<IDialogService, MopupsDialogService>();
     services.AddSingleton<IProgressDialogService, ProgressDialogService>();
     services.AddSingleton<ISimpleProgressDialogService, SimpleProgressDialogService>();
+    services.AddSingleton<INotificationService, NotificationService>();
+    services.AddSingleton<INotificationPanelService, NotificationPanelService>();
 
     return services;
   }

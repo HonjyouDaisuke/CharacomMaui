@@ -9,17 +9,25 @@ using CharacomMaui.Application.Sessions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
 using CommunityToolkit.Maui.Extensions;
+using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Presentation.Interfaces;
 
 namespace CharacomMaui.Presentation.Pages;
 
-public partial class UserListPage : ContentPage
+public partial class UserListPage : BasePage
 {
   private readonly UserListViewModel _viewModel;
   private readonly IDialogService _dialogService;
   private readonly UserRolesSession _userRolesSession;
   private UserInfoRow? _selectedRow;
   private bool _isInitialized = false;
-  public UserListPage(UserListViewModel viewModel, IDialogService dialogService, UserRolesSession userRolesSession)
+  public UserListPage(
+    UserListViewModel viewModel,
+    IDialogService dialogService,
+    UserRolesSession userRolesSession,
+    IAppTokenStorageService tokenStorage,
+    INotificationService notificationService,
+    INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
     _viewModel = viewModel;

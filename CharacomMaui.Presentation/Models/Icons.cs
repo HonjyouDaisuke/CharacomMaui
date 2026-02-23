@@ -4,6 +4,7 @@ public class Icons
 {
   public const string FontFamily = "MaterialIcons";
   public const string AddIcon = "\ue147";
+  public const string NotificationIcon = "\ue7f4";
 }
 
 //http://fonts.google.com/icons

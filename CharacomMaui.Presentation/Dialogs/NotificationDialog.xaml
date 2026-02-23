@@ -1,0 +1,82 @@
+<views:Popup
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:views="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+  xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+  xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+  xmlns:validation="clr-namespace:InputKit.Shared.Validations;assembly=InputKit.Maui"
+  xmlns:models="clr-namespace:CharacomMaui.Presentation.Models"
+  x:Class="CharacomMaui.Presentation.Dialogs.NotificationDialog"
+  x:Name="Root"
+  Padding="0"
+  Margin="0"
+  BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}">
+
+  <Border StrokeThickness="0"
+          BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
+          Padding="0">
+
+    <!-- 全体レイアウト -->
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
+          WidthRequest="600">
+      <Grid Grid.Row="0"
+            Padding="15"
+            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryContainer}, Dark={DynamicResource PrimaryContainerDark}}"
+            HorizontalOptions="Fill">
+
+        <HorizontalStackLayout
+          HorizontalOptions="Center"
+          VerticalOptions="Center"
+          Spacing="10">
+
+          <Label
+            FontFamily="{x:Static models:Icons.FontFamily}"
+            Text="{Binding Source={x:Reference Root}, Path=Icon}"
+            FontSize="24"
+            VerticalOptions="Center"
+            TextColor="{AppThemeBinding Light={DynamicResource OnPrimaryContainer}, Dark={DynamicResource OnPrimaryContainerDark}}"/>
+
+          <Label
+            Text="{Binding Source={x:Reference Root}, Path=Title}"
+            FontSize="20"
+            FontAttributes="Bold"
+            VerticalOptions="Center"
+            TextColor="{AppThemeBinding Light={DynamicResource OnPrimaryContainer}, Dark={DynamicResource OnPrimaryContainerDark}}"/>
+
+        </HorizontalStackLayout>
+      </Grid>
+      <!-- メッセージ -->
+      <Label Grid.Row="1"
+             Text="{Binding Source={x:Reference Root}, Path=Message}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
+             Padding="10"
+             Margin="10"/>
+      <Grid Grid.Row="3"
+            ColumnDefinitions="Auto,*">
+        <Label
+          Grid.Column="0"
+          Text="作成日："/>
+        <Label
+          Grid.Column="1"
+          Text="{Binding Source={x:Reference Root}, Path=CreatedAt}"/>
+      </Grid>
+      <!-- 区切り線 -->
+      <BoxView Grid.Row="4"
+               HeightRequest="1"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource Outline}, Dark={DynamicResource OutlineDark}}"/>
+
+      <!-- ボタン -->
+
+      <Button Text="閉じる"
+              Grid.Row="5"
+              Padding="10"
+              Margin="10"
+              HeightRequest="40"
+              FontFamily="{x:Static models:Icons.FontFamily}"
+              BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+              TextColor="{AppThemeBinding Light={StaticResource OnPrimary}, Dark={StaticResource OnPrimaryDark}}"
+              HorizontalOptions="Center"
+              Clicked="OnOkClicked"/>
+    </Grid>
+  </Border>
+</views:Popup>
