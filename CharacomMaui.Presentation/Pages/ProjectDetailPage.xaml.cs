@@ -264,7 +264,11 @@ public partial class ProjectDetailPage : BasePage
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
       if (accessToken == null) return;
-
+      if (accessToken == null)
+      {
+        await SnackBarService.Error("アクセストークンが取得できませんでした。再ログインしてください。");
+        return;
+      }
       LogEditor.Text += $"招待します.{e.ProjectName}\n";
       var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
       var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);

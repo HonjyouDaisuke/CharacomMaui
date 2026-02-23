@@ -20,8 +20,8 @@ public partial class NotificationsPanel : ContentView
     if (Handler?.MauiContext?.Services is not IServiceProvider services)
       return;
 
-    _notificationService = services.GetService<INotificationService>();
-    _tokenStorage = services.GetService<IAppTokenStorageService>();
+    _notificationService = services.GetRequiredService<INotificationService>();
+    _tokenStorage = services.GetRequiredService<IAppTokenStorageService>();
     BindingContext = _notificationService;
 
     System.Diagnostics.Debug.WriteLine(

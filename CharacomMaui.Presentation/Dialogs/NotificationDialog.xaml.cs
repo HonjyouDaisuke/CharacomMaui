@@ -6,7 +6,6 @@ namespace CharacomMaui.Presentation.Dialogs;
 
 public partial class NotificationDialog : Popup
 {
-  public bool IsConfirmed { get; set; }
   // ========== Title ==========
   public static readonly BindableProperty TitleProperty =
       BindableProperty.Create(

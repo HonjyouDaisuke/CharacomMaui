@@ -25,7 +25,6 @@ public partial class InviteUserDialog : Popup
 
   private readonly IDialogService _dialogService;
 
-  public ObservableCollection<string> Avatars { get; } = new();
   // ========== Title ==========
   public static readonly BindableProperty TitleProperty =
       BindableProperty.Create(

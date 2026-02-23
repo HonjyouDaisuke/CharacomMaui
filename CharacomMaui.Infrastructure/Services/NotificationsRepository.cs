@@ -37,21 +37,20 @@ public class NotificationsRepository : INotificationsRepository
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------GetNotifications server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    using var response = JsonDocument.Parse(responseBody);
-    var success = response.RootElement.GetProperty("success").GetBoolean();
-    if (!success)
-    {
-      System.Diagnostics.Debug.WriteLine("通知メッセージが見つかりませんでした。");
-      return null;
-    }
+
     try
     {
       var result = JsonSerializer.Deserialize<GetNotificationsResponse>(responseBody);
+      if (result?.Success != true)
+      {
+        System.Diagnostics.Debug.WriteLine("通知メッセージが見つかりませんでした。");
+        return null;
+      }
       System.Diagnostics.Debug.WriteLine($"通知件数: {result?.Notifications?.Count}");
       return result?.Notifications ?? new List<NotificationItem>();
 
     }
-    catch (Exception ex)
+    catch (JsonException ex)
     {
       System.Diagnostics.Debug.WriteLine("!!!! JSON Deserialize ERROR !!!!");
       System.Diagnostics.Debug.WriteLine(ex.Message);
