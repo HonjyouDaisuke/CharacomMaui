@@ -30,16 +30,43 @@
     </Label>
 
     <!-- ▼ Notification -->
-    <Label
-      FontFamily="{x:Static models:Icons.FontFamily}"
-      Text="{Binding NotificationIcon}"
-      Grid.Column="2"
-      FontSize="26"
-      VerticalTextAlignment="Center">
-      <Label.GestureRecognizers>
-        <TapGestureRecognizer Tapped="OnNotificationTapped"/>
-      </Label.GestureRecognizers>
-    </Label>
+    <Grid Grid.Column="2"
+          WidthRequest="30"
+          HeightRequest="30">
+
+      <!-- ベル -->
+      <Label
+        FontFamily="{x:Static models:Icons.FontFamily}"
+        Text="{Binding NotificationIcon}"
+        FontSize="26"
+        VerticalTextAlignment="Center"
+        HorizontalTextAlignment="Center">
+        <Label.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnNotificationTapped"/>
+        </Label.GestureRecognizers>
+      </Label>
+
+      <!-- バッジ -->
+      <Border
+        BackgroundColor="Red"
+        WidthRequest="16"
+        HeightRequest="16"
+        StrokeShape="RoundRectangle 8"
+        HorizontalOptions="End"
+        VerticalOptions="Start"
+        TranslationX="4"
+        TranslationY="-4"
+        IsVisible="{Binding NotificationService.UnreadCount,
+                            Converter={StaticResource GreaterThanZeroConverter}}">
+
+        <Label Text="{Binding NotificationService.UnreadBadgeText}"
+               FontSize="10"
+               TextColor="White"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"/>
+      </Border>
+
+    </Grid>
 
     <!-- ▼ Avatar -->
     <toolkit:AvatarView

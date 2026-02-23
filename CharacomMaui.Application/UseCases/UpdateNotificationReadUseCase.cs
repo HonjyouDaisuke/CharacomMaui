@@ -17,4 +17,9 @@ public class UpdateNotificationReadUseCase
   {
     return await _repository.UpdateNotificationRead(accessToken, id);
   }
+
+  public async Task<bool> DeleteAsync(string accessToken, string id)
+  {
+    return await _repository.UpdateNotificationDeleted(accessToken, id);
+  }
 }

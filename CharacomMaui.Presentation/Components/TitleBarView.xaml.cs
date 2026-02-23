@@ -27,6 +27,7 @@ public partial class TitleBarView : ContentView
   private IGetUserInfoUseCase? _getUserInfoUseCase;
   private TitleBarViewModel _viewModel;
   private INotificationPanelService? _notificationPanelService;
+
   public TitleBarView()
   {
     InitializeComponent();
@@ -37,7 +38,7 @@ public partial class TitleBarView : ContentView
     this.Loaded += OnLoaded;
 
   }
-  private void OnLoaded(object? sender, EventArgs e)
+  private async void OnLoaded(object? sender, EventArgs e)
   {
     var services = Handler?.MauiContext?.Services;
     if (services == null)
@@ -55,6 +56,13 @@ public partial class TitleBarView : ContentView
     _userRolesSession = services.GetService<UserRolesSession>();
     _getUserInfoUseCase = services.GetService<IGetUserInfoUseCase>();
     _notificationPanelService = services.GetRequiredService<INotificationPanelService>();
+
+    var notification = services.GetService<INotificationService>();
+    if (notification == null) return;
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
+    await notification.InitNotificationsAsync(accessToken);
   }
   private bool isNullInstance()
   {

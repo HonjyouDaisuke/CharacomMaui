@@ -39,25 +39,39 @@
     </Border.GestureRecognizers>
     <VerticalStackLayout HorizontalOptions="Fill"
                          Spacing="6">
-      <HorizontalStackLayout HorizontalOptions="Start"
-                             Spacing="6">
-        <Label Text="{Binding Icon, Source={x:Reference This}}"
-               FontSize="24"
-               TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"
-               FontFamily="{x:Static models:Icons.FontFamily}"/>
-        <Label
-          x:Name="TitleLabel"
-          VerticalOptions="Center"
-          TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"
-          Text="{Binding Title, Source={x:Reference This}}"/>
+      <!-- 上段（アイコン・タイトル・削除） -->
+      <Grid ColumnDefinitions="Auto,*,Auto"
+            VerticalOptions="Center">
 
-        <Label
-          x:Name="FlagLabel"
-          FontAttributes="Bold"
-          VerticalOptions="Center"
-          TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"
-          Text="{Binding IsRead, Source={x:Reference This}}"/>
-      </HorizontalStackLayout>
+        <!-- 左側 -->
+        <HorizontalStackLayout Grid.Column="0"
+                               Spacing="6">
+
+          <Label Text="{Binding Icon, Source={x:Reference This}}"
+                 FontSize="24"
+                 FontFamily="{x:Static models:Icons.FontFamily}"
+                 TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"/>
+
+          <Label x:Name="TitleLabel"
+                 VerticalOptions="Center"
+                 Text="{Binding Title, Source={x:Reference This}}"
+                 TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}"/>
+        </HorizontalStackLayout>
+
+        <!-- Delete -->
+        <Label x:Name="DeleteIcon"
+               Grid.Column="2"
+               Text="&#xe872;"
+               FontSize="24"
+               HorizontalOptions="End"
+               FontFamily="{x:Static models:Icons.FontFamily}"
+               TextColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer}, Dark={DynamicResource OnSurfaceContainerDark}}">
+          <Label.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnDeleteTapped"/>
+          </Label.GestureRecognizers>
+        </Label>
+
+      </Grid>
       <BoxView x:Name="BorderLine"
                HeightRequest="1"
                BackgroundColor="{AppThemeBinding Light={DynamicResource OnSurfaceContainer},

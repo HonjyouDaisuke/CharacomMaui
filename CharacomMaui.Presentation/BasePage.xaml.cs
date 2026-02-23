@@ -17,7 +17,10 @@ public partial class BasePage : ContentPage
   private View? _notificationPanel;
   private INotificationService _notificationService;
   private IAppTokenStorageService _tokenStorage;
-  public BasePage(INotificationService notificationService, INotificationPanelService panelService, IAppTokenStorageService tokenStorage)
+  public BasePage(
+    INotificationService notificationService,
+    INotificationPanelService panelService,
+    IAppTokenStorageService tokenStorage)
   {
     InitializeComponent();
 
@@ -27,6 +30,7 @@ public partial class BasePage : ContentPage
 
     _panelService.OpenRequested += OpenPanel;
     _panelService.CloseRequested += ClosePanel;
+    _notificationService.DeleteRequested += OnNotificationDeleteRequested;
     _notificationService.NotificationRequested += OnNotificationRequested;
   }
 
@@ -38,7 +42,8 @@ public partial class BasePage : ContentPage
             request.Id,
             request.Title,
             request.Message,
-            request.Icon);
+            request.Icon,
+            request.CreatedAt);
 
     await this.ShowPopupAsync(dialog);
 
@@ -80,6 +85,15 @@ public partial class BasePage : ContentPage
     );
   }
 
+  private async void OnNotificationDeleteRequested(object? sender, string id)
+  {
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return;
+
+    System.Diagnostics.Debug.WriteLine($"通知を削除しますid{id}");
+    _notificationService.MarkAsDeleteAsync(accessToken, id);
+  }
   private async void ClosePanel()
   {
     System.Diagnostics.Debug.WriteLine("ClosePanel 閉じる処理");

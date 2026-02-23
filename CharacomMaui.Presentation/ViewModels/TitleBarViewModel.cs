@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Interfaces;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Services;
 using MauiApp = Microsoft.Maui.Controls.Application;
@@ -83,16 +84,21 @@ public class TitleBarViewModel : INotifyPropertyChanged
 
   public string ProjectName => _notifier.ProjectName;
   public bool IsProxy => _notifier.IsProxy;
+
+  public INotificationService NotificationService { get; }
+
   public TitleBarViewModel(AppStatusNotifier notifier,
                            AppStatus appStatus,
                            ProxyLoginUseCase proxyLoginUseCase,
-                            ProxyLogoutUseCase proxyLogoutUseCase,
+                           ProxyLogoutUseCase proxyLogoutUseCase,
                            IAppTokenStorageService tokenStorage,
+                           INotificationService notificationService,
                            IGetUserInfoUseCase getUserInfoUseCase)
   {
     System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
     _notifier = notifier;
     _appStatus = appStatus;
+    NotificationService = notificationService;
     _proxyLoginUseCase = proxyLoginUseCase;
     _proxyLogoutUseCase = proxyLogoutUseCase;
     _getUserInfoUseCase = getUserInfoUseCase;

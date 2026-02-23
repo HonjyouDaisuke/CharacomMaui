@@ -45,16 +45,30 @@ public partial class NotificationDialog : Popup
     set => SetValue(MessageProperty, value);
   }
 
+  // ========== CreatedAt ==========
+  public static readonly BindableProperty CreatedAtProperty =
+      BindableProperty.Create(
+        nameof(CreatedAt),
+        typeof(string),
+        typeof(NotificationDialog),
+        string.Empty);
+  public string CreatedAt
+  {
+    get => (string)GetValue(CreatedAtProperty);
+    set => SetValue(CreatedAtProperty, value);
+  }
+
   private string _id;
   public string SelectedId = string.Empty;
 
-  public NotificationDialog(string id, string title, string message, string icon)
+  public NotificationDialog(string id, string title, string message, string icon, string createdAt)
   {
     InitializeComponent();
 
     Title = title;
     Message = message;
     Icon = icon;
+    CreatedAt = createdAt;
     _id = id;
   }
 

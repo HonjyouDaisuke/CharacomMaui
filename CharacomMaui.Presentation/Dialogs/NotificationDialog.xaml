@@ -17,7 +17,7 @@
           Padding="0">
 
     <!-- 全体レイアウト -->
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto"
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
           WidthRequest="600">
       <Grid Grid.Row="0"
             Padding="15"
@@ -51,15 +51,24 @@
              BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
              Padding="10"
              Margin="10"/>
+      <Grid Grid.Row="3"
+            ColumnDefinitions="Auto,*">
+        <Label
+          Grid.Column="0"
+          Text="作成日："/>
+        <Label
+          Grid.Column="1"
+          Text="{Binding Source={x:Reference Root}, Path=CreatedAt}"/>
+      </Grid>
       <!-- 区切り線 -->
-      <BoxView Grid.Row="2"
+      <BoxView Grid.Row="4"
                HeightRequest="1"
                BackgroundColor="{AppThemeBinding Light={DynamicResource Outline}, Dark={DynamicResource OutlineDark}}"/>
 
       <!-- ボタン -->
 
       <Button Text="閉じる"
-              Grid.Row="3"
+              Grid.Row="5"
               Padding="10"
               Margin="10"
               HeightRequest="40"

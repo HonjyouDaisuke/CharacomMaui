@@ -67,7 +67,6 @@ public class NotificationsRepository : INotificationsRepository
     });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-
     using var res = await _http.PostAsync(ApiEndpoints.UpdateNotificationRead, content);
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------UpdateNotificationRead server res--------------");
@@ -77,6 +76,28 @@ public class NotificationsRepository : INotificationsRepository
     if (!success)
     {
       System.Diagnostics.Debug.WriteLine("既読設定に失敗しました");
+      return false;
+    }
+    return true;
+  }
+  public async Task<bool> UpdateNotificationDeleted(string accessToken, string id)
+  {
+    var json = JsonSerializer.Serialize(new
+    {
+      token = accessToken,
+      notification_id = id,
+    });
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    using var res = await _http.PostAsync(ApiEndpoints.UpdateNotificationDeleted, content);
+    var responseBody = await res.Content.ReadAsStringAsync();
+    System.Diagnostics.Debug.WriteLine("----------UpdateNotificationDeleted server res--------------");
+    System.Diagnostics.Debug.WriteLine(responseBody);
+    var response = JsonDocument.Parse(responseBody);
+    var success = response.RootElement.GetProperty("success").GetBoolean();
+    if (!success)
+    {
+      System.Diagnostics.Debug.WriteLine("通知の削除に失敗しました");
       return false;
     }
     return true;

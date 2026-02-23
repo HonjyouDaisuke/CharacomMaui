@@ -32,6 +32,7 @@
                                    Id="{Binding Id}"
                                    Message="{Binding Message}"
                                    TypeId="{Binding TypeId}"
+                                   CreatedAt="{Binding CreatedAt}"
                                    IsRead="{Binding IsRead}"/>
           </DataTemplate>
         </CollectionView.ItemTemplate>
