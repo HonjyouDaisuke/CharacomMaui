@@ -30,7 +30,7 @@ public class UserProjectsRepository : IUserProjectsRepository
       to_user_id = toUserId,
       to_role_id = toRoleId,
     });
-    var content = new StringContent(json, Encoding.UTF8, "application/json");
+    using var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
       using var res = await _http.PostAsync(ApiEndpoints.InviteToProject, content);
