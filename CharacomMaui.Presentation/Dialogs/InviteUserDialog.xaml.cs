@@ -31,7 +31,7 @@ public partial class InviteUserDialog : Popup
       BindableProperty.Create(
         nameof(Title),
         typeof(string),
-        typeof(SelectUserDialog),
+        typeof(InviteUserDialog),
         string.Empty);
   public string Title
   {

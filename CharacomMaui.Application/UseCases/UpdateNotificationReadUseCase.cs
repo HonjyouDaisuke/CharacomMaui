@@ -15,11 +15,11 @@ public class UpdateNotificationReadUseCase
 
   public async Task<bool> ExecuteAsync(string accessToken, string id)
   {
-    return await _repository.UpdateNotificationRead(accessToken, id);
+    return await _repository.UpdateNotificationReadAsync(accessToken, id);
   }
 
   public async Task<bool> DeleteAsync(string accessToken, string id)
   {
-    return await _repository.UpdateNotificationDeleted(accessToken, id);
+    return await _repository.UpdateNotificationDeletedAsync(accessToken, id);
   }
 }

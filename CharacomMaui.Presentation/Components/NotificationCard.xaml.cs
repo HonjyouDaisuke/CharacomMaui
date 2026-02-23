@@ -82,6 +82,11 @@ public partial class NotificationCard : ContentView
   }
   private void OnDeleteTapped(object sender, EventArgs e)
   {
+    if (_notificationService == null)
+    {
+      System.Diagnostics.Debug.WriteLine("NotificationServiceが取得できませんでした");
+      return;
+    }
     _notificationService.RequestDelete(Id);
     System.Diagnostics.Debug.WriteLine("Delete tapped");
 

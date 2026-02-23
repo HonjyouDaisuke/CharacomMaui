@@ -105,7 +105,7 @@ public class NotificationService : INotificationService, INotifyPropertyChanged
     if (Notifications.Count == 0) return;
     foreach (var notification in Notifications)
     {
-      MarkAsReadAsync(accessToken, notification.Id);
+      await MarkAsReadAsync(accessToken, notification.Id);
     }
   }
   public async Task InitNotificationsAsync(string accessToken)

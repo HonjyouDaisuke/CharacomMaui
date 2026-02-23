@@ -30,7 +30,7 @@ public partial class NotificationsPanel : ContentView
 
   private async void OnAllReadClicked(object sender, EventArgs e)
   {
-    if (_tokenStorage == null) return;
+    if (_tokenStorage == null || _notificationService == null) return;
 
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;

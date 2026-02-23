@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using CharacomMaui.Domain.Entities;
+using System.ComponentModel;
 
 namespace CharacomMaui.Presentation.Dialogs;
 
@@ -64,7 +65,7 @@ public partial class NotificationDialog : Popup
   public NotificationDialog(string id, string title, string message, string icon, string createdAt)
   {
     InitializeComponent();
-
+    BindingContext = this;
     Title = title;
     Message = message;
     Icon = icon;

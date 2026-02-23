@@ -4,7 +4,7 @@ using CharacomMaui.Domain.Entities;
 
 public interface INotificationsRepository
 {
-  Task<List<NotificationItem>?> GetNotifications(string accessToken);
-  Task<bool> UpdateNotificationRead(string accessToken, string id);
-  Task<bool> UpdateNotificationDeleted(string accessToken, string id);
+  Task<List<NotificationItem>?> GetNotificationsAsync(string accessToken);
+  Task<bool> UpdateNotificationReadAsync(string accessToken, string id);
+  Task<bool> UpdateNotificationDeletedAsync(string accessToken, string id);
 }

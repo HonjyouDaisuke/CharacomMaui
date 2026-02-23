@@ -15,7 +15,7 @@ public class FetchNotificationsUseCase
 
   public async Task<List<NotificationItem>> ExecuteAsync(string accessToken)
   {
-    var notifications = await _repository.GetNotifications(accessToken);
+    var notifications = await _repository.GetNotificationsAsync(accessToken);
     if (notifications == null) return new List<NotificationItem>();
     return notifications;
   }

@@ -11,9 +11,7 @@
     x:Name="BackgroundBorder"
     Margin="4"
     Padding="8"
-    BackgroundColor="{AppThemeBinding Light={DynamicResource SurfaceContainer},
-                                          Dark={DynamicResource SurfaceContainerDark}}"
-    Shadow="3"
+    BackgroundColor="{AppThemeBinding Light={DynamicResource SurfaceContainer}, Dark={DynamicResource SurfaceContainerDark}}"
     Stroke="{DynamicResource Gray200}"
     StrokeShape="RoundRectangle 6"
     StrokeThickness="1">

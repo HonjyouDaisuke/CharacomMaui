@@ -45,8 +45,8 @@ public class UserProjectsRepository : IUserProjectsRepository
         System.Diagnostics.Debug.WriteLine($"プロジェクトへの招待に失敗しました: {message}");
         return new SimpleApiResult(false, message);
       }
-      return new SimpleApiResult(true, "招待に成功しました。");
       System.Diagnostics.Debug.WriteLine("プロジェクトへの招待に成功しました。");
+      return new SimpleApiResult(true, "招待に成功しました。");
     }
     catch (Exception ex)
     {

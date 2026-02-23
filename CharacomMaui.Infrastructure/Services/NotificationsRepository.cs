@@ -23,7 +23,7 @@ public class NotificationsRepository : INotificationsRepository
       throw new Exception("HttpClient.BaseAddress is NULL");
   }
 
-  public async Task<List<NotificationItem>?> GetNotifications(string accessToken)
+  public async Task<List<NotificationItem>?> GetNotificationsAsync(string accessToken)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -33,10 +33,11 @@ public class NotificationsRepository : INotificationsRepository
 
 
     using var res = await _http.PostAsync(ApiEndpoints.GetNotifications, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------GetNotifications server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    var response = JsonDocument.Parse(responseBody);
+    using var response = JsonDocument.Parse(responseBody);
     var success = response.RootElement.GetProperty("success").GetBoolean();
     if (!success)
     {
@@ -46,7 +47,7 @@ public class NotificationsRepository : INotificationsRepository
     try
     {
       var result = JsonSerializer.Deserialize<GetNotificationsResponse>(responseBody);
-      System.Diagnostics.Debug.WriteLine($"通知件数: {result?.Notifications.Count}");
+      System.Diagnostics.Debug.WriteLine($"通知件数: {result?.Notifications?.Count}");
       return result?.Notifications ?? new List<NotificationItem>();
 
     }
@@ -58,7 +59,7 @@ public class NotificationsRepository : INotificationsRepository
     }
   }
 
-  public async Task<bool> UpdateNotificationRead(string accessToken, string id)
+  public async Task<bool> UpdateNotificationReadAsync(string accessToken, string id)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -68,10 +69,11 @@ public class NotificationsRepository : INotificationsRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     using var res = await _http.PostAsync(ApiEndpoints.UpdateNotificationRead, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------UpdateNotificationRead server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    var response = JsonDocument.Parse(responseBody);
+    using var response = JsonDocument.Parse(responseBody);
     var success = response.RootElement.GetProperty("success").GetBoolean();
     if (!success)
     {
@@ -80,7 +82,7 @@ public class NotificationsRepository : INotificationsRepository
     }
     return true;
   }
-  public async Task<bool> UpdateNotificationDeleted(string accessToken, string id)
+  public async Task<bool> UpdateNotificationDeletedAsync(string accessToken, string id)
   {
     var json = JsonSerializer.Serialize(new
     {
@@ -90,10 +92,11 @@ public class NotificationsRepository : INotificationsRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     using var res = await _http.PostAsync(ApiEndpoints.UpdateNotificationDeleted, content);
+    res.EnsureSuccessStatusCode();
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------UpdateNotificationDeleted server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    var response = JsonDocument.Parse(responseBody);
+    using var response = JsonDocument.Parse(responseBody);
     var success = response.RootElement.GetProperty("success").GetBoolean();
     if (!success)
     {

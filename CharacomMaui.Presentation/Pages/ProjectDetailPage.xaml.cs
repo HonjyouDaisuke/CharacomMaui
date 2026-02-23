@@ -259,35 +259,43 @@ public partial class ProjectDetailPage : BasePage
   }
   private async Task OnInviteRequestedAsync(ProjectInfoEventArgs e)
   {
-    var tokens = await _tokenStorage.GetTokensAsync();
-    var accessToken = tokens?.AccessToken;
-    if (accessToken == null) return;
+    try
+    {
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return;
 
-    LogEditor.Text += $"招待します.{e.ProjectName}\n";
-    var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
-    var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
-    var dialog = new InviteUserDialog("ユーザーの招待", _dialogService, users, roles);
-    await this.ShowPopupAsync(dialog);
-    if (dialog.IsCanceled)
-    {
-      LogEditor.Text += "キャンセルされました\n";
-      return;
-    }
-    // else
-    // {
-    //   LogEditor.Text += $"選択された user_id:{dialog.SelectedUserId}: role_id:{dialog.SelectedProjectRoleId}\n";
-    // }
+      LogEditor.Text += $"招待します.{e.ProjectName}\n";
+      var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
+      var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
+      var dialog = new InviteUserDialog("ユーザーの招待", _dialogService, users, roles);
+      await this.ShowPopupAsync(dialog);
+      if (dialog.IsCanceled)
+      {
+        LogEditor.Text += "キャンセルされました\n";
+        return;
+      }
+      // else
+      // {
+      //   LogEditor.Text += $"選択された user_id:{dialog.SelectedUserId}: role_id:{dialog.SelectedProjectRoleId}\n";
+      // }
 
-    var result = await _viewModel.InviteToProjectAsync(e.ProjectId, dialog.SelectedUserId, dialog.SelectedProjectRoleId);
-    if (result.Success)
-    {
-      LogEditor.Text += $"招待に成功しました。{dialog.SelectedUserId}, {dialog.SelectedProjectRoleId}\n";
-      await SnackBarService.Success("ユーザーをプロジェクトに招待しました。");
+      var result = await _viewModel.InviteToProjectAsync(e.ProjectId, dialog.SelectedUserId, dialog.SelectedProjectRoleId);
+      if (result.Success)
+      {
+        LogEditor.Text += $"招待に成功しました。{dialog.SelectedUserId}, {dialog.SelectedProjectRoleId}\n";
+        await SnackBarService.Success("ユーザーをプロジェクトに招待しました。");
+      }
+      else
+      {
+        LogEditor.Text += $"招待に失敗しました: {result.Message}\n";
+        await SnackBarService.Error("ユーザーの招待に失敗しました。");
+      }
     }
-    else
+    catch (Exception ex)
     {
-      LogEditor.Text += $"招待に失敗しました: {result.Message}\n";
-      await SnackBarService.Error("ユーザーの招待に失敗しました。");
+      System.Diagnostics.Debug.WriteLine($"Invite error: {ex.Message}");
+      await SnackBarService.Error("ユーザーの招待中にエラーが発生しました。");
     }
   }
 }
