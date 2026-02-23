@@ -73,14 +73,23 @@ public class NotificationsRepository : INotificationsRepository
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------UpdateNotificationRead server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    using var response = JsonDocument.Parse(responseBody);
-    var success = response.RootElement.GetProperty("success").GetBoolean();
-    if (!success)
+    try
     {
+      using var response = JsonDocument.Parse(responseBody);
+      if (response.RootElement.TryGetProperty("success", out var successElem)
+          && successElem.GetBoolean())
+      {
+        return true;
+      }
       System.Diagnostics.Debug.WriteLine("既読設定に失敗しました");
       return false;
     }
-    return true;
+    catch (JsonException ex)
+    {
+      System.Diagnostics.Debug.WriteLine("!!!! JSON Parse ERROR !!!!");
+      System.Diagnostics.Debug.WriteLine(ex.Message);
+      return false;
+    }
   }
   public async Task<bool> UpdateNotificationDeletedAsync(string accessToken, string id)
   {
@@ -96,14 +105,23 @@ public class NotificationsRepository : INotificationsRepository
     var responseBody = await res.Content.ReadAsStringAsync();
     System.Diagnostics.Debug.WriteLine("----------UpdateNotificationDeleted server res--------------");
     System.Diagnostics.Debug.WriteLine(responseBody);
-    using var response = JsonDocument.Parse(responseBody);
-    var success = response.RootElement.GetProperty("success").GetBoolean();
-    if (!success)
+    try
     {
+      using var response = JsonDocument.Parse(responseBody);
+      if (response.RootElement.TryGetProperty("success", out var successElem)
+          && successElem.GetBoolean())
+      {
+        return true;
+      }
       System.Diagnostics.Debug.WriteLine("通知の削除に失敗しました");
       return false;
     }
-    return true;
+    catch (JsonException ex)
+    {
+      System.Diagnostics.Debug.WriteLine("!!!! JSON Parse ERROR !!!!");
+      System.Diagnostics.Debug.WriteLine(ex.Message);
+      return false;
+    }
   }
 }
 public class GetNotificationsResponse
