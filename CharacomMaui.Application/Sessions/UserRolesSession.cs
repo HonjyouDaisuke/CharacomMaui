@@ -32,4 +32,9 @@ public class UserRolesSession
     }
     return string.Empty;
   }
+
+  public bool HasRole(string roleName)
+  {
+    return _roles.Any(r => r.Name == roleName);
+  }
 }

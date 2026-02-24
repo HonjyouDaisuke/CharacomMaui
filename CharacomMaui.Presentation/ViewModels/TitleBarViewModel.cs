@@ -6,6 +6,7 @@ using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Interfaces;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Services;
+using CharacomMaui.Application.Sessions;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.ViewModels;
@@ -18,6 +19,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
   private readonly ProxyLogoutUseCase _proxyLogoutUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly IGetUserInfoUseCase _getUserInfoUseCase;
+  private readonly UserRolesSession _userRolesSession;
 
   // バインディング用プロパティ
   private string titleString = string.Empty;
@@ -62,10 +64,11 @@ public class TitleBarViewModel : INotifyPropertyChanged
       }
     }
   }
+
   public string ProxyIcon =>
-      IsProxy
-        ? "\ue9ba" // ← ログアウトアイコン（例）
-        : "\ue9ed"; // ← プロキシ（ログイン）アイコン
+        IsProxy
+            ? Icons.ProxyLogoutIcon
+            : Icons.ProxyLoginIcon;
   private ImageSource? avatarImageSource;
   public ImageSource? AvatarImageSource
   {
@@ -86,13 +89,16 @@ public class TitleBarViewModel : INotifyPropertyChanged
   public bool IsProxy => _notifier.IsProxy;
 
   public INotificationService NotificationService { get; }
-
+  public bool IsAdmin => string.Equals(_appStatus.UserRole, "admin",
+        StringComparison.OrdinalIgnoreCase);
+  public bool IsProxyIconVisible => IsProxy || IsAdmin;
   public TitleBarViewModel(AppStatusNotifier notifier,
                            AppStatus appStatus,
                            ProxyLoginUseCase proxyLoginUseCase,
                            ProxyLogoutUseCase proxyLogoutUseCase,
                            IAppTokenStorageService tokenStorage,
                            INotificationService notificationService,
+                           UserRolesSession userRolesSession,
                            IGetUserInfoUseCase getUserInfoUseCase)
   {
     System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
@@ -102,6 +108,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     _proxyLoginUseCase = proxyLoginUseCase;
     _proxyLogoutUseCase = proxyLogoutUseCase;
     _getUserInfoUseCase = getUserInfoUseCase;
+    _userRolesSession = userRolesSession;
     _tokenStorage = tokenStorage;
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += (_, e) =>
@@ -122,6 +129,8 @@ public class TitleBarViewModel : INotifyPropertyChanged
       {
         OnPropertyChanged(nameof(IsProxy));
         OnPropertyChanged(nameof(ProxyIcon));
+        OnPropertyChanged(nameof(IsProxyIconVisible));
+        OnPropertyChanged(nameof(IsAdmin));
       }
     };
 
