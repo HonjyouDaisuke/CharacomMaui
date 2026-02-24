@@ -19,7 +19,6 @@ public class TitleBarViewModel : INotifyPropertyChanged
   private readonly ProxyLogoutUseCase _proxyLogoutUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly IGetUserInfoUseCase _getUserInfoUseCase;
-  private readonly UserRolesSession _userRolesSession;
 
   // バインディング用プロパティ
   private string titleString = string.Empty;
@@ -98,7 +97,6 @@ public class TitleBarViewModel : INotifyPropertyChanged
                            ProxyLogoutUseCase proxyLogoutUseCase,
                            IAppTokenStorageService tokenStorage,
                            INotificationService notificationService,
-                           UserRolesSession userRolesSession,
                            IGetUserInfoUseCase getUserInfoUseCase)
   {
     System.Diagnostics.Debug.WriteLine($"[VM] TitleBarViewModel created: {GetHashCode()}");
@@ -108,7 +106,6 @@ public class TitleBarViewModel : INotifyPropertyChanged
     _proxyLoginUseCase = proxyLoginUseCase;
     _proxyLogoutUseCase = proxyLogoutUseCase;
     _getUserInfoUseCase = getUserInfoUseCase;
-    _userRolesSession = userRolesSession;
     _tokenStorage = tokenStorage;
     // AppStatusNotifier の変更を購読
     _notifier.PropertyChanged += (_, e) =>
