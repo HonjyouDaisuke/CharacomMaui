@@ -21,6 +21,7 @@
     <Label
       FontFamily="{x:Static models:Icons.FontFamily}"
       Text="{Binding ProxyIcon}"
+      IsVisible="{Binding IsProxyIconVisible}"
       Grid.Column="1"
       FontSize="26"
       VerticalTextAlignment="Center">

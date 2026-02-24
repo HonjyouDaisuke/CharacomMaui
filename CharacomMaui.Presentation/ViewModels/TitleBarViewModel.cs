@@ -6,6 +6,7 @@ using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Interfaces;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Services;
+using CharacomMaui.Application.Sessions;
 using MauiApp = Microsoft.Maui.Controls.Application;
 
 namespace CharacomMaui.Presentation.ViewModels;
@@ -62,10 +63,11 @@ public class TitleBarViewModel : INotifyPropertyChanged
       }
     }
   }
+
   public string ProxyIcon =>
-      IsProxy
-        ? "\ue9ba" // ← ログアウトアイコン（例）
-        : "\ue9ed"; // ← プロキシ（ログイン）アイコン
+        IsProxy
+            ? Icons.ProxyLogoutIcon
+            : Icons.ProxyLoginIcon;
   private ImageSource? avatarImageSource;
   public ImageSource? AvatarImageSource
   {
@@ -86,7 +88,9 @@ public class TitleBarViewModel : INotifyPropertyChanged
   public bool IsProxy => _notifier.IsProxy;
 
   public INotificationService NotificationService { get; }
-
+  public bool IsAdmin => string.Equals(_appStatus.UserRole, "admin",
+        StringComparison.OrdinalIgnoreCase);
+  public bool IsProxyIconVisible => IsProxy || IsAdmin;
   public TitleBarViewModel(AppStatusNotifier notifier,
                            AppStatus appStatus,
                            ProxyLoginUseCase proxyLoginUseCase,
@@ -122,6 +126,8 @@ public class TitleBarViewModel : INotifyPropertyChanged
       {
         OnPropertyChanged(nameof(IsProxy));
         OnPropertyChanged(nameof(ProxyIcon));
+        OnPropertyChanged(nameof(IsProxyIconVisible));
+        OnPropertyChanged(nameof(IsAdmin));
       }
     };
 
