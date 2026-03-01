@@ -149,7 +149,6 @@ public class ApiUserRepository : IUserRepository
     _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserInfo, "[API]ユーザー情報取得", "ユーザー情報を取得しました。",
       new
       {
-        Name = response.GetProperty("name").GetString(),
         RoleId = response.GetProperty("role_id").GetString(),
       });
     return new AppUser
@@ -182,7 +181,7 @@ public class ApiUserRepository : IUserRepository
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新しました。", new { userName });
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新しました。");
         return new SimpleApiResult
         {
           Success = true,
@@ -192,7 +191,7 @@ public class ApiUserRepository : IUserRepository
 
 
       var message = root.GetProperty("message").GetString();
-      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報更新に失敗しました。", new { userName, message });
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報更新に失敗しました。", new { message });
 
       return new SimpleApiResult
       {

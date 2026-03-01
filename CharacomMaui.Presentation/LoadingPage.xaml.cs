@@ -74,7 +74,6 @@ public partial class LoadingPage : ContentPage
         return;
       }
     }
-    System.Diagnostics.Debug.WriteLine($"isValid = {isValid}   ----");
     if (!isValid)
     {
       _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンが有効ではありません。ログインページに戻ります。");
@@ -89,7 +88,7 @@ public partial class LoadingPage : ContentPage
     {
       isValid = false;
     }
-    System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
+
     if (isValid)
     {
       if (user != null) _statusUseCase.SetUserInfo(user);

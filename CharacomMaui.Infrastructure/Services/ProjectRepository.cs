@@ -179,7 +179,6 @@ public class ProjectRepository : IProjectRepository
         : "不明なエラー";
 
       _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", "プロジェクトの削除中にサーバー側でエラーが発生しました。", new { projectId, message });
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
       return new SimpleApiResult
       {
         Success = false,

@@ -43,7 +43,6 @@ public interface IAppLogger
   /// <summary>
   /// システム警告のログを記録します。
   /// </summary>
-  /// <param name="userId"></param>
   /// <param name="userId">ユーザーID</param>
   /// <param name="screen">画面名</param>
   /// <param name="action">動作</param>
