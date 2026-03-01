@@ -101,7 +101,7 @@ public partial class LoadingPage : ContentPage
     }
     else
     {
-      _logger.SystemWarning(user.Id, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
+      _logger.SystemWarning(user.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _logger, _userRolesUseCase);
     }
   }

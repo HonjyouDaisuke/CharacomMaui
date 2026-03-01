@@ -122,7 +122,7 @@ public class ApiUserRepository : IUserRepository
     }
     catch (Exception ex)
     {
-      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー作成");
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー一覧");
       return new List<AppUser>();
     }
 
@@ -150,8 +150,6 @@ public class ApiUserRepository : IUserRepository
       new
       {
         Name = response.GetProperty("name").GetString(),
-        Email = response.GetProperty("email").GetString(),
-        PictureUrl = response.GetProperty("picture_url").GetString(),
         RoleId = response.GetProperty("role_id").GetString(),
       });
     return new AppUser
@@ -184,7 +182,7 @@ public class ApiUserRepository : IUserRepository
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新しました。", new { userName, userEmail, avatarUrl });
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新しました。", new { userName });
         return new SimpleApiResult
         {
           Success = true,
@@ -194,7 +192,7 @@ public class ApiUserRepository : IUserRepository
 
 
       var message = root.GetProperty("message").GetString();
-      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報更新に失敗しました。", new { userName, userEmail, avatarUrl, message });
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報更新に失敗しました。", new { userName, message });
 
       return new SimpleApiResult
       {
@@ -204,7 +202,7 @@ public class ApiUserRepository : IUserRepository
     }
     catch (Exception ex)
     {
-      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー作成");
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新");
       return new SimpleApiResult
       {
         Success = false,
@@ -226,8 +224,6 @@ public class ApiUserRepository : IUserRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.UpdateUserRole, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------Update UserRole server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
 
     try
     {
@@ -255,7 +251,7 @@ public class ApiUserRepository : IUserRepository
     }
     catch (Exception ex)
     {
-      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー作成");
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー権限の更新");
       return new SimpleApiResult
       {
         Success = false,

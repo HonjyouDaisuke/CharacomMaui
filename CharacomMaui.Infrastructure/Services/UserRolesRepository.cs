@@ -67,7 +67,7 @@ public class UserRolesRepository : IUserRolesRepository
         });
 
       }
-      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得", "ユーザー権限を取得しました。");
+      _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得", "ユーザー権限を取得しました。");
 
       return roles;
     }

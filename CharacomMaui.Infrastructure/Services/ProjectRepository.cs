@@ -207,7 +207,11 @@ public class ProjectRepository : IProjectRepository
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.GetProjectDetails, content);
-    if (!res.IsSuccessStatusCode) return null;
+    if (!res.IsSuccessStatusCode)
+    {
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetProjectDetails, "[API]プロジェクト詳細の取得", "HTTPエラーでプロジェクト詳細を取得できませんでした。", new { projectId, res.StatusCode });
+      return null;
+    }
     var responseBody = await res.Content.ReadAsStringAsync();
 
     var options = new JsonSerializerOptions
