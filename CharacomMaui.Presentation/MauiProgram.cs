@@ -12,6 +12,7 @@ using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Infrastructure.Services;
 using Microsoft.Extensions.Options;
 using CharacomMaui.Presentation.DependencyInjection;
+using CharacomMaui.Infrastructure.Logging;
 
 namespace CharacomMaui.Presentation;
 
@@ -48,7 +49,7 @@ public static class MauiProgram
       FileSystem.OpenAppPackageFileAsync("appsettings.json").Result;
 
     builder.Configuration.AddJsonStream(stream);
-
+    builder.Services.AddLoggingInfrastructure();
     builder.Services.Configure<ApiSettings>(
       builder.Configuration.GetSection("ApiSettings"));
 

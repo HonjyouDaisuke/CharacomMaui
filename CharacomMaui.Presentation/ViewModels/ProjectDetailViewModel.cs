@@ -12,6 +12,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
 {
   public ObservableCollection<CharaDataSummary> CharaDataSummaries { get; } = [];
   private readonly AppStatus _appStatus;
+  IAppLogger _logger;
   GetProjectCharaItemsUseCase _useCase;
   GetProjectDetailsUseCase _getProjectDetailsUseCase;
   private readonly InviteToProjectUseCase _inviteToProjectUseCase;
@@ -75,12 +76,14 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
   }
   public ProjectDetailViewModel(GetProjectCharaItemsUseCase useCase,
                                 AppStatus appStatus,
+                                IAppLogger logger,
                                  GetProjectDetailsUseCase getProjectDetailsUseCase,
                                  IAppTokenStorageService tokenStorage,
                                  InviteToProjectUseCase inviteToProjectUseCase)
   {
     _useCase = useCase;
     _appStatus = appStatus;
+    _logger = logger;
     _getProjectDetailsUseCase = getProjectDetailsUseCase;
     _tokenStorage = tokenStorage;
     _inviteToProjectUseCase = inviteToProjectUseCase;
@@ -110,7 +113,6 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     var accessToken = tokens?.AccessToken;
     if (accessToken == null) return;
     var charaItems = await _useCase.ExecuteAsync(accessToken, ProjectId);
-    System.Diagnostics.Debug.WriteLine($"Count = {charaItems.Count}");
 
     var grouped = charaItems.GroupBy(x => new { x.CharaName, x.MaterialName })
     .Select(g => new CharaDataSummary
@@ -133,15 +135,13 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
         {
           isSelected = true;
         }
-        System.Diagnostics.Debug.WriteLine($"[{item.CharaName}]-{item.MaterialName} : {item.CharaCount}個 IsSelected = {isSelected}");
         item.Number = _count;
         item.IsOdd = _count % 2 == 1;
         item.IsSelected = isSelected;
         CharaDataSummaries.Add(item);
         _count++;
       }
-      System.Diagnostics.Debug.WriteLine($"appStatus = {_appStatus}");
-      System.Diagnostics.Debug.WriteLine($"行数は；；；{_count} CharaDataSummariesCount = {CharaDataSummaries.Count}");
+      _logger.UserAction(_appStatus.UserId, this.GetType().Name, "個別文字の取得", "個別文字を取得しました。", new { ProjectId, _count });
     });
 
   }
@@ -153,10 +153,8 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
       if (accessToken == null) return;
-
+      _logger.UserAction(_appStatus.UserId, this.GetType().Name, "プロジェクト詳細を取得", "プロジェクト詳細取得を実行します。", new { projectId = projectId, projectName = ProjectName });
       var projectDetails = await _getProjectDetailsUseCase.ExecuteAsync(accessToken, projectId);
-      System.Diagnostics.Debug.WriteLine($"1ProjectId = {projectId}");
-      System.Diagnostics.Debug.WriteLine($"1ProjectName = {ProjectName}");
       if (projectDetails == null) return;
 
       ProjectId = projectDetails.Id;
@@ -168,12 +166,10 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       UpdatedAt = projectDetails.UpdatedAt.ToString("yyyy年MM月dd日");
       CreatedBy = projectDetails.CreatedBy;
       ParticipantsText = string.Join(", ", projectDetails.Participants);
-      System.Diagnostics.Debug.WriteLine($"2ProjectId = {projectId}");
-      System.Diagnostics.Debug.WriteLine($"2ProjectName = {ProjectName} ?? ?? {projectDetails.Name}");
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"Error loading project details: {ex}");
+      _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクト詳細取得", new { projectId });
       await SnackBarService.Error("プロジェクト詳細の読み込みに失敗しました。");
     }
   }
@@ -186,12 +182,21 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       var accessToken = tokens?.AccessToken;
       if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました"); ;
 
-      return await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
-
+      var res = await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
+      if (res.Success)
+      {
+        _logger.SystemInfo(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトに招待しました。", new { projectId, toUserId, toRoleId });
+        return res;
+      }
+      else
+      {
+        _logger.SystemWarning(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトへの招待に失敗しました。", new { projectId, toUserId, toRoleId });
+        return res;
+      }
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"Error inviting user to project: {ex}");
+      _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", new { projectId, toUserId, toRoleId });
       return new SimpleApiResult(false, "想定外のエラーが発生しました");
     }
   }

@@ -14,11 +14,15 @@ namespace CharacomMaui.Infrastructure.Services;
 public class UserRolesRepository : IUserRolesRepository
 {
   private readonly HttpClient _http;
-  public UserRolesRepository(HttpClient http)
+  private readonly AppStatus _appStatus;
+  private readonly IAppLogger _logger;
+  public UserRolesRepository(HttpClient http, AppStatus appStatus, IAppLogger logger)
   {
     _http = http;
     if (_http.BaseAddress == null)
       throw new Exception("HttpClient.BaseAddress is NULL");
+    _appStatus = appStatus;
+    _logger = logger;
   }
 
   public async Task<List<UserRole>?> FetchUserRolesAsync(string accessToken)
@@ -27,18 +31,19 @@ public class UserRolesRepository : IUserRolesRepository
     {
       token = accessToken,
     });
+
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得", "ユーザー権限を取得します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
       using var res = await _http.PostAsync(ApiEndpoints.GetUserRoles, content);
       var responseBody = await res.Content.ReadAsStringAsync();
-      System.Diagnostics.Debug.WriteLine("----------User Roles server res--------------");
-      System.Diagnostics.Debug.WriteLine(responseBody);
+
       var response = JsonDocument.Parse(responseBody);
       var success = response.RootElement.GetProperty("success").GetBoolean();
       if (!success)
       {
-        System.Diagnostics.Debug.WriteLine("UserRoleが見つかりませんでした。");
+        _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得", "ユーザー権限が見つかりませんでした。");
         return null;
       }
 
@@ -62,11 +67,13 @@ public class UserRolesRepository : IUserRolesRepository
         });
 
       }
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得", "ユーザー権限を取得しました。");
+
       return roles;
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"想定外のエラー: {ex.Message}");
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.GetUserRoles, "[API]ユーザー権限取得");
       return null;
     }
   }
