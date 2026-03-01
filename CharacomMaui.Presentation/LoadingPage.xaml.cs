@@ -2,7 +2,6 @@
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Presentation.Helpers;
-using CharacomMaui.Presentation.Helpers;
 using CharacomMaui.Presentation.Services;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -94,13 +93,13 @@ public partial class LoadingPage : ContentPage
       if (user != null) _statusUseCase.SetUserInfo(user);
       MainThread.BeginInvokeOnMainThread(() =>
       {
-        _logger.UserAction(user.Id, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
+        _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
         MauiApp.Current!.Windows[0].Page = new AppShell();
       });
     }
     else
     {
-      _logger.SystemWarning(user.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
+      _logger.SystemWarning(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _logger, _userRolesUseCase);
     }
   }
