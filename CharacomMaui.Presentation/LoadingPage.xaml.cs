@@ -15,7 +15,14 @@ public partial class LoadingPage : ContentPage
   private readonly AppStatusUseCase _statusUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly FetchUserRolesUseCase _userRolesUseCase;
-  public LoadingPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
+  private readonly IAppLogger _logger;
+
+  public LoadingPage(
+    IAppLogger logger,
+    IGetUserInfoUseCase userUseCase,
+   AppStatusUseCase statusUseCase,
+    IAppTokenStorageService tokenStorage,
+     FetchUserRolesUseCase userRolesUseCase)
   {
     InitializeComponent();
 
@@ -23,23 +30,22 @@ public partial class LoadingPage : ContentPage
     _statusUseCase = statusUseCase;
     _tokenStorage = tokenStorage;
     _userRolesUseCase = userRolesUseCase;
+    _logger = logger;
   }
 
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    System.Diagnostics.Debug.WriteLine($"スタート----");
+    _logger.UserAction("", this.GetType().Name, "システムスタート", "Characom Imager Pro Maui Start--------");
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     var tokenService = ServiceHelper.GetService<ITokenValidationService>();
     bool isValid = false;
-    System.Diagnostics.Debug.WriteLine($"チェック開始 : {accessToken}");
     if (!string.IsNullOrEmpty(accessToken))
     {
       try
       {
         var result = await tokenService.ValidateAsync(accessToken);
-        System.Diagnostics.Debug.WriteLine($"tokenRes = {result}");
         bool isProxy = false;
 
         if (result.Payload.ValueKind == JsonValueKind.Object &&
@@ -53,7 +59,7 @@ public partial class LoadingPage : ContentPage
         isValid = result.Success;
         if (isProxy)
         {
-          System.Diagnostics.Debug.WriteLine("前回代理ログインで終了したので、ログインし直してください");
+          _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "前回代理ログインで終了したので、ログインページに戻ります。");
           await _tokenStorage.ClearTokensAsync();
           isValid = false;
         }
@@ -62,16 +68,15 @@ public partial class LoadingPage : ContentPage
       {
         isValid = false;
         await SnackBarService.Error("AccessTokenが有効ではありません。");
-        System.Diagnostics.Debug.WriteLine($"Error --tokenRes isValid = {isValid}");
-        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
+        _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンの有効期限が切れていますので、ログインページに戻ります。");
+        MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _logger, _userRolesUseCase);
         return;
       }
     }
-    System.Diagnostics.Debug.WriteLine($"isValid = {isValid}");
     if (!isValid)
     {
-      System.Diagnostics.Debug.WriteLine($"TokenError = {isValid}");
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
+      _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンが有効ではありません。ログインページに戻ります。");
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _logger, _userRolesUseCase);
       return;
     }
     // ユーザー権限一覧を取得
@@ -82,18 +87,20 @@ public partial class LoadingPage : ContentPage
     {
       isValid = false;
     }
-    System.Diagnostics.Debug.WriteLine($"Token有効後のisValid = {isValid}");
+
     if (isValid)
     {
       if (user != null) _statusUseCase.SetUserInfo(user);
       MainThread.BeginInvokeOnMainThread(() =>
       {
+        _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
         MauiApp.Current!.Windows[0].Page = new AppShell();
       });
     }
     else
     {
-      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase);
+      _logger.SystemWarning(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
+      MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _logger, _userRolesUseCase);
     }
   }
 }

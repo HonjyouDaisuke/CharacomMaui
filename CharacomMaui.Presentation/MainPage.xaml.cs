@@ -13,10 +13,16 @@ public partial class MainPage : ContentPage
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly AppStatusUseCase _statusUseCase;
+  private readonly IAppLogger _logger;
   private readonly FetchUserRolesUseCase _userRolesUseCase;
   private bool _isLoginProcessing = false;
 
-  public MainPage(IGetUserInfoUseCase userUseCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
+  public MainPage(
+    IGetUserInfoUseCase userUseCase,
+    AppStatusUseCase statusUseCase,
+    IAppTokenStorageService tokenStorage,
+    IAppLogger logger,
+    FetchUserRolesUseCase userRolesUseCase)
   {
     try
     {
@@ -29,6 +35,7 @@ public partial class MainPage : ContentPage
       _userUseCase = userUseCase;
       _userRolesUseCase = userRolesUseCase;
       _statusUseCase = statusUseCase;
+      _logger = logger;
       _tokenStorage = tokenStorage;
     }
     catch (Exception ex)
@@ -47,11 +54,12 @@ public partial class MainPage : ContentPage
     {
       if (sender is VisualElement button) button.IsEnabled = false; //UIをロック
 
-
+      _logger.UserAction("", this.GetType().Name, "ログイン", "ログイン処理を開始します。");
       LogEditor.Text += "ログイン処理を開始...\n";
       var res = await _boxLoginViewModel.LoginAsync();
       if (res == null)
       {
+        _logger.UserAction("", this.GetType().Name, "ログイン", "ログインに失敗しました。");
         LogEditor.Text += "ログインに失敗しました。。。\n";
         return;
       }
@@ -78,9 +86,11 @@ public partial class MainPage : ContentPage
       // 失敗終了（早期リターン）
       if (!success)
       {
+        _logger.SystemWarning(user.id, this.GetType().Name, "ログイン", "ユーザー情報登録に失敗しました。");
         LogEditor.Text += "ユーザー情報保存に失敗\n";
         return;
       }
+      _logger.UserAction(appUser.Id, this.GetType().Name, "ログイン", "ユーザーを作成しました。", new { appUser.Name });
 
       LogEditor.Text += "ユーザー情報を保存しました...\n";
       var tokens = await _tokenStorage.GetTokensAsync();
@@ -88,6 +98,7 @@ public partial class MainPage : ContentPage
       LogEditor.Text += $"app AccessToken = {accessToken}\n";
       // ユーザー権限一覧を取得
       await _userRolesUseCase.ExecuteAsync(accessToken!);
+      _logger.SystemInfo(appUser.Id, this.GetType().Name, "ログイン", "ユーザー情報詳細を取得しました。", new { appUser.Name });
 
       var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
       _statusUseCase.SetUserInfo(userInfo);
@@ -103,7 +114,7 @@ public partial class MainPage : ContentPage
     catch (Exception ex)
     {
       LogEditor.Text += $"エラーが発生しました：{ex.Message}\n";
-      System.Diagnostics.Debug.WriteLine($"[Login Error] {ex.Message}");
+      _logger.UserActionError(ex, "", this.GetType().Name, "ログイン", "ログイン中にエラーが発生しました。");
     }
     finally
     {

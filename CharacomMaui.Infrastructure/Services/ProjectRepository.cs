@@ -14,12 +14,16 @@ namespace CharacomMaui.Infrastructure.Services;
 public class ProjectRepository : IProjectRepository
 {
   private readonly HttpClient _http;
+  private readonly IAppLogger _logger;
+  private readonly AppStatus _appStatus;
 
-  public ProjectRepository(HttpClient http)
+  public ProjectRepository(HttpClient http, IAppLogger logger, AppStatus appStatus)
   {
     _http = http;
     if (_http.BaseAddress == null)
       throw new Exception("HttpClient.BaseAddress is NULL");
+    _logger = logger;
+    _appStatus = appStatus;
   }
 
   public async Task<SimpleApiResult> CreateOrUpdateProjectAsync(string accessToken, Project project)
@@ -33,20 +37,19 @@ public class ProjectRepository : IProjectRepository
       project_folder_id = project.FolderId,
       chara_folder_id = project.CharaFolderId,
     });
-    System.Diagnostics.Debug.WriteLine($"更新するデータ：名前{project.Name} 説明{project.Description}");
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateOrUpdateProject, "[API]プロジェクトの新規作成/更新", "プロジェクトの新規作成または更新を行います。", new { project.Id, project.Name, project.Description });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.CreateOrUpdateProject, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------create Project server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
+
     try
     {
       var root = JsonDocument.Parse(responseBody).RootElement;
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        System.Diagnostics.Debug.WriteLine("こっち");
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateOrUpdateProject, "[API]プロジェクトの新規作成/更新", "プロジェクトの新規作成または更新に成功しました。", new { project.Id, project.Name, project.Description });
         return new SimpleApiResult
         {
           Success = true,
@@ -54,9 +57,8 @@ public class ProjectRepository : IProjectRepository
         };
       }
 
-
       var message = root.GetProperty("message").GetString();
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.CreateOrUpdateProject, "[API]プロジェクトの新規作成/更新", "プロジェクトの新規作成または更新に失敗しました。", new { project.Id, project.Name, project.Description, message });
       return new SimpleApiResult
       {
         Success = false,
@@ -65,6 +67,7 @@ public class ProjectRepository : IProjectRepository
     }
     catch (Exception ex)
     {
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.CreateOrUpdateProject, "[API]プロジェクトの新規作成/更新", new { project.Id, project.Name, project.Description });
       return new SimpleApiResult
       {
         Success = false,
@@ -79,12 +82,11 @@ public class ProjectRepository : IProjectRepository
     {
       token = accessToken,
     });
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserProjects, "[API]プロジェクト取得", "関与するプロジェクトを取得します。");
 
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.GetUserProjects, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
     var response = JsonDocument.Parse(responseBody);
 
     var list = response.RootElement
@@ -92,6 +94,8 @@ public class ProjectRepository : IProjectRepository
         .EnumerateArray()
         .Select(x => x.GetProperty("project_id").GetString())
         .ToList();
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserProjects, "[API]プロジェクト取得", "関与するプロジェクトを取得しました。", new { list.Count });
+
     return list;
   }
 
@@ -102,11 +106,10 @@ public class ProjectRepository : IProjectRepository
       token = accessToken,
     });
 
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserProjects, "[API]プロジェクト取得", "関与するプロジェクトを取得します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.GetUserProjects, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------User Projects server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
     var response = JsonDocument.Parse(responseBody);
 
     var options = new JsonSerializerOptions
@@ -129,6 +132,7 @@ public class ProjectRepository : IProjectRepository
         CharaCount = x.CharaCount,
         UserCount = x.UserCount
     })];
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserProjects, "[API]プロジェクト情報取得", "関与するプロジェクト情報を取得しました。", new { projects.Count });
 
     return projects;
   }
@@ -141,11 +145,14 @@ public class ProjectRepository : IProjectRepository
       project_id = projectId,
     });
 
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", "プロジェクトを削除します。", new { projectId });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.ProjectDelete, content);
     if (!res.IsSuccessStatusCode)
     {
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", "プロジェクトの削除中にHTTPエラーが発生しました。", new { res.StatusCode });
+
       return new SimpleApiResult
       {
         Success = false,
@@ -154,15 +161,13 @@ public class ProjectRepository : IProjectRepository
     }
 
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------delete Project server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
     try
     {
       var root = JsonDocument.Parse(responseBody).RootElement;
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        System.Diagnostics.Debug.WriteLine("こっち");
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", "プロジェクトの削除に成功しました", new { projectId });
         return new SimpleApiResult
         {
           Success = true,
@@ -173,7 +178,7 @@ public class ProjectRepository : IProjectRepository
         ? msgProp.GetString()
         : "不明なエラー";
 
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", "プロジェクトの削除中にサーバー側でエラーが発生しました。", new { projectId, message });
       return new SimpleApiResult
       {
         Success = false,
@@ -182,6 +187,7 @@ public class ProjectRepository : IProjectRepository
     }
     catch (Exception ex)
     {
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.ProjectDelete, "[API]プロジェクトの削除", new { projectId });
       return new SimpleApiResult
       {
         Success = false,
@@ -196,15 +202,16 @@ public class ProjectRepository : IProjectRepository
       token = accessToken,
       project_id = projectId,
     });
-
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetProjectDetails, "[API]プロジェクト詳細の取得", "プロジェクト詳細を取得します。", new { projectId });
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.GetProjectDetails, content);
-    if (!res.IsSuccessStatusCode) return null;
+    if (!res.IsSuccessStatusCode)
+    {
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetProjectDetails, "[API]プロジェクト詳細の取得", "HTTPエラーでプロジェクト詳細を取得できませんでした。", new { projectId, res.StatusCode });
+      return null;
+    }
     var responseBody = await res.Content.ReadAsStringAsync();
-
-    System.Diagnostics.Debug.WriteLine("----------GetProjectDetails server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
 
     var options = new JsonSerializerOptions
     {
@@ -215,9 +222,14 @@ public class ProjectRepository : IProjectRepository
         JsonSerializer.Deserialize<ProjectDetailsResponse>(responseBody, options);
 
     if (apiResponse == null || !apiResponse.Success || apiResponse.Data == null)
+    {
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetProjectDetails, "[API]プロジェクト詳細の取得", "サーバーからのレスポンスがありません。", new { projectId });
       return null;
+    }
+
 
     var d = apiResponse.Data;
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetProjectDetails, "[API]プロジェクト詳細の取得", "プロジェクト詳細を取得しました。", new { projectId, d.Name });
 
     // Domain / ViewModel 用 Project に変換
     return new ProjectDetails

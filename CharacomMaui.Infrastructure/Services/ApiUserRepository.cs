@@ -15,12 +15,16 @@ namespace CharacomMaui.Infrastructure.Services;
 public class ApiUserRepository : IUserRepository
 {
   private readonly HttpClient _http;
+  private readonly AppStatus _appStatus;
+  private readonly IAppLogger _logger;
 
-  public ApiUserRepository(HttpClient http)
+  public ApiUserRepository(HttpClient http, AppStatus appStatus, IAppLogger logger)
   {
     _http = http;
     if (_http.BaseAddress == null)
       throw new Exception("HttpClient.BaseAddress is NULL");
+    _appStatus = appStatus;
+    _logger = logger;
   }
 
   public async Task<AppTokenResult> CreateUserAsync(AppUser user)
@@ -35,21 +39,20 @@ public class ApiUserRepository : IUserRepository
       box_access_token = user.BoxAccessToken,
       box_refresh_token = user.BoxRefreshToken
     });
-
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザーを作成します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
     var res = await _http.PostAsync(ApiEndpoints.CreateUser, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("---------- Create User server res--------------");
-    System.Diagnostics.Debug.WriteLine($"PictureUrl = {user.PictureUrl}");
-    System.Diagnostics.Debug.WriteLine(responseBody);
+
     try
     {
       var root = JsonDocument.Parse(responseBody).RootElement;
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        System.Diagnostics.Debug.WriteLine("こっち");
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザー情報作成しに成功しました。");
+
         return new AppTokenResult
         {
           Success = true,
@@ -62,15 +65,17 @@ public class ApiUserRepository : IUserRepository
 
 
       var message = root.GetProperty("message").GetString();
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザー情報作成時にサーバーでエラーが発生しました。", new { message });
       return new AppTokenResult
       {
         Success = false,
         Message = $"サーバーエラー: {message}",
       };
     }
-    catch
+    catch (Exception ex)
     {
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成");
+
       return new AppTokenResult
       {
         Success = false,
@@ -85,20 +90,17 @@ public class ApiUserRepository : IUserRepository
     {
       token = accessToken,
     });
-
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー一覧", "ユーザー一覧を取得します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
       var res = await _http.PostAsync(ApiEndpoints.GetUserList, content);
       var responseBody = await res.Content.ReadAsStringAsync();
-      System.Diagnostics.Debug.WriteLine("---------- User List server res--------------");
-      System.Diagnostics.Debug.WriteLine(responseBody);
-
       var response = JsonDocument.Parse(responseBody).RootElement;
       var success = response.GetProperty("success").GetBoolean();
       if (!success)
       {
-        System.Diagnostics.Debug.WriteLine("success = Falseだよ");
+        _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー一覧", "ユーザー一覧の取得に失敗しました。");
         return null;
       }
 
@@ -114,11 +116,13 @@ public class ApiUserRepository : IUserRepository
           RoleId = item.GetProperty("role_id").GetString(),
         });
       }
+      _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー一覧", "ユーザー一覧を取得しました。");
+
       return users;
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"想定外のエラー: {ex.Message}");
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.GetUserList, "[API]ユーザー一覧");
       return new List<AppUser>();
     }
 
@@ -130,21 +134,23 @@ public class ApiUserRepository : IUserRepository
     {
       token = accessToken,
     });
-
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserInfo, "[API]ユーザー情報取得", "ユーザー情報を取得します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.GetUserInfo, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------User Info server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
 
     var response = JsonDocument.Parse(responseBody).RootElement;
     var success = response.GetProperty("success").GetBoolean();
     if (!success)
     {
-      System.Diagnostics.Debug.WriteLine("success = Falseだよ");
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetUserInfo, "[API]ユーザー情報取得", "ユーザー情報取得に失敗しました。");
       return null;
     }
-
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetUserInfo, "[API]ユーザー情報取得", "ユーザー情報を取得しました。",
+      new
+      {
+        RoleId = response.GetProperty("role_id").GetString(),
+      });
     return new AppUser
     {
       Id = response.GetProperty("id").GetString(),
@@ -163,11 +169,11 @@ public class ApiUserRepository : IUserRepository
       user_email = userEmail,
       avatar_url = avatarUrl,
     });
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新します。");
+
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.UpdateUserInfo, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------Update User Info server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
 
     try
     {
@@ -175,7 +181,7 @@ public class ApiUserRepository : IUserRepository
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        System.Diagnostics.Debug.WriteLine("こっち");
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報を更新しました。");
         return new SimpleApiResult
         {
           Success = true,
@@ -185,7 +191,8 @@ public class ApiUserRepository : IUserRepository
 
 
       var message = root.GetProperty("message").GetString();
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新", "ユーザー情報更新に失敗しました。", new { message });
+
       return new SimpleApiResult
       {
         Success = false,
@@ -194,6 +201,7 @@ public class ApiUserRepository : IUserRepository
     }
     catch (Exception ex)
     {
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserInfo, "[API]ユーザー情報更新");
       return new SimpleApiResult
       {
         Success = false,
@@ -210,11 +218,11 @@ public class ApiUserRepository : IUserRepository
       user_id = userId,
       user_role_id = userRoleId,
     });
+    _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー権限の更新", "ユーザー権限を更新します。");
+
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     var res = await _http.PostAsync(ApiEndpoints.UpdateUserRole, content);
     var responseBody = await res.Content.ReadAsStringAsync();
-    System.Diagnostics.Debug.WriteLine("----------Update UserRole server res--------------");
-    System.Diagnostics.Debug.WriteLine(responseBody);
 
     try
     {
@@ -222,7 +230,7 @@ public class ApiUserRepository : IUserRepository
 
       if (root.TryGetProperty("success", out var successProp) && successProp.GetBoolean())
       {
-        System.Diagnostics.Debug.WriteLine("こっち");
+        _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー権限の更新", "権限の更新に成功しました。", new { userRoleId });
         return new SimpleApiResult
         {
           Success = true,
@@ -230,9 +238,10 @@ public class ApiUserRepository : IUserRepository
         };
       }
 
-
       var message = root.GetProperty("message").GetString();
-      System.Diagnostics.Debug.WriteLine($"サーバーエラー: {message}");
+
+      _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー権限の更新", "ユーザー権限の更新に失敗しました。", new { userRoleId, message });
+
       return new SimpleApiResult
       {
         Success = false,
@@ -241,6 +250,7 @@ public class ApiUserRepository : IUserRepository
     }
     catch (Exception ex)
     {
+      _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.UpdateUserRole, "[API]ユーザー権限の更新");
       return new SimpleApiResult
       {
         Success = false,
