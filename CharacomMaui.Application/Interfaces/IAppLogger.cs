@@ -18,7 +18,7 @@ public interface IAppLogger
   /// <param name="action">動作</param>
   /// <param name="message">メッセージ</param>
   /// <param name="data">ログデータ</param>
-  void UserAction(string userId, string screen, string action, string message, object? data = null);
+  Task UserAction(string userId, string screen, string action, string message, object? data = null);
 
   /// <summary>
   /// ユーザーアクションのエラーログを記録します。
@@ -28,7 +28,7 @@ public interface IAppLogger
   /// <param name="screen">画面名</param>
   /// <param name="action">動作</param>
   /// <param name="data">ログデータ</param>
-  void UserActionError(Exception ex, string userId, string screen, string action, object? data = null);
+  Task UserActionError(Exception ex, string userId, string screen, string action, object? data = null);
 
   /// <summary>
   /// システム情報のログを記録します。
@@ -38,7 +38,7 @@ public interface IAppLogger
   /// <param name="action">動作</param>
   /// <param name="message">メッセージ</param>
   /// <param name="data">ログデータ</param>
-  void SystemInfo(string userId, string screen, string action, string message, object? data = null);
+  Task SystemInfo(string userId, string screen, string action, string message, object? data = null);
 
   /// <summary>
   /// システム警告のログを記録します。
@@ -48,7 +48,7 @@ public interface IAppLogger
   /// <param name="action">動作</param>
   /// <param name="message">メッセージ</param>
   /// <param name="data">ログデータ</param>
-  void SystemWarning(string userId, string screen, string action, string message, object? data = null);
+  Task SystemWarning(string userId, string screen, string action, string message, object? data = null);
 
   /// <summary>
   /// システムのエラーログを記録します。
@@ -58,5 +58,5 @@ public interface IAppLogger
   /// <param name="screen">画面名</param>
   /// <param name="action">動作</param>
   /// <param name="data">ログデータ</param>
-  void SystemError(Exception ex, string userId, string screen, string action, object? data = null);
+  Task SystemError(Exception ex, string userId, string screen, string action, object? data = null);
 }

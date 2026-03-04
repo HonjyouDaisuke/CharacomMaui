@@ -1,11 +1,19 @@
 using System;
 using Serilog;
 using CharacomMaui.Application.Interfaces;
+using CharacomMaui.Application.Logging;
+using System.Threading.Tasks;
 
 namespace CharacomMaui.Infrastructure.Logging;
 
 public class SerilogAppLogger : IAppLogger
 {
+  private readonly ILogApiClient _logApiClient;
+
+  public SerilogAppLogger(ILogApiClient logApiClient)
+  {
+    _logApiClient = logApiClient;
+  }
   public void Info(string message, object? data = null)
   {
     if (data is null)
@@ -37,7 +45,7 @@ public class SerilogAppLogger : IAppLogger
   }
 
   // 🔥 ユーザー操作ログ
-  public void UserAction(
+  public async Task UserAction(
       string userId,
       string screen,
       string action,
@@ -53,9 +61,20 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       Timestamp = DateTime.UtcNow
     });
-  }
+    if (userId == "" || userId == null) return;
+    var request = new LogRequest
+    {
+      Level = "User Info",
+      Screen = screen,
+      Action = action,
+      Message = message,
+      Data = data,
+      CorrelationId = Guid.NewGuid().ToString()
+    };
 
-  public void UserActionError(
+    await _logApiClient.SendAsync(request);
+  }
+  public async Task UserActionError(
       Exception ex,
       string userId,
       string screen,
@@ -70,9 +89,20 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       Timestamp = DateTime.UtcNow
     });
+    if (userId == "" || userId == null) return;
+    var request = new LogRequest
+    {
+      Level = "User Error",
+      Screen = screen,
+      Action = action,
+      Data = data,
+      CorrelationId = Guid.NewGuid().ToString()
+    };
+
+    await _logApiClient.SendAsync(request);
   }
 
-  public void SystemInfo(
+  public async Task SystemInfo(
       string userId,
       string screen,
       string action,
@@ -88,8 +118,20 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       Timestamp = DateTime.UtcNow
     });
+    if (userId == "" || userId == null) return;
+    var request = new LogRequest
+    {
+      Level = "System Info",
+      Screen = screen,
+      Action = action,
+      Message = message,
+      Data = data,
+      CorrelationId = Guid.NewGuid().ToString()
+    };
+
+    await _logApiClient.SendAsync(request);
   }
-  public void SystemWarning(
+  public async Task SystemWarning(
       string userId,
       string screen,
       string action,
@@ -105,9 +147,21 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       Timestamp = DateTime.UtcNow
     });
+    if (userId == "" || userId == null) return;
+    var request = new LogRequest
+    {
+      Level = "System Warning",
+      Screen = screen,
+      Action = action,
+      Message = message,
+      Data = data,
+      CorrelationId = Guid.NewGuid().ToString()
+    };
+
+    await _logApiClient.SendAsync(request);
   }
 
-  public void SystemError(
+  public async Task SystemError(
     Exception ex,
     string userId,
     string screen,
@@ -122,5 +176,16 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       Timestamp = DateTime.UtcNow
     });
+    if (userId == "" || userId == null) return;
+    var request = new LogRequest
+    {
+      Level = "System Error",
+      Screen = screen,
+      Action = action,
+      Data = data,
+      CorrelationId = Guid.NewGuid().ToString()
+    };
+
+    await _logApiClient.SendAsync(request);
   }
 }

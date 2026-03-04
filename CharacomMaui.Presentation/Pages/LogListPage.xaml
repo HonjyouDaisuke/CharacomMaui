@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<page:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               x:Class="CharacomMaui.Presentation.Pages.LogListPage"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:material="clr-namespace:UraniumUI.Material.Controls;assembly=UraniumUI.Material"
+               xmlns:page="clr-namespace:CharacomMaui.Presentation"
+               Title="LogListPage">
+  <Shell.TitleView>
+
+    <Grid Padding="0,0,10,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+    </Grid>
+  </Shell.TitleView>
+
+  <!-- ページ全体をGridにする -->
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- 何も置かないダミー -->
+    <BoxView Grid.Row="0"
+             HeightRequest="0"/>
+    <material:DataGrid
+      Grid.Row="1"
+      ItemsSource="{Binding Logs}"
+      VerticalOptions="Fill"
+      HorizontalOptions="Fill"
+      HeightRequest="600">
+
+      <material:DataGrid.Columns>
+
+        <material:DataGridColumn
+          ValueBinding="{Binding CreatedAt}"
+          Title="日時"/>
+
+        <material:DataGridColumn
+          ValueBinding="{Binding Level}"
+          Title="Level"/>
+
+        <material:DataGridColumn
+          ValueBinding="{Binding Screen}"
+          Title="画面"/>
+
+        <material:DataGridColumn
+          ValueBinding="{Binding Action}"
+          Title="操作"/>
+
+        <material:DataGridColumn
+          ValueBinding="{Binding Message}"
+          Title="メッセージ"/>
+
+      </material:DataGrid.Columns>
+
+    </material:DataGrid>
+
+  </Grid>
+
+</page:BasePage>

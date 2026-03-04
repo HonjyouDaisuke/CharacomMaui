@@ -95,7 +95,12 @@
       ContentTemplate="{DataTemplate pages:HomePage}"
       Route="HomePage"/>
   </FlyoutItem>
-
+  <FlyoutItem Title="ログ情報（管理者のみ）"
+              Icon="{AppThemeBinding Light=log_icon_light.png, Dark=log_icon_dark.png}">
+    <ShellContent
+      ContentTemplate="{DataTemplate pages:LogListPage}"
+      Route="LogListPage"/>
+  </FlyoutItem>
   <Shell.FlyoutFooter>
     <VerticalStackLayout>
       <Label Text="Characom Maui"

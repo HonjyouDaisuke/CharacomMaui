@@ -3,6 +3,8 @@ using CharacomMaui.Infrastructure.Services;
 using CharacomMaui.Presentation.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using CharacomMaui.Application.Logging;
+using CharacomMaui.Infrastructure.Logging;
 
 namespace CharacomMaui.Presentation.DependencyInjection;
 
@@ -25,6 +27,8 @@ public static class ApiClientRegistration
     services.AddHttpClient<IProjectRolesRepository, ProjectRolesRepository>(ConfigureClient);
     services.AddHttpClient<IUserProjectsRepository, UserProjectsRepository>(ConfigureClient);
     services.AddHttpClient<INotificationsRepository, NotificationsRepository>(ConfigureClient);
+    services.AddHttpClient<ILogApiClient, LogApiClient>(ConfigureClient);
+    services.AddHttpClient<ILogQueryService, LogQueryService>(ConfigureClient);
     return services;
   }
 
