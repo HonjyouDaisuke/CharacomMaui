@@ -21,6 +21,7 @@ public partial class LogListPage : BasePage
     _appLog = appLog;
     _viewModel = viewModel;
     BindingContext = _viewModel;
+
   }
   protected override async void OnAppearing()
   {

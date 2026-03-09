@@ -31,17 +31,18 @@ public class LogQueryService : ILogQueryService
     _logger = logger;
   }
 
-  public async Task<List<LogDto>> GetLogsAsync(int page = 1)
+  public async Task<List<LogDto>> GetLogsAsync(DateTime targetDate, int page = 1)
   {
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     if (accessToken == null)
       return new List<LogDto>();
+    string dateString = targetDate.ToString("yyyy/MM/dd");
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
-      from = "2026/03/02",
-      to = "2026//03/03",
+      from = dateString,
+      to = dateString,
       page = page,
     });
     // _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザーを作成します。");

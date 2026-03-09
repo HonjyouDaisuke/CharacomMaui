@@ -20,7 +20,7 @@ public partial class ChartPage : ContentPage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    var logs = await _appLog.GetLogsAsync();
+    var logs = await _appLog.GetLogsAsync(DateTime.Today);
 
     foreach (LogDto log in logs)
     {
