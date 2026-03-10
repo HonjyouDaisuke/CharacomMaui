@@ -31,19 +31,20 @@ public class LogQueryService : ILogQueryService
     _logger = logger;
   }
 
-  public async Task<List<LogDto>> GetLogsAsync(DateTime targetDate, int page = 1)
+  public async Task<LogQueryResult> GetLogsAsync(DateTime targetDate, int limit = 50, int page = 1)
   {
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     if (accessToken == null)
-      return new List<LogDto>();
+      return new LogQueryResult();
     string dateString = targetDate.ToString("yyyy/MM/dd");
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,
       from = dateString,
       to = dateString,
-      page = page,
+      limit,
+      page,
     });
     // _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザーを作成します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -51,6 +52,7 @@ public class LogQueryService : ILogQueryService
     {
       var res = await _http.PostAsync(ApiEndpoints.GetLogs, content);
       var responseBody = await res.Content.ReadAsStringAsync();
+      System.Diagnostics.Debug.WriteLine(responseBody);
       var response = JsonDocument.Parse(responseBody).RootElement;
 
       var success = response.GetProperty("success").GetBoolean();
@@ -60,6 +62,7 @@ public class LogQueryService : ILogQueryService
         return null;
       }
 
+      int logsCount = response.GetProperty("logs_count").GetInt32();
       var logs = new List<LogDto>();
       foreach (var item in response.GetProperty("logs").EnumerateArray())
       {
@@ -76,12 +79,17 @@ public class LogQueryService : ILogQueryService
       }
       await _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetLogs, "[API]ログ取得", "ログを取得しました。");
 
-      return logs;
+      return new LogQueryResult
+      {
+        LogsCount = logsCount,
+        Logs = logs
+      };
     }
     catch (Exception ex)
     {
       await _logger.SystemError(ex, _appStatus.UserId, ApiEndpoints.GetLogs, "[API]ログ取得");
-      return new List<LogDto>();
+
+      return new LogQueryResult();
     }
   }
 }

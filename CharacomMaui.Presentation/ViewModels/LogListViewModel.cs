@@ -35,6 +35,9 @@ public class LogListViewModel : INotifyPropertyChanged
         "System Info"
   ];
   private int page = 1;
+  private int totalPages = 1;
+  private const int PageSize = 50;
+
   private string _selectedLevel = "All";
   public string SelectedLevel
   {
@@ -69,7 +72,19 @@ public class LogListViewModel : INotifyPropertyChanged
       OnPropertyChanged(nameof(IsNotLoading));
     }
   }
+  private bool _canGoNext;
+  public bool CanGoNext
+  {
+    get => _canGoNext;
+    set => SetProperty(ref _canGoNext, value);
+  }
 
+  private bool _canGoPrev;
+  public bool CanGoPrev
+  {
+    get => _canGoPrev;
+    set => SetProperty(ref _canGoPrev, value);
+  }
   public bool IsNotLoading => !IsLoading;
   public ICommand ClearFilterCommand => new Command(ClearFilter);
   public ICommand NextButtonCommand => new Command(NextPage);
@@ -80,9 +95,14 @@ public class LogListViewModel : INotifyPropertyChanged
     SelectedDate = DateTime.Today;
     ApplyFilter();
   }
-
+  private void UpdatePagingState()
+  {
+    CanGoNext = page < totalPages;
+    CanGoPrev = page > 1;
+  }
   private async void NextPage()
   {
+    if (page >= totalPages) return;
     page++;
     await ReloadLogsAsync();
   }
@@ -93,26 +113,34 @@ public class LogListViewModel : INotifyPropertyChanged
     page--;
     await ReloadLogsAsync();
   }
+
   private async Task ReloadLogsAsync()
   {
     IsLoading = true;
-    var result = await _logQueryService.GetLogsAsync(SelectedDate, page);
+    var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize, page);
 
-    _allLogs = result.ToList();
-
+    _allLogs = result.Logs;
+    totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
     ApplyFilter();
+    UpdatePagingState();
     IsLoading = false;
+
+    System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
   }
   public async Task LoadAsync()
   {
     IsLoading = true;
-    var result = await _logQueryService.GetLogsAsync(SelectedDate);
+    var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize);
     if (result == null) return;
 
-    _allLogs = result.ToList();
+    _allLogs = result.Logs;
+    totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
     page = 1;
     ApplyFilter();
+    UpdatePagingState();
     IsLoading = false;
+
+    System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
   }
 
   private void ApplyFilter()

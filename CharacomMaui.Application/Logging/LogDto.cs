@@ -11,3 +11,9 @@ public class LogDto
   public string CreatedAt { get; set; } = string.Empty;
 
 }
+
+public class LogQueryResult
+{
+  public int LogsCount { get; set; }
+  public List<LogDto> Logs { get; set; } = new();
+}

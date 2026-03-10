@@ -135,9 +135,11 @@
         </Border>
         <Button Grid.Column="5"
                 Text="戻る"
+                IsEnabled="{Binding CanGoPrev}"
                 Command="{Binding PrevButtonCommand}"/>
         <Button Grid.Column="6"
                 Text="次へ"
+                IsEnabled="{Binding CanGoNext}"
                 Command="{Binding NextButtonCommand}"/>
         <!-- Clear -->
         <Button Grid.Column="7"
@@ -150,6 +152,8 @@
     <dg:DataGrid
       Grid.Row="1"
       ItemsSource="{Binding Logs}"
+      RowHeight="40"
+      HeaderHeight="45"
       BorderColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
       BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
       HeaderBackground="{AppThemeBinding Light={DynamicResource SurfaceVariant}, Dark={DynamicResource SurfaceVariantDark}}"
@@ -162,14 +166,12 @@
                            Width="200">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-                <Label
-                  Text="{Binding CreatedAt}"
-                  VerticalTextAlignment="Center"
-                  Style="{StaticResource LogTextStyle}"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding CreatedAt}"
+                VerticalTextAlignment="Center"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>
@@ -178,44 +180,40 @@
                            Width="180">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-                <Label
-                  Text="{Binding Level}"
-                  Style="{StaticResource LogTextStyle}"
-                  VerticalTextAlignment="Center"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding Level}"
+                Style="{StaticResource LogTextStyle}"
+                VerticalTextAlignment="Center"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>
+
         <dg:DataGridColumn Title="UserID"
                            Width="180">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-                <Label
-                  Text="{Binding UserId}"
-                  Style="{StaticResource LogTextStyle}"
-                  VerticalTextAlignment="Center"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding UserId}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>
+
         <dg:DataGridColumn Title="画面"
                            Width="*">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-                <Label
-                  Text="{Binding Screen}"
-                  Style="{StaticResource LogTextStyle}"
-                  VerticalTextAlignment="Center"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding Screen}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>
@@ -224,15 +222,12 @@
                            Width="*">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-
-                <Label
-                  Text="{Binding Action}"
-                  Style="{StaticResource LogTextStyle}"
-                  VerticalTextAlignment="Center"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding Action}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>
@@ -241,14 +236,12 @@
                            Width="*">
           <dg:DataGridColumn.CellTemplate>
             <DataTemplate>
-              <Grid Padding="10,0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
-                <Label
-                  Text="{Binding Message}"
-                  Style="{StaticResource LogTextStyle}"
-                  VerticalTextAlignment="Center"
-                  HorizontalTextAlignment="Start"/>
-              </Grid>
+              <Label
+                Text="{Binding Message}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
             </DataTemplate>
           </dg:DataGridColumn.CellTemplate>
         </dg:DataGridColumn>

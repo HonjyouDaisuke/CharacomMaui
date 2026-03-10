@@ -20,9 +20,9 @@ public partial class ChartPage : ContentPage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    var logs = await _appLog.GetLogsAsync(DateTime.Today);
+    var res = await _appLog.GetLogsAsync(DateTime.Today);
 
-    foreach (LogDto log in logs)
+    foreach (LogDto log in res.Logs)
     {
       System.Diagnostics.Debug.WriteLine($" Id = {log.Id}");
       System.Diagnostics.Debug.WriteLine($" UserId = {log.UserId}");

@@ -2,5 +2,5 @@ namespace CharacomMaui.Application.Logging;
 
 public interface ILogQueryService
 {
-  Task<List<LogDto>> GetLogsAsync(DateTime targetDate, int page = 1);
+  Task<LogQueryResult> GetLogsAsync(DateTime targetDate, int limit = 50, int page = 1);
 }
