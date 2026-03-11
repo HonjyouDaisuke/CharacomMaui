@@ -148,6 +148,14 @@ public class LogListViewModel : INotifyPropertyChanged
     try
     {
       var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize, page);
+      if (result == null)
+      {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+          IsLoading = false;
+        });
+        return;
+      }
       _allLogs = result.Logs;
       totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
 

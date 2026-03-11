@@ -78,7 +78,7 @@ public static class ServicesRegistration
     services.AddSingleton<TitleBarViewModel>();
     services.AddSingleton<CharaSelectViewModel>();
     services.AddSingleton<UserListViewModel>();
-    services.AddTransient<LogListViewModel>();
+    services.AddSingleton<LogListViewModel>();
 
     // Domain Service
     services.AddSingleton<AppStatus>();

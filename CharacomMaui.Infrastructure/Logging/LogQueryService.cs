@@ -57,7 +57,7 @@ public class LogQueryService : ILogQueryService
       if (!success)
       {
         await _logger.SystemWarning(_appStatus.UserId, ApiEndpoints.GetLogs, "[API]ログ取得", "ログの取得に失敗しました。");
-        return null;
+        return new LogQueryResult();
       }
 
       int logsCount = response.GetProperty("logs_count").GetInt32();
@@ -66,14 +66,14 @@ public class LogQueryService : ILogQueryService
       {
         logs.Add(new LogDto
         {
-          Id = item.GetProperty("id").GetString(),
-          UserId = item.GetProperty("user_id").GetString(),
-          Level = item.GetProperty("level").GetString(),
-          Screen = item.GetProperty("screen").GetString(),
-          Action = item.GetProperty("action").GetString(),
-          Message = item.GetProperty("message").GetString(),
-          Data = item.GetProperty("data").GetString(),
-          CreatedAt = item.GetProperty("created_at").GetString(),
+          Id = item.GetProperty("id").GetString() ?? string.Empty,
+          UserId = item.GetProperty("user_id").GetString() ?? string.Empty,
+          Level = item.GetProperty("level").GetString() ?? string.Empty,
+          Screen = item.GetProperty("screen").GetString() ?? string.Empty,
+          Action = item.GetProperty("action").GetString() ?? string.Empty,
+          Message = item.GetProperty("message").GetString() ?? string.Empty,
+          Data = item.GetProperty("data").GetString() ?? string.Empty,
+          CreatedAt = item.GetProperty("created_at").GetString() ?? string.Empty,
         });
       }
       await _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.GetLogs, "[API]ログ取得", "ログを取得しました。");
