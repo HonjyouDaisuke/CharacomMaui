@@ -71,8 +71,15 @@ public class SerilogAppLogger : IAppLogger
       Data = data,
       CorrelationId = Guid.NewGuid().ToString()
     };
+    try
+    {
+      await _logApiClient.SendAsync(request);
+    }
+    catch
+    {
+      System.Diagnostics.Debug.WriteLine("Failed to send log to API");
+    }
 
-    await _logApiClient.SendAsync(request);
   }
   public async Task UserActionError(
       Exception ex,
@@ -87,6 +94,7 @@ public class SerilogAppLogger : IAppLogger
       Screen = screen,
       Action = action,
       Data = data,
+      Message = ex.Message,
       Timestamp = DateTime.UtcNow
     });
     if (userId == "" || userId == null) return;
@@ -96,10 +104,18 @@ public class SerilogAppLogger : IAppLogger
       Screen = screen,
       Action = action,
       Data = data,
+      Message = ex.Message,
       CorrelationId = Guid.NewGuid().ToString()
     };
 
-    await _logApiClient.SendAsync(request);
+    try
+    {
+      await _logApiClient.SendAsync(request);
+    }
+    catch
+    {
+      System.Diagnostics.Debug.WriteLine("Failed to send log to API");
+    }
   }
 
   public async Task SystemInfo(
@@ -129,7 +145,14 @@ public class SerilogAppLogger : IAppLogger
       CorrelationId = Guid.NewGuid().ToString()
     };
 
-    await _logApiClient.SendAsync(request);
+    try
+    {
+      await _logApiClient.SendAsync(request);
+    }
+    catch
+    {
+      System.Diagnostics.Debug.WriteLine("Failed to send log to API");
+    }
   }
   public async Task SystemWarning(
       string userId,
@@ -173,6 +196,7 @@ public class SerilogAppLogger : IAppLogger
       UserId = userId,
       Screen = screen,
       Action = action,
+      Message = ex.Message,
       Data = data,
       Timestamp = DateTime.UtcNow
     });
@@ -182,10 +206,18 @@ public class SerilogAppLogger : IAppLogger
       Level = "System Error",
       Screen = screen,
       Action = action,
+      Message = ex.Message,
       Data = data,
       CorrelationId = Guid.NewGuid().ToString()
     };
 
-    await _logApiClient.SendAsync(request);
+    try
+    {
+      await _logApiClient.SendAsync(request);
+    }
+    catch
+    {
+      System.Diagnostics.Debug.WriteLine("Failed to send log to API");
+    }
   }
 }
