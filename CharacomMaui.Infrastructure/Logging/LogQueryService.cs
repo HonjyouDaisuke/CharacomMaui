@@ -46,13 +46,11 @@ public class LogQueryService : ILogQueryService
       limit,
       page,
     });
-    // _logger.SystemInfo(_appStatus.UserId, ApiEndpoints.CreateUser, "[API]ユーザー作成", "ユーザーを作成します。");
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
       var res = await _http.PostAsync(ApiEndpoints.GetLogs, content);
       var responseBody = await res.Content.ReadAsStringAsync();
-      System.Diagnostics.Debug.WriteLine(responseBody);
       var response = JsonDocument.Parse(responseBody).RootElement;
 
       var success = response.GetProperty("success").GetBoolean();
@@ -74,6 +72,7 @@ public class LogQueryService : ILogQueryService
           Screen = item.GetProperty("screen").GetString(),
           Action = item.GetProperty("action").GetString(),
           Message = item.GetProperty("message").GetString(),
+          Data = item.GetProperty("data").GetString(),
           CreatedAt = item.GetProperty("created_at").GetString(),
         });
       }

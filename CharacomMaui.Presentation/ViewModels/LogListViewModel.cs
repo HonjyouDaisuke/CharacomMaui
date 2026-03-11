@@ -3,7 +3,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Views;
 using CharacomMaui.Application.Logging;
+using CharacomMaui.Presentation.Dialogs;
+using UraniumUI.Dialogs;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -19,6 +23,12 @@ public class LogListViewModel : INotifyPropertyChanged
   public LogListViewModel(ILogQueryService logQueryService)
   {
     _logQueryService = logQueryService;
+    SelectedDate = DateTime.Today;
+    SelectedLevel = "All";
+
+    NextButtonCommand = new Command(NextPage);
+    PrevButtonCommand = new Command(PrevPage);
+
     SelectedDate = DateTime.Today;
     SelectedLevel = "All";
   }
@@ -62,6 +72,13 @@ public class LogListViewModel : INotifyPropertyChanged
       }
     }
   }
+
+  private LogDto _selectedLog;
+  public LogDto SelectedLog
+  {
+    get => _selectedLog;
+    set => SetProperty(ref _selectedLog, value);
+  }
   private bool _isLoading;
   public bool IsLoading
   {
@@ -87,8 +104,17 @@ public class LogListViewModel : INotifyPropertyChanged
   }
   public bool IsNotLoading => !IsLoading;
   public ICommand ClearFilterCommand => new Command(ClearFilter);
-  public ICommand NextButtonCommand => new Command(NextPage);
-  public ICommand PrevButtonCommand => new Command(PrevPage);
+  public ICommand NextButtonCommand { get; }
+  public ICommand PrevButtonCommand { get; }
+  public ICommand RowTappedCommand => new Command(OnRowTap);
+  public event Action<LogDto>? ShowLogDetailRequested;
+  private async void OnRowTap()
+  {
+    if (SelectedLog == null)
+      return;
+
+    ShowLogDetailRequested?.Invoke(SelectedLog);
+  }
   private void ClearFilter()
   {
     SelectedLevel = "All";
@@ -99,6 +125,8 @@ public class LogListViewModel : INotifyPropertyChanged
   {
     CanGoNext = page < totalPages;
     CanGoPrev = page > 1;
+    (NextButtonCommand as Command)?.ChangeCanExecute();
+    (PrevButtonCommand as Command)?.ChangeCanExecute();
   }
   private async void NextPage()
   {
@@ -117,30 +145,30 @@ public class LogListViewModel : INotifyPropertyChanged
   private async Task ReloadLogsAsync()
   {
     IsLoading = true;
-    var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize, page);
+    try
+    {
+      var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize, page);
+      _allLogs = result.Logs;
+      totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
 
-    _allLogs = result.Logs;
-    totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
-    ApplyFilter();
-    UpdatePagingState();
-    IsLoading = false;
-
-    System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
+      // UI更新に関わるものを一箇所にまとめる
+      MainThread.BeginInvokeOnMainThread(() =>
+      {
+        ApplyFilter();      // コレクション更新
+        UpdatePagingState(); // ボタン状態更新 (ChangeCanExecute)
+        IsLoading = false;   // ローディング終了
+      });
+    }
+    finally
+    {
+      // 念のため
+      System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
+    }
   }
   public async Task LoadAsync()
   {
-    IsLoading = true;
-    var result = await _logQueryService.GetLogsAsync(SelectedDate, PageSize);
-    if (result == null) return;
-
-    _allLogs = result.Logs;
-    totalPages = (int)Math.Ceiling(result.LogsCount / (double)PageSize);
     page = 1;
-    ApplyFilter();
-    UpdatePagingState();
-    IsLoading = false;
-
-    System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
+    await ReloadLogsAsync();
   }
 
   private void ApplyFilter()

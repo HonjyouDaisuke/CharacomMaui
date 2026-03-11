@@ -8,6 +8,7 @@ public class LogDto
   public string Screen { get; set; } = string.Empty;
   public string Action { get; set; } = string.Empty;
   public string Message { get; set; } = string.Empty;
+  public string Data { get; set; } = string.Empty;
   public string CreatedAt { get; set; } = string.Empty;
 
 }

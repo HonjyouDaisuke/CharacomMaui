@@ -206,8 +206,9 @@ public partial class UserProfileDialog : Popup
 
   private async void OnCancelClicked(object sender, EventArgs e)
   {
-    await CloseAsync();
     await SnackBarService.Warning("キャンセルされました。");
+    await CloseAsync();
+
   }
 
   private void OnAvaterSelectClicked(object sender, EventArgs e)

@@ -91,6 +91,7 @@
 
       <Grid ColumnDefinitions="Auto,200,20,Auto,200,Auto,Auto,Auto"
             ColumnSpacing="10"
+            InputTransparent="{Binding IsLoading}"
             VerticalOptions="Center">
 
         <!-- Level -->
@@ -154,6 +155,8 @@
       ItemsSource="{Binding Logs}"
       RowHeight="40"
       HeaderHeight="45"
+      SelectedItem="{Binding SelectedLog}"
+      RowTappedCommand="{Binding RowTappedCommand}"
       BorderColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
       BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
       HeaderBackground="{AppThemeBinding Light={DynamicResource SurfaceVariant}, Dark={DynamicResource SurfaceVariantDark}}"
