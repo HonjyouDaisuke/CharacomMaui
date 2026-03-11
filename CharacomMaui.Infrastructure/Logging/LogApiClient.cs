@@ -54,7 +54,7 @@ public class LogApiClient : ILogApiClient
       var res = await _http.PostAsync(
           ApiEndpoints.AddLog,
           content);
-      var responseBody = await res.Content.ReadAsStringAsync();
+      res.EnsureSuccessStatusCode();
     }
     catch (Exception ex)
     {
