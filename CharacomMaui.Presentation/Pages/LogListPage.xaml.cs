@@ -37,6 +37,14 @@ public partial class LogListPage : BasePage
   {
     base.OnAppearing();
     System.Diagnostics.Debug.WriteLine("LogListPage Appearing");
-    await _viewModel.LoadAsync();
+    try
+    {
+      await _viewModel.LoadAsync();
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"LoadAsync failed: {ex.Message}");
+      // 必要に応じてユーザーへの通知処理を追加
+    }
   }
 }
