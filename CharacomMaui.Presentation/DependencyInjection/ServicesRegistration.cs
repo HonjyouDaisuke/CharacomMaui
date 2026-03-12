@@ -2,8 +2,10 @@ using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
 using CharacomMaui.Application.Coordinators;
 using CharacomMaui.Application.Sessions;
+using CharacomMaui.Application.Logging;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Services;
+using CharacomMaui.Infrastructure.Logging;
 using CharacomMaui.Presentation.Models;
 using CharacomMaui.Presentation.Pages;
 using CharacomMaui.Presentation.Services;
@@ -76,6 +78,7 @@ public static class ServicesRegistration
     services.AddSingleton<TitleBarViewModel>();
     services.AddSingleton<CharaSelectViewModel>();
     services.AddSingleton<UserListViewModel>();
+    services.AddSingleton<LogListViewModel>();
 
     // Domain Service
     services.AddSingleton<AppStatus>();
@@ -89,6 +92,7 @@ public static class ServicesRegistration
     services.AddSingleton<MainPage>();
     services.AddSingleton<ProjectDetailPage>();
     services.AddSingleton<UserListPage>();
+    services.AddSingleton<LogListPage>();
 
     // その他
     services.AddSingleton<IDialogService, MopupsDialogService>();

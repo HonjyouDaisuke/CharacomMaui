@@ -1,25 +1,20 @@
-﻿using CharacomMaui.Presentation.Components;
-using CharacomMaui.Presentation.Services;
-using CharacomMaui.Presentation.Interfaces;
-using CharacomMaui.Application.Interfaces;
-using CharacomMaui.Application.Models;
-using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Views;
-using CharacomMaui.Presentation.Dialogs;
-
-
+﻿using AuthenticationServices;
+using CharacomMaui.Domain.Entities;
+using CharacomMaui.Presentation.Pages;
 namespace CharacomMaui.Presentation;
 
 public partial class AppShell : Shell
 {
-  public AppShell()
+  private readonly AppStatus _appStatus;
+  public AppShell(AppStatus appStatus)
   {
-
     InitializeComponent();
-    Routing.RegisterRoute("ProjectDetailPage", typeof(Pages.ProjectDetailPage));
+
+    _appStatus = appStatus;
+    AdminLogMenu.IsVisible = IsAdmin;
+    Routing.RegisterRoute(nameof(ProjectDetailPage), typeof(ProjectDetailPage));
   }
-
-
+  public bool IsAdmin => string.Equals(_appStatus.UserRole, "admin",
+          StringComparison.OrdinalIgnoreCase);
 }
 

@@ -101,7 +101,7 @@
   <Color x:Key="OnWarningDark">#9a7f02</Color>
   <Color x:Key="Info">#FF0C334E</Color>
   <Color x:Key="OnInfo">#FFC5D2F3</Color>
-  <Color x:Key="InfoDark">#FFB8B4EB</Color>
+  <Color x:Key="InfoDark">#FFD2D0E9</Color>
   <Color x:Key="OnInfoDark">#FF1A1A39</Color>
   <Color x:Key="Success">#4DA3FF</Color>
   <Color x:Key="OnSuccess">#FFFFFF</Color>

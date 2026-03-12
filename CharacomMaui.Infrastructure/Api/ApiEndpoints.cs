@@ -31,4 +31,6 @@ public static class ApiEndpoints
   public const string GetNotifications = "get_notifications.php";
   public const string UpdateNotificationRead = "update_notification_read.php";
   public const string UpdateNotificationDeleted = "update_notification_deleted.php";
+  public const string AddLog = "add_log.php";
+  public const string GetLogs = "get_logs.php";
 }

@@ -8,18 +8,20 @@
   <ContentPage.ControlTemplate>
     <ControlTemplate>
 
-      <Grid>
+      <Grid RowDefinitions="*">
 
         <!-- ここに子ページの中身が入る -->
-        <ContentPresenter/>
+        <ContentPresenter Grid.Row="0"/>
 
         <BoxView x:Name="Overlay"
+                 Grid.Row="0"
                  BackgroundColor="#80000000"
                  IsVisible="False"
                  Opacity="0"/>
 
         <panel:NotificationsPanel
           x:Name="NotificationPanel"
+          Grid.Row="0"
           IsVisible="False"
           HorizontalOptions="End"
           WidthRequest="300"/>

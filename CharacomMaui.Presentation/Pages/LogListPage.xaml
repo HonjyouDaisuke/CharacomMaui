@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<page:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               x:Class="CharacomMaui.Presentation.Pages.LogListPage"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:dg="clr-namespace:Maui.DataGrid;assembly=Maui.DataGrid"
+               xmlns:uu="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:sys="clr-namespace:System;assembly=netstandard"
+               xmlns:page="clr-namespace:CharacomMaui.Presentation"
+               Title="LogListPage">
+  <Shell.TitleView>
+    <components:TitleBarView/>
+  </Shell.TitleView>
+  <page:BasePage.Resources>
+    <Style x:Key="DataGridHeaderStyle"
+           TargetType="Label">
+      <!-- 文字色 -->
+      <Setter Property="TextColor"
+              Value="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+      <!-- 太字 -->
+      <Setter Property="FontAttributes"
+              Value="Bold"/>
+      <!-- 左右中央 -->
+      <Setter Property="HorizontalTextAlignment"
+              Value="Center"/>
+      <!-- 上下中央 -->
+      <Setter Property="VerticalTextAlignment"
+              Value="Center"/>
+    </Style>
+    <Style x:Key="LogTextStyle"
+           TargetType="Label">
+
+      <!-- デフォルト -->
+      <Setter Property="TextColor"
+              Value="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"/>
+
+      <Style.Triggers>
+
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="User Error">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Error}, Dark={DynamicResource ErrorDark}}"/>
+        </DataTrigger>
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="User Warning">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Warning}, Dark={DynamicResource WarningDark}}"/>
+        </DataTrigger>
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="User Info">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Info}, Dark={DynamicResource InfoDark}}"/>
+        </DataTrigger>
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="System Error">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Error}, Dark={DynamicResource ErrorDark}}"/>
+        </DataTrigger>
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="System Warning">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Warning}, Dark={DynamicResource WarningDark}}"/>
+        </DataTrigger>
+        <DataTrigger TargetType="Label"
+                     Binding="{Binding Level}"
+                     Value="System Info">
+          <Setter Property="TextColor"
+                  Value="{AppThemeBinding Light={DynamicResource Info}, Dark={DynamicResource InfoDark}}"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </page:BasePage.Resources>
+  <Grid RowDefinitions="Auto, *"
+        RowSpacing="10"
+        Margin="10">
+    <Border Grid.Row="0"
+            Padding="10"
+            StrokeShape="RoundRectangle 8"
+            BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}">
+
+      <Grid ColumnDefinitions="Auto,200,20,Auto,200,Auto,Auto,Auto"
+            ColumnSpacing="10"
+            InputTransparent="{Binding IsLoading}"
+            VerticalOptions="Center">
+
+        <!-- Level -->
+        <Label Grid.Column="0"
+               Text="Level"
+               VerticalTextAlignment="Center"/>
+
+        <Border
+          Grid.Column="1"
+          Stroke="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
+          StrokeThickness="1"
+          StrokeShape="RoundRectangle 10"
+          Padding="0">
+
+          <uu:Dropdown
+            Placeholder="All"
+            BorderWidth="0"
+            ItemsSource="{Binding LevelFilters}"
+            SelectedItem="{Binding SelectedLevel, Mode=TwoWay}"/>
+
+        </Border>
+
+        <!-- Date -->
+        <Label Grid.Column="3"
+               Text="Date"
+               VerticalTextAlignment="Center"/>
+
+        <Border
+          Grid.Column="4"
+          Stroke="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
+          StrokeThickness="1"
+          StrokeShape="RoundRectangle 10"
+          Padding="1"
+          BackgroundColor="Transparent">
+
+          <DatePicker
+            Date="{Binding SelectedDate}"
+            Format="yyyy/MM/dd"
+            BackgroundColor="Transparent"
+            Margin="5,20,0,0"/>
+
+        </Border>
+        <Button Grid.Column="5"
+                Text="戻る"
+                IsEnabled="{Binding CanGoPrev}"
+                Command="{Binding PrevButtonCommand}"/>
+        <Button Grid.Column="6"
+                Text="次へ"
+                IsEnabled="{Binding CanGoNext}"
+                Command="{Binding NextButtonCommand}"/>
+        <!-- Clear -->
+        <Button Grid.Column="7"
+                Text="Clear"
+                Command="{Binding ClearFilterCommand}"/>
+
+      </Grid>
+
+    </Border>
+    <dg:DataGrid
+      Grid.Row="1"
+      ItemsSource="{Binding Logs}"
+      RowHeight="40"
+      HeaderHeight="45"
+      SelectedItem="{Binding SelectedLog}"
+      RowTappedCommand="{Binding RowTappedCommand}"
+      BorderColor="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
+      BackgroundColor="{AppThemeBinding Light={DynamicResource Background}, Dark={DynamicResource BackgroundDark}}"
+      HeaderBackground="{AppThemeBinding Light={DynamicResource SurfaceVariant}, Dark={DynamicResource SurfaceVariantDark}}"
+      HeaderLabelStyle="{StaticResource DataGridHeaderStyle}"
+      SelectionMode="Single">
+
+      <dg:DataGrid.Columns>
+
+        <dg:DataGridColumn Title="日時"
+                           Width="200">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding CreatedAt}"
+                VerticalTextAlignment="Center"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+        <dg:DataGridColumn Title="Level"
+                           Width="180">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding Level}"
+                Style="{StaticResource LogTextStyle}"
+                VerticalTextAlignment="Center"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+        <dg:DataGridColumn Title="UserID"
+                           Width="180">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding UserId}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+        <dg:DataGridColumn Title="画面"
+                           Width="*">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding Screen}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+        <dg:DataGridColumn Title="操作"
+                           Width="*">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding Action}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+        <dg:DataGridColumn Title="メッセージ"
+                           Width="*">
+          <dg:DataGridColumn.CellTemplate>
+            <DataTemplate>
+              <Label
+                Text="{Binding Message}"
+                Style="{StaticResource LogTextStyle}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
+                VerticalTextAlignment="Center"
+                HorizontalTextAlignment="Start"/>
+            </DataTemplate>
+          </dg:DataGridColumn.CellTemplate>
+        </dg:DataGridColumn>
+
+
+      </dg:DataGrid.Columns>
+
+    </dg:DataGrid>
+    <!-- Loading Overlay -->
+    <Grid
+      Grid.RowSpan="2"
+      IsVisible="{Binding IsLoading}"
+      BackgroundColor="#80000000">
+
+      <ActivityIndicator
+        IsRunning="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        WidthRequest="50"
+        HeightRequest="50"/>
+
+    </Grid>
+  </Grid>
+</page:BasePage>
