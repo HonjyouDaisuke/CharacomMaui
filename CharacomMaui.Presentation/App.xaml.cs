@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Application.UseCases;
+using CharacomMaui.Domain.Entities;
 using CharacomMaui.Presentation.Services;
 
 namespace CharacomMaui.Presentation;
@@ -9,14 +10,16 @@ public partial class App : Microsoft.Maui.Controls.Application
 {
   private readonly IGetUserInfoUseCase _userUseCase;
   private readonly AppStatusUseCase _statusUseCase;
+  private readonly AppStatus _appStatus;
   private readonly IAppTokenStorageService _tokenStorage;
   private readonly FetchUserRolesUseCase _userRolesUseCase;
   private readonly IAppLogger _logger;
-  public App(IAppLogger logger, IGetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
+  public App(IAppLogger logger, IGetUserInfoUseCase userUserCase, AppStatusUseCase statusUseCase, AppStatus appStatus, IAppTokenStorageService tokenStorage, FetchUserRolesUseCase userRolesUseCase)
   {
     InitializeComponent();
     _userUseCase = userUserCase;
     _statusUseCase = statusUseCase;
+    _appStatus = appStatus;
     _tokenStorage = tokenStorage;
     _userRolesUseCase = userRolesUseCase;
     _logger = logger;
@@ -55,7 +58,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
   protected override Window CreateWindow(IActivationState? activationState)
   {
-    var window = new Window(new LoadingPage(_logger, _userUseCase, _statusUseCase, _tokenStorage, _userRolesUseCase));
+    var window = new Window(new LoadingPage(_logger, _userUseCase, _statusUseCase, _appStatus, _tokenStorage, _userRolesUseCase));
 
     window.Title = "CharacomMaui";  // ← ★ここでタイトルを設定！
     return window;

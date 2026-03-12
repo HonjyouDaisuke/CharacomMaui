@@ -212,7 +212,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     _notifier.IsProxy = true;
     _notifier.FromUserName = fromUserName;
     await SnackBarService.Success($"Proxy Login {newUser.Name} に代理ログインしました。", 500);
-    MauiApp.Current!.Windows[0].Page = new AppShell();
+    MauiApp.Current!.Windows[0].Page = new AppShell(_appStatus);
   }
 
   public async Task ProxyLogoutAsync()
@@ -244,7 +244,7 @@ public class TitleBarViewModel : INotifyPropertyChanged
     SetNotifier(newUser);
     _notifier.IsProxy = false;
     await SnackBarService.Success($"Proxy Logout {newUser.Name} に戻りました。", 500);
-    MauiApp.Current!.Windows[0].Page = new AppShell();
+    MauiApp.Current!.Windows[0].Page = new AppShell(_appStatus);
   }
   public event PropertyChangedEventHandler? PropertyChanged;
 

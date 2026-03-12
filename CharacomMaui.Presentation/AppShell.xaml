@@ -95,9 +95,11 @@
       ContentTemplate="{DataTemplate pages:HomePage}"
       Route="HomePage"/>
   </FlyoutItem>
-  <FlyoutItem Title="ログ情報（管理者のみ）"
+  <FlyoutItem x:Name="AdminLogMenu"
+              Title="ログ情報（管理者のみ）"
               Icon="{AppThemeBinding Light=log_icon_light.png, Dark=log_icon_dark.png}">
     <ShellContent
+      Title="ログ一覧"
       ContentTemplate="{DataTemplate pages:LogListPage}"
       Route="LogListPage"/>
   </FlyoutItem>
