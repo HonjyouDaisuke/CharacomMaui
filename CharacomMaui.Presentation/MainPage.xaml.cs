@@ -93,7 +93,7 @@ public partial class MainPage : ContentPage
         LogEditor.Text += "ユーザー情報保存に失敗\n";
         return;
       }
-      await _logger.UserAction(appUser.Id, this.GetType().Name, "ログイン", "ユーザーを作成しました。", new { appUser.Name });
+      await _logger.UserAction(appUser.Id, this.GetType().Name, "ログイン", "ユーザーを作成しました。", new { appUser.Id, appUser.RoleId });
 
       LogEditor.Text += "ユーザー情報を保存しました...\n";
       var tokens = await _tokenStorage.GetTokensAsync();
@@ -101,7 +101,7 @@ public partial class MainPage : ContentPage
       LogEditor.Text += $"app AccessToken = {accessToken}\n";
       // ユーザー権限一覧を取得
       await _userRolesUseCase.ExecuteAsync(accessToken!);
-      await _logger.SystemInfo(appUser.Id, this.GetType().Name, "ログイン", "ユーザー情報詳細を取得しました。", new { appUser.Name });
+      await _logger.SystemInfo(appUser.Id, this.GetType().Name, "ログイン", "ユーザー情報詳細を取得しました。", new { appUser.Id, appUser.RoleId });
 
       var userInfo = await _userUseCase.GetUserInfoAsync(accessToken);
       _statusUseCase.SetUserInfo(userInfo);

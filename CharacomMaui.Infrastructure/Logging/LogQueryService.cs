@@ -49,9 +49,10 @@ public class LogQueryService : ILogQueryService
     var content = new StringContent(json, Encoding.UTF8, "application/json");
     try
     {
-      var res = await _http.PostAsync(ApiEndpoints.GetLogs, content);
+      using var res = await _http.PostAsync(ApiEndpoints.GetLogs, content);
       var responseBody = await res.Content.ReadAsStringAsync();
-      var response = JsonDocument.Parse(responseBody).RootElement;
+      using var document = JsonDocument.Parse(responseBody);
+      var response = document.RootElement;
 
       var success = response.GetProperty("success").GetBoolean();
       if (!success)

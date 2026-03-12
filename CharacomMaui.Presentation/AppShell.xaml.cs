@@ -11,22 +11,10 @@ public partial class AppShell : Shell
     InitializeComponent();
 
     _appStatus = appStatus;
-    UpdateMenuVisibility();
+    AdminLogMenu.IsVisible = IsAdmin;
     Routing.RegisterRoute(nameof(ProjectDetailPage), typeof(ProjectDetailPage));
   }
-
-  private void UpdateMenuVisibility()
-  {
-    var roleId = _appStatus.UserRole;
-
-    if (roleId == "admin")
-    {
-      AdminLogMenu.IsVisible = true;
-    }
-    else
-    {
-      AdminLogMenu.IsVisible = false;
-    }
-  }
+  public bool IsAdmin => string.Equals(_appStatus.UserRole, "admin",
+          StringComparison.OrdinalIgnoreCase);
 }
 

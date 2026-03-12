@@ -95,9 +95,9 @@ public partial class LoadingPage : ContentPage
     if (isValid)
     {
       if (user != null) _statusUseCase.SetUserInfo(user);
+      await _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
       MainThread.BeginInvokeOnMainThread(() =>
       {
-        _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
         MauiApp.Current!.Windows[0].Page = new AppShell(_appStatus);
       });
     }

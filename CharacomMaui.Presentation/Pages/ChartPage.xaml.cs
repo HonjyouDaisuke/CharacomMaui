@@ -17,27 +17,5 @@ public partial class ChartPage : ContentPage
     BindingContext = userState;
     System.Diagnostics.Debug.WriteLine($"名前 {_statusUseCase.GetAppStatus().ToString()}");
   }
-  protected override async void OnAppearing()
-  {
-    base.OnAppearing();
-    try
-    {
-      var res = await _appLog.GetLogsAsync(DateTime.Today);
 
-      foreach (LogDto log in res.Logs)
-      {
-        System.Diagnostics.Debug.WriteLine($" Id = {log.Id}");
-        System.Diagnostics.Debug.WriteLine($" UserId = {log.UserId}");
-        System.Diagnostics.Debug.WriteLine($" Level = {log.Level}");
-        System.Diagnostics.Debug.WriteLine($" Screen = {log.Screen}");
-        System.Diagnostics.Debug.WriteLine($" Action = {log.Action}");
-        System.Diagnostics.Debug.WriteLine($" Message = {log.Message}");
-        System.Diagnostics.Debug.WriteLine($" CreatedAt = {log.CreatedAt}");
-      }
-    }
-    catch (Exception ex)
-    {
-      System.Diagnostics.Debug.WriteLine($"ログ取得失敗: {ex}");
-    }
-  }
 }

@@ -115,11 +115,13 @@ public class LogListViewModel : INotifyPropertyChanged
 
     ShowLogDetailRequested?.Invoke(SelectedLog);
   }
-  private void ClearFilter()
+  private async void ClearFilter()
   {
     SelectedLevel = "All";
-    SelectedDate = DateTime.Today;
-    ApplyFilter();
+    _selectedDate = DateTime.Today;
+    OnPropertyChanged(nameof(SelectedDate));
+    page = 1;
+    await ReloadLogsAsync();
   }
   private void UpdatePagingState()
   {
@@ -167,9 +169,20 @@ public class LogListViewModel : INotifyPropertyChanged
         IsLoading = false;   // ローディング終了
       });
     }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"ログ取得エラー: {ex.Message}");
+      MainThread.BeginInvokeOnMainThread(() =>
+      {
+        _allLogs = new List<LogDto>();
+        Logs.Clear();
+        totalPages = 1;
+        UpdatePagingState();
+        IsLoading = false;
+      });
+    }
     finally
     {
-      // 念のため
       System.Diagnostics.Debug.WriteLine($"page = {page} / {totalPages} prev={CanGoPrev} next={CanGoNext}");
     }
   }
