@@ -194,9 +194,11 @@ public class LogListViewModel : INotifyPropertyChanged
 
   private void ApplyFilter()
   {
-    // データがロードされていない時は何もしない
-    if (_allLogs == null || !_allLogs.Any()) return;
-
+    if (_allLogs == null || !_allLogs.Any())
+    {
+      MainThread.BeginInvokeOnMainThread(() => Logs.Clear());
+      return;
+    }
     IEnumerable<LogDto> query = _allLogs;
 
     // Levelフィルタ
