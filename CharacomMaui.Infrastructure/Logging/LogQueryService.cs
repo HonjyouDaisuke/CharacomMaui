@@ -10,6 +10,7 @@ using CharacomMaui.Application.Logging;
 using CharacomMaui.Application.Interfaces;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Infrastructure.Api;
+using System.Globalization;
 
 public class LogQueryService : ILogQueryService
 {
@@ -37,7 +38,7 @@ public class LogQueryService : ILogQueryService
     var accessToken = tokens?.AccessToken;
     if (accessToken == null)
       return new LogQueryResult();
-    string dateString = targetDate.ToString("yyyy/MM/dd");
+    string dateString = targetDate.ToString("yyyy'/'MM'/'dd", CultureInfo.InvariantCulture);
     var json = JsonSerializer.Serialize(new
     {
       token = accessToken,

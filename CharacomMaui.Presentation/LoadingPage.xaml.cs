@@ -40,7 +40,14 @@ public partial class LoadingPage : ContentPage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    await _logger.UserAction("", this.GetType().Name, "システムスタート", "Characom Imager Pro Maui Start--------");
+    try
+    {
+      await _logger.UserAction("", this.GetType().Name, "システムスタート", "Characom Imager Pro Maui Start--------");
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine(ex.Message);
+    }
     var tokens = await _tokenStorage.GetTokensAsync();
     var accessToken = tokens?.AccessToken;
     var tokenService = ServiceHelper.GetService<ITokenValidationService>();
@@ -63,7 +70,14 @@ public partial class LoadingPage : ContentPage
         isValid = result.Success;
         if (isProxy)
         {
-          await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "前回代理ログインで終了したので、ログインページに戻ります。");
+          try
+          {
+            await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "前回代理ログインで終了したので、ログインページに戻ります。");
+          }
+          catch (Exception ex)
+          {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+          }
           await _tokenStorage.ClearTokensAsync();
           isValid = false;
         }
@@ -72,14 +86,28 @@ public partial class LoadingPage : ContentPage
       {
         isValid = false;
         await SnackBarService.Error("AccessTokenが有効ではありません。");
-        await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンの有効期限が切れていますので、ログインページに戻ります。");
+        try
+        {
+          await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンの有効期限が切れていますので、ログインページに戻ります。");
+        }
+        catch (Exception ex)
+        {
+          System.Diagnostics.Debug.WriteLine(ex.Message);
+        }
         MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _appStatus, _logger, _userRolesUseCase);
         return;
       }
     }
     if (!isValid)
     {
-      await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンが有効ではありません。ログインページに戻ります。");
+      try
+      {
+        await _logger.SystemWarning("", this.GetType().Name, "自動ログイン", "アクセストークンが有効ではありません。ログインページに戻ります。");
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine(ex.Message);
+      }
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _appStatus, _logger, _userRolesUseCase);
       return;
     }
@@ -95,7 +123,15 @@ public partial class LoadingPage : ContentPage
     if (isValid)
     {
       if (user != null) _statusUseCase.SetUserInfo(user);
-      await _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
+      try
+      {
+        await _logger.UserAction(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログイン 成功");
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine(ex.Message);
+      }
+
       MainThread.BeginInvokeOnMainThread(() =>
       {
         MauiApp.Current!.Windows[0].Page = new AppShell(_appStatus);
@@ -103,7 +139,14 @@ public partial class LoadingPage : ContentPage
     }
     else
     {
-      await _logger.SystemWarning(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
+      try
+      {
+        await _logger.SystemWarning(user?.Id ?? string.Empty, this.GetType().Name, "自動ログイン", "自動ログインできなかったので、ログインページに戻ります。");
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine(ex.Message);
+      }
       MauiApp.Current!.Windows[0].Page = new MainPage(_userUseCase, _statusUseCase, _tokenStorage, _appStatus, _logger, _userRolesUseCase);
     }
   }
