@@ -2,6 +2,7 @@
 <ContentPage
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   x:Class="CharacomMaui.Presentation.BasePage"
+  xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:panel="clr-namespace:CharacomMaui.Presentation.Panels">
 
@@ -25,6 +26,11 @@
           IsVisible="False"
           HorizontalOptions="End"
           WidthRequest="300"/>
+        <!-- ★ SnackBar追加 -->
+        <components:SnackBarView
+          Grid.Row="0"
+          VerticalOptions="End"
+          HorizontalOptions="Fill"/>
 
       </Grid>
 

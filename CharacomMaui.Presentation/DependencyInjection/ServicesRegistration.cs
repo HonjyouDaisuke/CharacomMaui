@@ -72,7 +72,7 @@ public static class ServicesRegistration
     services.AddSingleton<CreateAppUserViewModel>();
     services.AddSingleton<CreateProjectViewModel>();
     services.AddSingleton<BoxFolderViewModel>();
-    services.AddSingleton<ProjectDetailViewModel>();
+    services.AddTransient<ProjectDetailViewModel>();
     services.AddSingleton<BoxItemViewModel>();
     services.AddSingleton<BoxImageItemViewModel>();
     services.AddSingleton<TitleBarViewModel>();
@@ -90,7 +90,7 @@ public static class ServicesRegistration
 
     // PageのDI
     services.AddSingleton<MainPage>();
-    services.AddSingleton<ProjectDetailPage>();
+    services.AddTransient<ProjectDetailPage>();
     services.AddSingleton<UserListPage>();
     services.AddSingleton<LogListPage>();
 

@@ -4,11 +4,17 @@
                x:Class="CharacomMaui.Presentation.Pages.CharaSelectPage"
                xmlns:components="clr-namespace:CharacomMaui.Presentation.Components"
                xmlns:viewmodels="clr-namespace:CharacomMaui.Presentation.ViewModels"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:pages="clr-namespace:CharacomMaui.Presentation.Pages"
                xmlns:page="clr-namespace:CharacomMaui.Presentation"
                xmlns:uranium="clr-namespace:UraniumUI.Controls;assembly=UraniumUI"
                xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
                Title="CharaSelectPage">
+  <page:BasePage.Resources>
+    <ResourceDictionary>
+      <toolkit:InvertedBoolConverter x:Key="InverseBoolConverter"/>
+    </ResourceDictionary>
+  </page:BasePage.Resources>
   <Shell.TitleView>
     <components:TitleBarView/>
   </Shell.TitleView>

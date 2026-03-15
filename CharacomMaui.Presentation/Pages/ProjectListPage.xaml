@@ -35,6 +35,10 @@
         x:Name="StrokeBtn"
         Text="筆順画像生成"
         Clicked="OnStrokeBtnClicked"/>
+      <Button
+        x:Name="SnackBtn"
+        Text="スナック・バー表示"
+        Clicked="OnSnackBarBtnClicked"/>
       <ScrollView
         x:Name="ProjectsScrollView"
         Orientation="Vertical"

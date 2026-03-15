@@ -38,7 +38,16 @@ public partial class ProjectDetailPage : BasePage
                             INotificationService notificationService,
                             INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
-    InitializeComponent();
+    try
+    {
+      System.Console.WriteLine("☆Detail Page Constructor Start");
+      InitializeComponent();
+      BindingContext = viewModel;
+    }
+    catch (Exception ex)
+    {
+      System.Console.WriteLine($"☆Constructor Error: {ex}");
+    }
     _appStatus = appStatus;
     _useCase = useCase;
     _tokenStorage = tokenStorage;

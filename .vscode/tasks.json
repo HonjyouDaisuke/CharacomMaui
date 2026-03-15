@@ -7,7 +7,7 @@
       "command": "sh",
       "args": [
         "-c",
-        "dotnet build ${workspaceFolder}/CharacomMaui.Presentation/CharacomMaui.Presentation.csproj -t:Build -f net9.0-maccatalyst && sleep 2"
+        "dotnet build ${workspaceFolder}/CharacomMaui.Presentation/CharacomMaui.Presentation.csproj -c Debug -t:Build -f net9.0-maccatalyst && sleep 2"
       ],
       "problemMatcher": "$msCompile"
     },

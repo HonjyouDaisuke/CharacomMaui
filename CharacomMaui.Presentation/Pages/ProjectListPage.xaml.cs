@@ -11,6 +11,7 @@ using CharacomMaui.Presentation.Interfaces;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
+using System.Data.Common;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -49,12 +50,26 @@ public partial class ProjectListPage : BasePage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
+    Console.WriteLine("☆projectList^^^^^^^^^^^");
     var projects = await _viewModel.GetProjectsAsync();
+
     if (projects == null) return;
-    BindableLayout.SetItemsSource(ProjectsFlex, projects);
+    Console.WriteLine($"☆projectList count = {projects.Count} ^^^^^^^^^^^");
+    try
+    {
+
+      BindableLayout.SetItemsSource(ProjectsFlex, projects);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"☆Error☆ ^^^^^^^^^^^");
+
+      Console.WriteLine(ex.Message);
+    }
+    Console.WriteLine($"☆projectList count = {projects.Count} ^^^^^^^^^^^");
     foreach (var project in projects)
     {
-      System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
+      System.Console.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
 
   }
@@ -270,6 +285,13 @@ public partial class ProjectListPage : BasePage
 
     }
   }
+
+  private async void OnSnackBarBtnClicked(object sender, EventArgs e)
+  {
+    Console.WriteLine("スナックバー押しました");
+    await DisplayAlert("Test", "Success", "OK");
+    await SnackBarService.Info("ボタンを押しました。");
+  }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
   {
     if (sender is ProjectInfoCard clickedCard)
@@ -310,9 +332,17 @@ public partial class ProjectListPage : BasePage
       LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
-
-    await Shell.Current.GoToAsync(
-        $"///ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
-    );
+    System.Console.WriteLine($"dobleclick ==> {e.ProjectId}");
+    try
+    {
+      // 登録されているなら "//" または スラッシュなし で遷移するはずです
+      await Shell.Current.GoToAsync($"//{nameof(ProjectDetailPage)}?ProjectId={e.ProjectId}");
+      //await Shell.Current.GoToAsync($"//ProjectDetailPage?ProjectId={e.ProjectId}");
+    }
+    catch (Exception ex)
+    {
+      // ここでキャッチされる場合は、ルート名が間違っているか、遷移先ページでエラーが出ています
+      System.Diagnostics.Debug.WriteLine($"Navigation Error: {ex.Message}");
+    }
   }
 }

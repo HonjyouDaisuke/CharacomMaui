@@ -21,7 +21,6 @@ public class SerilogAppLogger : IAppLogger
     else
       Log.Information("{Message} {@Data}", message, data);
   }
-
   public void Debug(string message, object? data = null)
   {
     if (data is null)
@@ -29,6 +28,7 @@ public class SerilogAppLogger : IAppLogger
     else
       Log.Debug("{Message} {@Data}", message, data);
   }
+
   public void Warning(string message, object? data = null)
   {
     if (data is null)
@@ -52,6 +52,7 @@ public class SerilogAppLogger : IAppLogger
       string message,
       object? data = null)
   {
+    Console.WriteLine($"[UserAction] Screen:{screen}, Action:{action}, Msg:{message}, Data:{data ?? "null"}");
     Log.Information("UserAction {@UserAction}", new
     {
       UserId = userId,
@@ -125,6 +126,7 @@ public class SerilogAppLogger : IAppLogger
       string message,
       object? data = null)
   {
+    Console.WriteLine($"[SystemInfo] Screen:{screen}, Action:{action}, Msg:{message}, Data:{data ?? "null"}");
     Log.Information("SystemInfo {@SystemMessage}", new
     {
       UserId = userId,
