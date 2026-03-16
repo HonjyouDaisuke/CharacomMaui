@@ -76,25 +76,6 @@ public partial class ProjectListPage : BasePage
       System.Diagnostics.Debug.WriteLine($"OnAppearing Error: {ex}");
       await SnackBarService.Error("プロジェクト一覧の取得に失敗しました。");
     }
-    // var projects = await _viewModel.GetProjectsAsync();
-
-    // if (projects == null) return;
-    // try
-    // {
-    //   BindableLayout.SetItemsSource(ProjectsFlex, projects);
-    // }
-    // catch (Exception ex)
-    // {
-    //   Console.WriteLine(ex.Message);
-    //   await SnackBarService.Error("プロジェクト一覧の表示に失敗しました。");
-    //   return;
-    // }
-
-    // foreach (var project in projects)
-    // {
-    //   System.Console.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
-    // }
-
   }
   protected override void OnDisappearing()
   {
@@ -226,6 +207,11 @@ public partial class ProjectListPage : BasePage
       LogEditor.Text += $"招待します.{e.ProjectName}\n";
       var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
       var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
+      if (users == null || roles == null)
+      {
+        await SnackBarService.Error("ユーザー一覧または権限一覧の取得に失敗しました。");
+        return;
+      }
       var dialog = new InviteUserDialog("ユーザーの招待", _dialogService, users, roles);
       await this.ShowPopupAsync(dialog);
       if (dialog.IsCanceled)

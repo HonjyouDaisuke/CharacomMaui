@@ -22,7 +22,7 @@ public partial class CreateProjectViewModel : ObservableObject
   private BoxItem _selectedFolder = new();
 
   public AppStatus _appStatus = new();
-  IAppLogger _logger;
+  private readonly IAppLogger _logger;
 
   public BoxItem SelectedFolder
   {
@@ -171,7 +171,7 @@ public partial class CreateProjectViewModel : ObservableObject
     {
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
-      if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました"); ;
+      if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました");
 
       var res = await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
       if (res.Success)
