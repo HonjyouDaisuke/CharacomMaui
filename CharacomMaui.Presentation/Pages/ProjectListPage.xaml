@@ -55,7 +55,7 @@
             <DataTemplate>
               <components:ProjectInfoCard
                 EditRequested="OnEditRequested"
-                InviteRequested="OnInviteRequested"
+                InviteRequested="OnInviteRequestedAsync"
                 DeleteRequested="OnDeleteRequested"
                 ProjectFolderId="{Binding FolderId}"
                 CharaFolderId="{Binding CharaFolderId}"

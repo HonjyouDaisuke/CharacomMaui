@@ -5,6 +5,7 @@ using CharacomMaui.Application.UseCases;
 using CharacomMaui.Domain.Entities;
 using CharacomMaui.Application.Interfaces;
 using CommunityToolkit.Maui.Converters;
+using Box.Sdk.Gen.Schemas;
 
 namespace CharacomMaui.Presentation.ViewModels;
 
@@ -15,11 +16,14 @@ public partial class CreateProjectViewModel : ObservableObject
   private readonly GetUserProjectsUseCase _getUserProjectsUseCase;
   private readonly UpdateStrokeMasterUseCase _updateStrokeMasterUseCase;
   private readonly UpdateStandardMasterUseCase _updateStandardMasterUseCase;
+  private readonly InviteToProjectUseCase _inviteToProjectUseCase;
   private readonly DeleteProjectUseCase _deleteProjectUseCase;
   private readonly IAppTokenStorageService _tokenStorage;
   private BoxItem _selectedFolder = new();
 
   public AppStatus _appStatus = new();
+  IAppLogger _logger;
+
   public BoxItem SelectedFolder
   {
     get => _selectedFolder;
@@ -42,6 +46,8 @@ public partial class CreateProjectViewModel : ObservableObject
                                 UpdateStrokeMasterUseCase updateStrokeMasterUseCase,
                                 UpdateStandardMasterUseCase updateStandardMasterUseCase,
                                 DeleteProjectUseCase deleteProjectUseCase,
+                                IAppLogger logger,
+                                InviteToProjectUseCase inviteToProjectUseCase,
                                 IAppTokenStorageService tokenStorage)
   {
     _getFolderItemsUsecase = getBoxFolderItemsUseCase;
@@ -50,6 +56,8 @@ public partial class CreateProjectViewModel : ObservableObject
     _updateStrokeMasterUseCase = updateStrokeMasterUseCase;
     _updateStandardMasterUseCase = updateStandardMasterUseCase;
     _deleteProjectUseCase = deleteProjectUseCase;
+    _inviteToProjectUseCase = inviteToProjectUseCase;
+    _logger = logger;
     _tokenStorage = tokenStorage;
   }
 
@@ -149,6 +157,39 @@ public partial class CreateProjectViewModel : ObservableObject
         Message = "AccessTokenの取得に失敗しました。"
       };
     return await _deleteProjectUseCase.ExecuteAsync(accessToken, projectId);
+  }
+  public async Task<string> GetAccessTokenAsync()
+  {
+    var tokens = await _tokenStorage.GetTokensAsync();
+    var accessToken = tokens?.AccessToken;
+    if (accessToken == null) return string.Empty;
+    return accessToken;
+  }
+  public async Task<SimpleApiResult> InviteToProjectAsync(string projectId, string toUserId, string toRoleId)
+  {
+    try
+    {
+      var tokens = await _tokenStorage.GetTokensAsync();
+      var accessToken = tokens?.AccessToken;
+      if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました"); ;
+
+      var res = await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
+      if (res.Success)
+      {
+        await _logger.SystemInfo(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトに招待しました。", new { projectId, toUserId, toRoleId });
+        return res;
+      }
+      else
+      {
+        await _logger.SystemWarning(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトへの招待に失敗しました。", new { projectId, toUserId, toRoleId });
+        return res;
+      }
+    }
+    catch (Exception ex)
+    {
+      await _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", new { projectId, toUserId, toRoleId });
+      return new SimpleApiResult(false, "想定外のエラーが発生しました");
+    }
   }
 }
 
