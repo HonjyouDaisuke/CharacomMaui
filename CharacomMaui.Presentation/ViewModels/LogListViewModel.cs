@@ -18,7 +18,7 @@ public class LogListViewModel : INotifyPropertyChanged
   public ObservableCollection<LogDto> Logs { get; } = new();
 
   // 元データ
-  private List<LogDto> _allLogs = new();
+  private List<LogDto> _allLogs = [];
 
   public LogListViewModel(ILogQueryService logQueryService)
   {

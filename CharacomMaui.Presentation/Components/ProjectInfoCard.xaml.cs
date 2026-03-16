@@ -20,7 +20,6 @@ public partial class ProjectInfoCard : ContentView
   public ProjectInfoCard()
   {
     InitializeComponent();
-    System.Diagnostics.Debug.WriteLine($"ProjectFolderId={ProjectFolderId}, CharaFolderId={CharaFolderId}");
   }
 
   public static readonly BindableProperty ProjectIdProperty =

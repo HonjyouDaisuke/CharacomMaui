@@ -40,7 +40,15 @@ public partial class CharaSelectPage : BasePage
     INotificationService notificationService,
     INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
-    InitializeComponent();
+    try
+    {
+      InitializeComponent();
+    }
+    catch (Exception ex)
+    {
+      System.Console.WriteLine($"☆Constructor Error: {ex}");
+      throw;
+    }
     _appStatus = appStatus;
     _viewModel = viewModel;
     _notifier = notifier;

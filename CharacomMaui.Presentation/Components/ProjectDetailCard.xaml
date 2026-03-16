@@ -10,11 +10,15 @@
     Margin="8"
     Padding="16"
     StrokeShape="RoundRectangle 12"
-    Shadow="5"
     BackgroundColor="{AppThemeBinding Light={DynamicResource Surface}, Dark={DynamicResource SurfaceDark}}"
     Stroke="{AppThemeBinding Light={DynamicResource OnSurface}, Dark={DynamicResource OnSurfaceDark}}"
     StrokeThickness="1">
-
+    <Border.Shadow>
+      <Shadow Brush="Black"
+              Offset="2,2"
+              Radius="5"
+              Opacity="0.3"/>
+    </Border.Shadow>
     <Grid
       ColumnDefinitions="Auto,*,Auto,Auto"
       RowDefinitions="Auto,Auto,Auto,Auto"

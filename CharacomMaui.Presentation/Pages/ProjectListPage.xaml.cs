@@ -11,6 +11,7 @@ using CharacomMaui.Presentation.Interfaces;
 using CommunityToolkit.Maui.Extensions;
 using UraniumUI.Dialogs;
 using UraniumUI.Dialogs.Mopups;
+using System.Data.Common;
 
 namespace CharacomMaui.Presentation.Pages;
 
@@ -50,11 +51,22 @@ public partial class ProjectListPage : BasePage
   {
     base.OnAppearing();
     var projects = await _viewModel.GetProjectsAsync();
+
     if (projects == null) return;
-    BindableLayout.SetItemsSource(ProjectsFlex, projects);
+    try
+    {
+      BindableLayout.SetItemsSource(ProjectsFlex, projects);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.Message);
+      await SnackBarService.Error("プロジェクト一覧の表示に失敗しました。");
+      return;
+    }
+
     foreach (var project in projects)
     {
-      System.Diagnostics.Debug.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
+      System.Console.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
     }
 
   }
@@ -270,6 +282,13 @@ public partial class ProjectListPage : BasePage
 
     }
   }
+
+  private async void OnSnackBarBtnClicked(object sender, EventArgs e)
+  {
+    Console.WriteLine("スナックバー押しました");
+    await DisplayAlert("Test", "Success", "OK");
+    await SnackBarService.Info("ボタンを押しました。");
+  }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
   {
     if (sender is ProjectInfoCard clickedCard)
@@ -311,8 +330,21 @@ public partial class ProjectListPage : BasePage
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
 
-    await Shell.Current.GoToAsync(
-        $"///ProjectDetailPage?ProjectId={_selectedCard!.ProjectId}"
-    );
+    try
+    {
+      if (string.IsNullOrWhiteSpace(e.ProjectId))
+      {
+        await SnackBarService.Error("ProjectId が不正のため画面遷移できません。");
+        return;
+      }
+      var projectId = Uri.EscapeDataString(e.ProjectId);
+      await Shell.Current.GoToAsync($"//{nameof(ProjectDetailPage)}?ProjectId={projectId}");
+    }
+    catch (Exception ex)
+    {
+      // ここでキャッチされる場合は、ルート名が間違っているか、遷移先ページでエラーが出ています
+      Console.WriteLine($"Navigation Error: {ex.Message}");
+      await SnackBarService.Error("画面遷移に失敗しました。");
+    }
   }
 }
