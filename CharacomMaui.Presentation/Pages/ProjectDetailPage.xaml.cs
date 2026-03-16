@@ -40,7 +40,6 @@ public partial class ProjectDetailPage : BasePage
   {
     try
     {
-      System.Console.WriteLine("☆Detail Page Constructor Start");
       InitializeComponent();
       BindingContext = viewModel;
     }

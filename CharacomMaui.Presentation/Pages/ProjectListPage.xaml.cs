@@ -332,17 +332,22 @@ public partial class ProjectListPage : BasePage
       LogEditor.Text += $"Status [{_selectedCard.ProjectName} id={_selectedCard.ProjectId}]が選択されました\n";
       LogEditor.Text += $"Project [{_selectedCard.ProjectName}]が選択されました\n";
     }
-    System.Console.WriteLine($"dobleclick ==> {e.ProjectId}");
+
     try
     {
-      // 登録されているなら "//" または スラッシュなし で遷移するはずです
-      await Shell.Current.GoToAsync($"//{nameof(ProjectDetailPage)}?ProjectId={e.ProjectId}");
-      //await Shell.Current.GoToAsync($"//ProjectDetailPage?ProjectId={e.ProjectId}");
+      if (string.IsNullOrWhiteSpace(e.ProjectId))
+      {
+        await SnackBarService.Error("ProjectId が不正のため画面遷移できません。");
+        return;
+      }
+      var projectId = Uri.EscapeDataString(e.ProjectId);
+      await Shell.Current.GoToAsync($"//{nameof(ProjectDetailPage)}?ProjectId={projectId}");
     }
     catch (Exception ex)
     {
       // ここでキャッチされる場合は、ルート名が間違っているか、遷移先ページでエラーが出ています
-      System.Diagnostics.Debug.WriteLine($"Navigation Error: {ex.Message}");
+      Console.WriteLine($"Navigation Error: {ex.Message}");
+      await SnackBarService.Error("画面遷移に失敗しました。");
     }
   }
 }

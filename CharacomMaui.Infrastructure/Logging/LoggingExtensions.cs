@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using CharacomMaui.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
 
 namespace CharacomMaui.Infrastructure.Logging;
 
@@ -20,7 +22,12 @@ public static class LoggingExtensions
       )
         //.WriteTo.Debug()
         .CreateLogger();
-    Serilog.Debugging.SelfLog.Enable(msg => System.Console.WriteLine($"SERILOG-ERROR: {msg}"));
+    //Serilog.Debugging.SelfLog.Enable(msg => System.Console.WriteLine($"SERILOG-ERROR: {msg}"));
+    if (Environment.GetEnvironmentVariable("SERILOG_SELFLOG") == "1")
+    {
+      Serilog.Debugging.SelfLog.Enable(
+          TextWriter.Synchronized(Console.Error));
+    }
     // 2. ILogger 経由のログを Serilog に流す設定を DI に追加
     services.AddLogging(logging =>
     {

@@ -42,14 +42,13 @@ public partial class CharaSelectPage : BasePage
   {
     try
     {
-      System.Console.WriteLine("☆CharaSelect Page Constructor Start");
       InitializeComponent();
     }
     catch (Exception ex)
     {
       System.Console.WriteLine($"☆Constructor Error: {ex}");
+      throw;
     }
-    //InitializeComponent();
     _appStatus = appStatus;
     _viewModel = viewModel;
     _notifier = notifier;

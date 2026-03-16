@@ -52,7 +52,7 @@ public class SerilogAppLogger : IAppLogger
       string message,
       object? data = null)
   {
-    Console.WriteLine($"[UserAction] Screen:{screen}, Action:{action}, Msg:{message}, Data:{data ?? "null"}");
+    Console.WriteLine($"[UserAction] Screen:{screen}, Action:{action}, Msg:{message}");
     Log.Information("UserAction {@UserAction}", new
     {
       UserId = userId,
@@ -126,7 +126,7 @@ public class SerilogAppLogger : IAppLogger
       string message,
       object? data = null)
   {
-    Console.WriteLine($"[SystemInfo] Screen:{screen}, Action:{action}, Msg:{message}, Data:{data ?? "null"}");
+    Console.WriteLine($"[SystemInfo] Screen:{screen}, Action:{action}, Msg:{message}");
     Log.Information("SystemInfo {@SystemMessage}", new
     {
       UserId = userId,
