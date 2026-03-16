@@ -47,6 +47,7 @@ public partial class ProjectDetailPage : BasePage
     catch (Exception ex)
     {
       System.Console.WriteLine($"☆Constructor Error: {ex}");
+      throw;
     }
     _appStatus = appStatus;
     _useCase = useCase;
