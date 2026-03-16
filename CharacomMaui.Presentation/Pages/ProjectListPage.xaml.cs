@@ -25,6 +25,8 @@ public partial class ProjectListPage : BasePage
   private readonly AppStatusUseCase _appStatusUseCase;
   private readonly AppStatusNotifier _notifier;
   private readonly ISimpleProgressDialogService _simpleDialog;
+  private readonly IGetUserInfoUseCase _getUserInfoUseCase;
+  private readonly FetchProjectRolesUseCase _projectRolesUseCase;
   public ProjectListPage(IBoxFolderRepository repository,
   IDialogService dialogService,
   CreateProjectViewModel viewModel,
@@ -33,6 +35,8 @@ public partial class ProjectListPage : BasePage
   ISimpleProgressDialogService simpleDialog,
   IAppTokenStorageService tokenStorage,
   INotificationService notificationService,
+  IGetUserInfoUseCase getUserInfoUseCase,
+  FetchProjectRolesUseCase projectRolesUseCase,
   INotificationPanelService panelService) : base(notificationService, panelService, tokenStorage)
   {
     InitializeComponent();
@@ -41,6 +45,8 @@ public partial class ProjectListPage : BasePage
     _appStatusUseCase = appStatusUseCase;
     _viewModel = viewModel;
     _notifier = notifier;
+    _getUserInfoUseCase = getUserInfoUseCase;
+    _projectRolesUseCase = projectRolesUseCase;
     _simpleDialog = simpleDialog;
     _viewModel.SetUserStatus(_appStatusUseCase.GetAppStatus());
     System.Diagnostics.Debug.WriteLine($"status = {_viewModel._appStatus.ToString()}");
@@ -50,25 +56,29 @@ public partial class ProjectListPage : BasePage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    var projects = await _viewModel.GetProjectsAsync();
-
-    if (projects == null) return;
     try
     {
+      var projects = await _viewModel.GetProjectsAsync();
+
+      if (projects == null)
+      {
+        await SnackBarService.Error("プロジェクト一覧の取得に失敗しました。");
+        return;
+      }
+
       BindableLayout.SetItemsSource(ProjectsFlex, projects);
+
+      foreach (var project in projects)
+      {
+        System.Console.WriteLine(
+            $"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
+      }
     }
     catch (Exception ex)
     {
-      Console.WriteLine(ex.Message);
-      await SnackBarService.Error("プロジェクト一覧の表示に失敗しました。");
-      return;
+      System.Diagnostics.Debug.WriteLine($"OnAppearing Error: {ex}");
+      await SnackBarService.Error("プロジェクト一覧の取得に失敗しました。");
     }
-
-    foreach (var project in projects)
-    {
-      System.Console.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");
-    }
-
   }
   protected override void OnDisappearing()
   {
@@ -99,7 +109,14 @@ public partial class ProjectListPage : BasePage
     var dialog = new CreateProjectDialog("プロジェクトの更新", topFolderItems, _dialogService, _viewModel, project);
     await this.ShowPopupAsync(dialog);
 
+
     // ダイアログから返ってきてから。。。
+    if (dialog.IsCanceled)
+    {
+      LogEditor.Text += "キャンセルされました";
+      return;
+    }
+
     if (dialog.SelectedTopFolder == null)
     {
       LogEditor.Text += "選択されていない";
@@ -178,13 +195,52 @@ public partial class ProjectListPage : BasePage
     }
 
   }
-
-  private void OnInviteRequested(object? sender, ProjectInfoEventArgs e)
+  private async void OnInviteRequestedAsync(object? sender, ProjectInfoEventArgs e)
   {
     LogEditor.Text += $"招待: {e.ProjectName} (ID: {e.ProjectId})\n";
 
-    // 例: 招待ダイアログ
-    // await Navigation.PushAsync(new InvitePage(e.ProjectId));
+    try
+    {
+      var accessToken = await _viewModel.GetAccessTokenAsync();
+      if (accessToken == string.Empty)
+      {
+        await SnackBarService.Error("アクセストークンが取得できませんでした。再ログインしてください。");
+        return;
+      }
+      LogEditor.Text += $"招待します.{e.ProjectName}\n";
+      var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
+      var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
+      if (users == null || users.Count == 0 || roles == null)
+      {
+        await SnackBarService.Error("ユーザー一覧または権限一覧の取得に失敗しました。");
+        return;
+      }
+      var dialog = new InviteUserDialog("ユーザーの招待", _dialogService, users, roles);
+      await this.ShowPopupAsync(dialog);
+      if (dialog.IsCanceled)
+      {
+        LogEditor.Text += "キャンセルされました\n";
+        return;
+      }
+
+      var result = await _viewModel.InviteToProjectAsync(e.ProjectId, dialog.SelectedUserId, dialog.SelectedProjectRoleId);
+      if (result.Success)
+      {
+        LogEditor.Text += $"招待に成功しました。{dialog.SelectedUserId}, {dialog.SelectedProjectRoleId}\n";
+        await SnackBarService.Success("ユーザーをプロジェクトに招待しました。");
+      }
+      else
+      {
+        LogEditor.Text += $"招待に失敗しました: {result.Message}\n";
+        await SnackBarService.Error("ユーザーの招待に失敗しました。");
+      }
+    }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"Invite error: {ex.Message}");
+      await SnackBarService.Error("ユーザーの招待中にエラーが発生しました。");
+    }
+
   }
 
   private async void OnCreateProjectBtn(object? sender, EventArgs e)
@@ -286,7 +342,6 @@ public partial class ProjectListPage : BasePage
   private async void OnSnackBarBtnClicked(object sender, EventArgs e)
   {
     Console.WriteLine("スナックバー押しました");
-    await DisplayAlert("Test", "Success", "OK");
     await SnackBarService.Info("ボタンを押しました。");
   }
   private void OnCardClicked(object sender, ProjectInfoEventArgs e)
