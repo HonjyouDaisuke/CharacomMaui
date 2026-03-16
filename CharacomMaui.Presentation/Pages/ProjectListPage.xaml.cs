@@ -61,7 +61,10 @@ public partial class ProjectListPage : BasePage
       var projects = await _viewModel.GetProjectsAsync();
 
       if (projects == null)
+      {
+        await SnackBarService.Error("プロジェクト一覧の取得に失敗しました。");
         return;
+      }
 
       BindableLayout.SetItemsSource(ProjectsFlex, projects);
 
@@ -207,7 +210,7 @@ public partial class ProjectListPage : BasePage
       LogEditor.Text += $"招待します.{e.ProjectName}\n";
       var users = await _getUserInfoUseCase.GetUserListAsync(accessToken);
       var roles = await _projectRolesUseCase.ExecuteAsync(accessToken);
-      if (users == null || roles == null)
+      if (users == null || users.Count == 0 || roles == null)
       {
         await SnackBarService.Error("ユーザー一覧または権限一覧の取得に失敗しました。");
         return;

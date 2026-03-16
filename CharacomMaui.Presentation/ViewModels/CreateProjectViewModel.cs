@@ -169,6 +169,12 @@ public partial class CreateProjectViewModel : ObservableObject
   {
     try
     {
+      if (string.IsNullOrWhiteSpace(projectId) ||
+        string.IsNullOrWhiteSpace(toUserId) ||
+        string.IsNullOrWhiteSpace(toRoleId))
+      {
+        return new SimpleApiResult(false, "招待パラメータが不正です");
+      }
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
       if (accessToken == null) return new SimpleApiResult(false, "accessTokenエラーが発生しました");
