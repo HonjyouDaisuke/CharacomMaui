@@ -153,7 +153,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       var tokens = await _tokenStorage.GetTokensAsync();
       var accessToken = tokens?.AccessToken;
       if (accessToken == null) return;
-      _logger.UserAction(_appStatus.UserId, this.GetType().Name, "プロジェクト詳細を取得", "プロジェクト詳細取得を実行します。", new { projectId = projectId, projectName = ProjectName });
+      await _logger.UserAction(_appStatus.UserId, this.GetType().Name, "プロジェクト詳細を取得", "プロジェクト詳細取得を実行します。", new { projectId = projectId, projectName = ProjectName });
       var projectDetails = await _getProjectDetailsUseCase.ExecuteAsync(accessToken, projectId);
       if (projectDetails == null) return;
 
@@ -169,7 +169,7 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
     }
     catch (Exception ex)
     {
-      _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクト詳細取得", new { projectId });
+      await _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクト詳細取得", new { projectId });
       await SnackBarService.Error("プロジェクト詳細の読み込みに失敗しました。");
     }
   }
@@ -185,18 +185,18 @@ public class ProjectDetailViewModel : INotifyPropertyChanged
       var res = await _inviteToProjectUseCase.ExecuteAsync(accessToken, projectId, toUserId, toRoleId);
       if (res.Success)
       {
-        _logger.SystemInfo(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトに招待しました。", new { projectId, toUserId, toRoleId });
+        await _logger.SystemInfo(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトに招待しました。", new { projectId, toUserId, toRoleId });
         return res;
       }
       else
       {
-        _logger.SystemWarning(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトへの招待に失敗しました。", new { projectId, toUserId, toRoleId });
+        await _logger.SystemWarning(_appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", "プロジェクトへの招待に失敗しました。", new { projectId, toUserId, toRoleId });
         return res;
       }
     }
     catch (Exception ex)
     {
-      _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", new { projectId, toUserId, toRoleId });
+      await _logger.SystemError(ex, _appStatus.UserId, this.GetType().Name, "プロジェクトへ招待", new { projectId, toUserId, toRoleId });
       return new SimpleApiResult(false, "想定外のエラーが発生しました");
     }
   }

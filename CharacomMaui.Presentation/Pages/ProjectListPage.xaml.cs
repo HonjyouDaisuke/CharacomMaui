@@ -50,23 +50,20 @@ public partial class ProjectListPage : BasePage
   protected override async void OnAppearing()
   {
     base.OnAppearing();
-    Console.WriteLine("☆projectList^^^^^^^^^^^");
     var projects = await _viewModel.GetProjectsAsync();
 
     if (projects == null) return;
-    Console.WriteLine($"☆projectList count = {projects.Count} ^^^^^^^^^^^");
     try
     {
-
       BindableLayout.SetItemsSource(ProjectsFlex, projects);
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"☆Error☆ ^^^^^^^^^^^");
-
       Console.WriteLine(ex.Message);
+      await SnackBarService.Error("プロジェクト一覧の表示に失敗しました。");
+      return;
     }
-    Console.WriteLine($"☆projectList count = {projects.Count} ^^^^^^^^^^^");
+
     foreach (var project in projects)
     {
       System.Console.WriteLine($"Project: {project.Name} (ID: {project.Id}) FolderId: {project.FolderId} CharaFolderId: {project.CharaFolderId}");

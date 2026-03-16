@@ -14,12 +14,16 @@ public static class LoggingExtensions
   {
     // 1. Serilog 自体の設定
     Log.Logger = new LoggerConfiguration()
+#if DEBUG
         .MinimumLevel.Debug()
+#else
+        .MinimumLevel.Information()
+#endif
         .WriteTo.Console(
           // 💡 Theme を None にすることで、色変えエラーを回避します
           theme: Serilog.Sinks.SystemConsole.Themes.ConsoleTheme.None,
           outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-      )
+        )
         //.WriteTo.Debug()
         .CreateLogger();
     //Serilog.Debugging.SelfLog.Enable(msg => System.Console.WriteLine($"SERILOG-ERROR: {msg}"));
